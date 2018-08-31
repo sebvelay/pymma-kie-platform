@@ -228,4 +228,31 @@
         </dependencies>
     </dependencyManagement>
 
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>pymma-snapshot</id>
+            <url>https://nexus.pymma-software.com/nexus/content/repositories/pymma-snapshot</url>
+        </snapshotRepository>
+        <repository>
+            <id>pymma-release</id>
+            <url>https://nexus.pymma-software.com/nexus/content/repositories/pymma-release</url>
+        </repository>
+    </distributionManagement>
+    <developers>
+        <developer>
+            <id>nheron</id>
+            <name>Nicolas Héron</name>
+            <email>nicolas.heron@pymma-software.com</email>
+        </developer>
+
+    </developers>
+
+    <scm>
+        <connection>scm:git:git@gitlab.pymma-software.com:drools-platform/pymma-jbpm-platform-parent.git</connection>
+        <url>scm:git:git@gitlab.pymma-software.com:drools-platform/pymma-jbpm-platform-parent.git</url>
+        <developerConnection>scm:git:git@gitlab.pymma-software.com:drools-platform/pymma-jbpm-platform-parent.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
 </project>
