@@ -17,6 +17,7 @@
         <module>kie-server</module>
 
         <module>kie-wb</module>
+        <module>drools-framework-examples</module>
     </modules>
     <packaging>pom</packaging>
 
