@@ -30,7 +30,9 @@ public class GenericRestAPIImpl implements UsedRestAPI {
 
 
         try {
-            response = mapper.readValue(responseJson, objectRequest.getClass()   );
+            if (responseJson != null) {
+                response = mapper.readValue(responseJson, objectRequest.getClass());
+            }
         } catch (IOException e) {
             logger.error("GenericRestAPIImpl.runSession.readValue", e);
         }

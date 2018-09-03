@@ -34,12 +34,14 @@ public class QuoteController {
     @Resource
     private UsedRestAPI serviceCalculate;
 
-    @RequestMapping(value = "/calculate/{containerId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/calculate/{containerId:.+}/{className:.+}", method = RequestMethod.PUT)
     public Quote storeTicket(@PathVariable("containerId") String containerid,
+                             @PathVariable("className") String className,
                              @RequestBody Quote quoteRequest) {
         Quote response = null;
         try {
-            response = (Quote) serviceCalculate.runSession(containerid, "swimmingpool.P000", Quote.class.getCanonicalName(), quoteRequest);
+            //  response = (Quote) serviceCalculate.runSession(containerid, "swimmingpool.P000", Quote.class.getCanonicalName(), quoteRequest);
+            response = (Quote) serviceCalculate.runSession(containerid, "swimmingpool.P000", className, quoteRequest);
         } catch (Exception e) {
             e.printStackTrace();
         }
