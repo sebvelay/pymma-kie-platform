@@ -23,6 +23,8 @@
 
     <properties>
         <jbpm.version>7.10.0.Final</jbpm.version>
+        <spring.boot.version>1.5.9.Release</spring.boot.version>
+        <spring.version>4.3.3.Release</spring.version>
     </properties>
 
     <build>
@@ -227,6 +229,54 @@
                 <groupId>javax.ws.rs</groupId>
                 <artifactId>javax.ws.rs-api</artifactId>
                 <version>2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot</artifactId>
+                <version>${spring.boot.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>commons-logging</artifactId>
+                        <groupId>commons-logging</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-autoconfigure</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.kie.server</groupId>
+                <artifactId>kie-server-api</artifactId>
+                <version>${jbpm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.kie.server</groupId>
+                <artifactId>kie-server-services-common</artifactId>
+                <version>${jbpm.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>aopalliance</groupId>
+                        <artifactId>aopalliance</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.jboss.spec.javax.ws.rs</groupId>
+                        <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.kie</groupId>
+                <artifactId>kie-server-spring-boot-autoconfiguration</artifactId>
+                <version>${jbpm.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

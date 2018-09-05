@@ -9,6 +9,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="kie-server (1) (org.kie.server)" />
+    <orderEntry type="library" name="Maven: org.kie.server:kie-server:war:ee7:7.10.0.Final" level="project" />
   </component>
 </module>

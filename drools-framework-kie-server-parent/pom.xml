@@ -15,6 +15,8 @@
         <module>drools-framework-kie-server-rest-drools</module>
         <module>drools-framework-kie-server-client-connector</module>
         <module>drools-framework-kie-server-extension-interface</module>
+        <module>drools-framework-kie-server-spring-boot-autoconfiguration-drools</module>
+        <module>drools-framework-kie-server-spring-boot</module>
     </modules>
 
 </project>
