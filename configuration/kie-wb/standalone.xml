@@ -518,9 +518,9 @@
                     <authentication>
                         <login-module code="UsersRoles" flag="required">
                             <module-option name="usersProperties"
-                                           value="${jboss.server.config.dir}/drools-users.properties"/>
+                                           value="${jboss.server.config.dir}/application-users.properties"/>
                             <module-option name="rolesProperties"
-                                           value="${jboss.server.config.dir}/drools-roles.properties"/>
+                                           value="${jboss.server.config.dir}/application-roles.properties"/>
                         </login-module>
                     </authentication>
                 </security-domain>
