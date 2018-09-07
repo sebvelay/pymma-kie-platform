@@ -1,4 +1,4 @@
-package org.chtijbug.example.swimmingpool;
+package org.training.leisure.swimmingpool;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

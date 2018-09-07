@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.chtijbug.example.swimmingpool;
+package org.training.leisure.swimmingpool;
 
 public enum Gender {
     male, female

@@ -17,8 +17,8 @@ package org.chtijbug.swimmingpool.web;
 
 
 import org.chtijbug.drools.generic.restclient.rest.UsedRestAPI;
-import org.chtijbug.example.swimmingpool.Quote;
 import org.springframework.web.bind.annotation.*;
+import org.training.leisure.swimmingpool.Quote;
 
 import javax.annotation.Resource;
 
