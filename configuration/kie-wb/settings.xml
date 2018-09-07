@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<settings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+    <localRepository>/Users/nheron/m2_kiewb</localRepository>
+    <servers>
+        <server>
+            <id>dev-tomcat-dpf1</id>
+            <username>tomcat</username>
+            <password>tomcat</password>
+        </server>
+
+        <server>
+            <id>nheron-release</id>
+            <username>nheron</username>
+            <password>blqndinejavacamille</password>
+        </server>
+
+        <server>
+            <id>chtijbug-release</id>
+            <username>chtijbug-dev</username>
+            <password>chtijbug-dev</password>
+        </server>
+        <server>
+            <id>chtijbug-snapshot</id>
+            <username>chtijbug-dev</username>
+            <password>chtijbug-dev</password>
+        </server>
+        <server>
+            <id>pymma-release</id>
+            <username>pymma-dev</username>
+            <password>VlcBe38jE9eNIu5H</password>
+        </server>
+        <server>
+            <id>pymma-snapshot</id>
+            <username>pymma-dev</username>
+            <password>VlcBe38jE9eNIu5H</password>
+        </server>
+
+        <server>
+            <id>pymma-release2</id>
+            <username>pymma-user</username>
+            <password>c9dk4Hjd</password>
+        </server>
+        <server>
+            <id>pymma-snapshot3</id>
+            <username>pymma-user</username>
+            <password>c9dk4Hjd</password>
+        </server>
+
+
+        <server>
+            <id>amag-release</id>
+            <username>amag-user</username>
+            <password>c9dk4Hjd</password>
+        </server>
+        <server>
+            <id>amag-snapshot</id>
+            <username>amag-user</username>
+            <password>c9dk4Hjd</password>
+        </server>
+        <server>
+            <id>drools-snapshot</id>
+            <username>drools-user</username>
+            <password>c9dk4Hjd</password>
+        </server>
+        <server>
+            <id>sonatype-nexus-snapshots</id>
+            <username>yxEbjet+</username>
+            <password>49W6WY9RpIcx2mR7lbNBdov2/t/a6Es5hwtct+5ngoXd</password>
+        </server>
+        <server>
+            <id>sonatype-nexus-staging</id>
+            <username>yxEbjet+</username>
+            <password>49W6WY9RpIcx2mR7lbNBdov2/t/a6Es5hwtct+5ngoXd</password>
+        </server>
+
+    </servers>
+
+
+    <mirrors>
+    </mirrors>
+
+    <profiles>
+
+
+        <profile>
+            <id>pymma-declasin</id>
+
+
+            <repositories>
+                <repository>
+                    <id>maven-central</id>
+                    <name>Maven Central</name>
+                    <url>http://central.maven.org/maven2/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>projectodd-snapshots</id>
+                    <name>Project:odd Snapshots from CI</name>
+                    <url>https://repository-projectodd.forge.cloudbees.com/snapshot</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+
+
+                <repository>
+                    <id>origin-repository.jboss.org</id>
+                    <name>origin-repository.jboss.org</name>
+                    <url>https://origin-repository.jboss.org/nexus/content/repositories/snapshots</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>chtijbug-release</id>
+                    <name>chtijbug repo release</name>
+                    <url>http://nexus.pymma-software.com/nexus/content/repositories/chtijbug-release/</url>
+                </repository>
+                <repository>
+                    <id>chtijbug-snapshot</id>
+                    <name>chtijbug repo release</name>
+                    <url>http://nexus.pymma-software.com/nexus/content/repositories/chtijbug-snapshot/</url>
+                </repository>
+                <repository>
+                    <id>jboss-origin-repository-group</id>
+                    <name>JBoss.org Public Repository Group</name>
+                    <url>https://origin-repository.jboss.org/nexus/content/groups/ea/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>jboss-developer-repository-group</id>
+                    <name>JBoss.org Developer Repository Group</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/developer/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>jboss-public-repository-group</id>
+                    <name>JBoss Public Repository Group</name>
+                    <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>origin-repository.jboss.org</id>
+                    <name>JBoss Public Repository Group (canonical)</name>
+                    <url>https://origin-repository.jboss.org/nexus/content/repositories/snapshots/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>jskywayperspectives</id>
+                    <name>skywayperspectives</name>
+                    <url>http://downloads.skywayperspectives.org/maven-repo/</url>
+
+                </repository>
+                <repository>
+                    <id>sonatype-plus-releases</id>
+                    <name>sonatype-plus</name>
+                    <url>http://oss.sonatype.org/content/repositories/releases/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>interval:20</updatePolicy>
+                    </releases>
+                </repository>
+                <repository>
+                    <id>sonatype-plus-snapshots</id>
+                    <name>sonatype-plus</name>
+                    <url>http://oss.sonatype.org/content/repositories/snapshots/</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>interval:20</updatePolicy>
+                    </snapshots>
+                </repository>
+
+                <repository>
+                    <id>chtijbug-release</id>
+                    <name>chtijbug repo release</name>
+                    <url>https://nexus.pymma-software.com/nexus/content/repositories/chtijbug-release/</url>
+                </repository>
+                <repository>
+                    <id>chtijbug-snapshot</id>
+                    <name>chtijbug repo release</name>
+                    <url>https://nexus.pymma-software.com/nexus//nexus/content/repositories/chtijbug-snapshot/</url>
+                </repository>
+
+                <repository>
+                    <id>maven-central</id>
+                    <name>Maven Central</name>
+                    <url>http://central.maven.org/maven2/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>origin-repository.jboss.org</id>
+                    <name>origin-repository.jboss.org</name>
+                    <url>https://origin-repository.jboss.org/nexus/content/repositories/snapshots</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </repository>
+
+            </repositories>
+
+
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>kie-staging-repository-group</id>
+                    <name>KIE Staging Repositories</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/kie-group</url>
+                    <layout>default</layout>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>jboss-public-repository-group</id>
+                    <name>JBoss Public Maven Repository Group</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+                    <layout>default</layout>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+            <properties>
+                <gpg.executable>gpg</gpg.executable>
+                <gpg.passphrase>blqndine</gpg.passphrase>
+            </properties>
+        </profile>
+
+
+        <profile>
+            <id>pymma-developpeur</id>
+
+
+            <repositories>
+
+
+                <repository>
+                    <id>jboss-developer-repository-group</id>
+                    <name>JBoss.org Developer Repository Group</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/developer/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>jboss-public-repository-group</id>
+                    <name>JBoss Public Repository Group</name>
+                    <url>http://repository.jboss.org/nexus/content/groups/public/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>jskywayperspectives</id>
+                    <name>skywayperspectives</name>
+                    <url>http://downloads.skywayperspectives.org/maven-repo/</url>
+
+                </repository>
+
+            </repositories>
+
+
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>kie-staging-repository-group</id>
+                    <name>KIE Staging Repositories</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/kie-group</url>
+                    <layout>default</layout>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </pluginRepository>
+                <pluginRepository>
+                    <id>jboss-public-repository-group</id>
+                    <name>JBoss Public Maven Repository Group</name>
+                    <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+                    <layout>default</layout>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>never</updatePolicy>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+            <properties>
+                <gpg.executable>gpg</gpg.executable>
+                <gpg.passphrase>blqndine</gpg.passphrase>
+            </properties>
+        </profile>
+
+
+        <profile>
+            <id>oss-developpeur</id>
+
+
+            <properties>
+                <gpg.executable>gpg</gpg.executable>
+                <gpg.passphrase>blqndine</gpg.passphrase>
+            </properties>
+
+
+            <repositories>
+                <repository>
+                    <id>sonatype-plus-releases</id>
+                    <name>sonatype-plus</name>
+                    <url>http://oss.sonatype.org/content/repositories/releases/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>interval:20</updatePolicy>
+                    </releases>
+                </repository>
+                <repository>
+                    <id>sonatype-plus-snapshots</id>
+                    <name>sonatype-plus</name>
+                    <url>http://oss.sonatype.org/content/repositories/snapshots/</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>interval:20</updatePolicy>
+                    </snapshots>
+                </repository>
+            </repositories>
+        </profile>
+
+    </profiles>
+    <activeProfiles>
+
+
+        <activeProfile>pymma-declasin</activeProfile>
+    </activeProfiles>
+
+</settings>
