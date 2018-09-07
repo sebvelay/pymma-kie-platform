@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 public class Price {
     private BigDecimal amount;
     private String description;
-    private PriceType priceType;
+    private String priceType;
 
     public Price() {
     }
@@ -42,11 +42,11 @@ public class Price {
         this.description = description;
     }
 
-    public PriceType getPriceType() {
+    public String getPriceType() {
         return priceType;
     }
 
-    public void setPriceType(PriceType priceType) {
+    public void setPriceType(String priceType) {
         this.priceType = priceType;
     }
 

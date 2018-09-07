@@ -20,7 +20,7 @@ import java.util.Date;
 
 public class Period extends BaseElement {
     private Date desidedStartDate;
-    private SeasonType seasonType;
+    private String seasonType;
 
     public Period() {
     }
@@ -33,11 +33,11 @@ public class Period extends BaseElement {
         this.desidedStartDate = desidedStartDate;
     }
 
-    public SeasonType getSeasonType() {
+    public String getSeasonType() {
         return seasonType;
     }
 
-    public void setSeasonType(SeasonType seasonType) {
+    public void setSeasonType(String seasonType) {
         this.seasonType = seasonType;
     }
 

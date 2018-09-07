@@ -23,7 +23,7 @@ import java.util.List;
 public class Person extends BaseElement {
     private String name;
     private String surname;
-    private Gender gender;
+    private String gender;
     private Date birthdate;
     private List<Price> priceList = new ArrayList<>();
     private double age;
@@ -49,11 +49,11 @@ public class Person extends BaseElement {
         this.surname = surname;
     }
 
-    public Gender getGender() {
+    public String getGender() {
         return gender;
     }
 
-    public void setGender(Gender gender) {
+    public void setGender(String gender) {
         this.gender = gender;
     }
 
