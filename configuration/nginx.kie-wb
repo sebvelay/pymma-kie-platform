@@ -1,40 +1,48 @@
-server {
-
-listen 443;
-server_name kie-wb.pymma-software.com;
-
-location / {
-        gzip off;
-    proxy_read_timeout      86400;
-    proxy_connect_timeout   86400;
-proxy_max_temp_file_size 86400;
-proxy_http_version 1.1;
-proxy_pass http://192.168.1.184:8080;
-    proxy_set_header    Host                    $host;
-    proxy_set_header    X-Real-IP               $remote_addr;
-    proxy_set_header    X-Forwarded-For         $proxy_add_x_forwarded_for;
-    proxy_set_header    Upgrade                 $http_upgrade;
-    proxy_set_header    Connection              "upgrade";
-    proxy_set_header    X-Forwarded-Proto       $scheme;
-proxy_redirect http://192.168.1.184:8080 https://kie-wb.pymma-software.com;
+# Add servers for load balancing
+upstream drools {
+  server 192.168.1.184:8080;
 }
 
-    ssl_certificate /etc/letsencrypt/live/kie-wb.pymma-software.com/fullchain.pem; # managed by Certbot
+# redirect all to https
+server {
+  listen         80;
+  server_name    kie-wb.pymma-software.com;
+  return         301 https://$server_name$request_uri;
+}
+
+server {
+  # Set log files.
+  error_log  /var/log/nginx/kie-wb.pymma-software.com_error.log;
+  access_log  /var/log/nginx/kie-wb.pymma-software.com_access.log;
+
+  # listen at 443 port, on any ip address.
+  listen    443;
+
+  # Server name
+  server_name kie-wb.pymma-software.com;
+
+  # disable any limits to avoid HTTP 413 for large image uploads
+  client_max_body_size 0;
+  
+  # required to avoid HTTP 411: see Issue #1486 (https://github.com/docker/docker/issues/1486)
+  chunked_transfer_encoding on;
+
+  # SSL settings
+  ssl on;
+   ssl_certificate /etc/letsencrypt/live/kie-wb.pymma-software.com/fullchain.pem; # managed by Certbot
     ssl_certificate_key /etc/letsencrypt/live/kie-wb.pymma-software.com/privkey.pem; # managed by Certbot
-}
 
-https://developer.jboss.org/thread/267320
+  
+  location / {
+    proxy_pass http://drools/;
 
-server {
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    roxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection “upgrade”;
 
-listen 443;
-server_name kie-test-client.pymma-software.com;
-
-location / {
-proxy_http_version 1.1;
-proxy_pass http://192.168.1.184:10080;
-proxy_read_timeout 90;
-proxy_redirect http://192.168.1.184:10080 https://kie-test-client.pymma-software.com;
-}
-
+  }
 }
