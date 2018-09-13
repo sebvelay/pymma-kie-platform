@@ -15,6 +15,8 @@
  */
 package org.training.leisure.swimmingpool;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.math.BigDecimal;
 
 
@@ -22,7 +24,8 @@ public class Price {
     private BigDecimal amount;
     private String description;
     private String priceType;
-
+    @JsonIgnore
+    private Person person;
     public Price() {
     }
 
@@ -48,6 +51,14 @@ public class Price {
 
     public void setPriceType(String priceType) {
         this.priceType = priceType;
+    }
+
+    public Person getPerson() {
+        return person;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
     @Override

@@ -15,6 +15,8 @@
  */
 package org.training.leisure.swimmingpool;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.math.BigDecimal;
 
 /**
@@ -30,7 +32,8 @@ public class CalculatedAttribute {
     private String stringValue;
     private BigDecimal bigDecimalValue;
     private Integer integerValue;
-
+    @JsonIgnore
+    private BaseElement father;
     public CalculatedAttribute() {
     }
 
@@ -81,6 +84,14 @@ public class CalculatedAttribute {
 
     public void setIntegerValue(Integer integerValue) {
         this.integerValue = integerValue;
+    }
+
+    public BaseElement getFather() {
+        return father;
+    }
+
+    public void setFather(BaseElement father) {
+        this.father = father;
     }
 
     @Override

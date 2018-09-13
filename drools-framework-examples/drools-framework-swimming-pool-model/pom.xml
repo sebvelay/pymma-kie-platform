@@ -9,6 +9,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>drools-framework-swimming-pool-model</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>
