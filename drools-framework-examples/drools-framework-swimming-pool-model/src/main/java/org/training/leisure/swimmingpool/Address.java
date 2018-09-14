@@ -21,7 +21,7 @@ package org.training.leisure.swimmingpool;
  * Time: 10:09
  * To change this template use File | Settings | File Templates.
  */
-public class Address extends BaseElement {
+public class Address  {
     private String streetNumber;
     private String streetName;
     private String zipCode;

@@ -25,9 +25,9 @@
     <orderEntry type="library" scope="TEST" name="Maven: commons-io:commons-io:2.1" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.4.0" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.4.0" level="project" />
-    <orderEntry type="library" name="Maven: org.kie:kie-internal:7.10.0.Final" level="project" />
-    <orderEntry type="library" name="Maven: org.kie:kie-api:7.10.0.Final" level="project" />
-    <orderEntry type="library" name="Maven: org.kie.soup:kie-soup-maven-support:7.10.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: org.kie:kie-internal:7.11.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: org.kie:kie-api:7.11.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: org.kie.soup:kie-soup-maven-support:7.11.0.Final" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.2" level="project" />
   </component>
 </module>
