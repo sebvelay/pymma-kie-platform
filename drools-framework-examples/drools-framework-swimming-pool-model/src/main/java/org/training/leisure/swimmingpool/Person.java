@@ -20,7 +20,7 @@ import java.util.List;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-public class Person extends BaseElement {
+public class Person {
     private String name;
     private String surname;
     private String gender;
@@ -28,6 +28,7 @@ public class Person extends BaseElement {
     private List<Price> priceList = new ArrayList<>();
     private double age;
     private BigDecimal standardPrice;
+    private List<CalculatedAttribute> calculatedAttributeList = new ArrayList<>();
 
 
     public Person() {
@@ -93,6 +94,13 @@ public class Person extends BaseElement {
         this.standardPrice = standardPrice;
     }
 
+    public List<CalculatedAttribute> getCalculatedAttributeList() {
+        return calculatedAttributeList;
+    }
+
+    public void setCalculatedAttributeList(List<CalculatedAttribute> calculatedAttributeList) {
+        this.calculatedAttributeList = calculatedAttributeList;
+    }
 
     @Override
     public String toString() {

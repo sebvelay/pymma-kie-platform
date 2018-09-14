@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 @XmlRootElement
-public class Quote extends BaseElement {
+public class Quote {
     private Date quoteDate;
     private Date validUntil;
     private Period period;

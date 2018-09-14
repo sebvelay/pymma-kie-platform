@@ -26,6 +26,9 @@ public class Price {
     private String priceType;
     @JsonIgnore
     private Person person;
+    @JsonIgnore
+    private Quote quote;
+
     public Price() {
     }
 
@@ -59,6 +62,14 @@ public class Price {
 
     public void setPerson(Person person) {
         this.person = person;
+    }
+
+    public Quote getQuote() {
+        return quote;
+    }
+
+    public void setQuote(Quote quote) {
+        this.quote = quote;
     }
 
     @Override

@@ -18,7 +18,7 @@ package org.training.leisure.swimmingpool;
 import java.util.Date;
 
 
-public class Period extends BaseElement {
+public class Period {
     private Date desidedStartDate;
     private String seasonType;
 

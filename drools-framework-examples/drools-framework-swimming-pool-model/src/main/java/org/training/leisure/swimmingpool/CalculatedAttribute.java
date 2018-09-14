@@ -33,7 +33,7 @@ public class CalculatedAttribute {
     private BigDecimal bigDecimalValue;
     private Integer integerValue;
     @JsonIgnore
-    private BaseElement father;
+    private Person father;
     public CalculatedAttribute() {
     }
 
@@ -86,11 +86,11 @@ public class CalculatedAttribute {
         this.integerValue = integerValue;
     }
 
-    public BaseElement getFather() {
+    public Person getFather() {
         return father;
     }
 
-    public void setFather(BaseElement father) {
+    public void setFather(Person father) {
         this.father = father;
     }
 
