@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -183,10 +184,24 @@ public class GenericResource {
                         kieServerLoggingDefinition.OnFireAllrulesEnd(kci.getKieContainer().getReleaseId().getGroupId(), kci.getKieContainer().getReleaseId().getArtifactId(), kci.getKieContainer().getReleaseId().getVersion(), chtijbutObjectResponse.getObjectRequest(), chtijbutObjectResponse.getSessionLogging());
                     }
                 }
+                String jsonInString = null;
+                String filetrace = System.getProperty("org.chtijbug.server.tracelog");
+                if ("true".equals(filetrace)) {
+                    try {
+                        Method traceMethod = foundClass.getMethod("logTrace", String.class);
+                        if (traceMethod != null) {
+                            jsonInString = mapper.writeValueAsString(chtijbutObjectResponse.getSessionLogging());
+                        }
+                        traceMethod.invoke(input, jsonInString);
+                    } catch (Exception e) {
 
+                    }
+                }
                 String fileTemp = System.getProperty("org.chtijbug.server.tracedir");
                 if (fileTemp != null) {
-                    String jsonInString = mapper.writeValueAsString(chtijbutObjectResponse.getSessionLogging());
+                    if (jsonInString == null) {
+                        jsonInString = mapper.writeValueAsString(chtijbutObjectResponse.getSessionLogging());
+                    }
                     File traceFile = new File(fileTemp + "/" + UUID.randomUUID().toString());
                     FileUtils.writeStringToFile(traceFile, jsonInString);
                 }

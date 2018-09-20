@@ -41,10 +41,11 @@ public class AfterNodeInstanceTriggeredEventStrategy implements AbstractMemoryEv
                 processExecution.getRuleflowGroups().add(ruleflowGroup);
 
             }
-            ruleflowGroup.setStartDate(afterNodeInstanceTriggeredHistoryEvent.getDateEvent());
-            ruleflowGroup.setStartEventID(afterNodeInstanceTriggeredHistoryEvent.getEventID());
-            ruleflowGroup.setRuleflowGroupStatus(RuleflowGroupStatus.STARTED);
-
+            if (ruleflowGroup != null) {
+                ruleflowGroup.setStartDate(afterNodeInstanceTriggeredHistoryEvent.getDateEvent());
+                ruleflowGroup.setStartEventID(afterNodeInstanceTriggeredHistoryEvent.getEventID());
+                ruleflowGroup.setRuleflowGroupStatus(RuleflowGroupStatus.STARTED);
+            }
         }
 
     }
