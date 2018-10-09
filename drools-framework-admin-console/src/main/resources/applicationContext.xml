@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/context
+      http://www.springframework.org/schema/context/spring-context-4.1.xsd">
+    <context:component-scan base-package="org.chtijbug.drools.console"/>
+    <bean class="org.chtijbug.drools.console.service.model.kie.KieConfigurationData">
+        <property name="userName" value="${kie-wb.username}"/>
+        <property name="password" value="${kie-wb.password}"/>
+        <property name="kiewbUrl" value="${kie-wb.baseurl}"/>
+        <property name="kieserverUserName" value="${kie-wb.kieserverUserName}"/>
+        <property name="kieserverPassword" value="${kie-wb.kieserverPassword}"/>
+        <property name="kieserverUrl" value="${kie-wb.kieserverUrl}"/>
+
+    </bean>
+    <!--bean class="org.chtijbug.drools.console.service.model.gitlab.GitLabConfigurationData">
+        <property name="url" value="${gitlab.url}"/>
+        <property name="token" value="${gitlab.token}"/>
+        <property name="groupName" value="${gitlab.group}"/>
+        <property name="baseUrl" value="${gitlab.baseurl}"/>
+    </bean>
+    <bean class="org.chtijbug.drools.console.service.model.jenkins.JenkinsConfigurationData">
+        <property name="url" value="${jenkins.url}"/>
+        <property name="username" value="${jenkins.username}"/>
+        <property name="password" value="${jenkins.password}"/>
+        <property name="credentials" value="${jenkins.credentials}"/>
+        <property name="nexusName" value="${jenkins.nexusName}"/>
+        <property name="nexusUrl" value="${jenkins.nexusUrl}"/>
+        <property name="jdkVersion" value="${jenkins.jdkVersion}"/>
+        <property name="groupName" value="${jenkins.group}"/>
+    </bean-->
+    <bean name="applicationContext" class="org.chtijbug.drools.console.service.util.ApplicationContextProvider"/>
+
+</beans>

@@ -222,6 +222,11 @@
                     <id>chtijbug-snapshot</id>
                     <name>chtijbug repo release</name>
                     <url>https://nexus.pymma-software.com/nexus//nexus/content/repositories/chtijbug-snapshot/</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>always</updatePolicy>
+
+                    </snapshots>
                 </repository>
 
                 <repository>

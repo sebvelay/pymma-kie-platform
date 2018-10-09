@@ -46,9 +46,11 @@ public class DroolsChtijbugKieServerExtension implements KieServerExtension {
     private List<Object> services = new ArrayList<Object>();
     private KieServerAddOnElement kieServerAddOnElement = null;
 
+    private boolean initialized = false;
+
     @Override
     public boolean isInitialized() {
-        return true;
+        return initialized;
     }
 
     @Override
@@ -62,6 +64,7 @@ public class DroolsChtijbugKieServerExtension implements KieServerExtension {
         this.rulesExecutionService = new DroolsChtijbugRulesExecutionService(registry, this.kieServerAddOnElement);
         this.registry = registry;
         services.add(rulesExecutionService);
+        initialized = true;
     }
 
     private void initExtensionsList() {
