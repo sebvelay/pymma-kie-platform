@@ -130,6 +130,7 @@ public class DroolsChtijbugKieServerExtension implements KieServerExtension {
         }
 
         kieContainerInstance.addExtraClasses(extraClasses);
+        this.rulesExecutionService.createRuleBasePackage(id, kieContainerInstance);
 
     }
 
@@ -160,6 +161,8 @@ public class DroolsChtijbugKieServerExtension implements KieServerExtension {
                 kieServerLoggingDefinition.OnDisposeKieBase();
             }
         }
+        kieContainerInstance.clearExtraClasses();
+        rulesExecutionService.removeRuleBasePackage(id);
     }
 
     @Override

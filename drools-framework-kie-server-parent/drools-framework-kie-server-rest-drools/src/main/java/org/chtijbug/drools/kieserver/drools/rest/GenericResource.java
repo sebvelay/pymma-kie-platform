@@ -159,6 +159,7 @@ public class GenericResource {
         try {
 
             KieContainerInstance kci = registry.getContainer(id);
+
             Set<Class<?>> classes = kci.getExtraClasses();
             Class foundClass = this.getClassFromName(classes, className);
             if (foundClass != null) {

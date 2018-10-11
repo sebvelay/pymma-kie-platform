@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.chtijbug.kieserver.services.drools;
 
@@ -31,6 +31,9 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Direct rules execution service that allow use of typed objects instead of string only
  */
@@ -38,7 +41,7 @@ public class DroolsChtijbugRulesExecutionService {
     private static final Logger logger = LoggerFactory.getLogger(DroolsChtijbugRulesExecutionService.class);
 
     private KieServerRegistry context;
-    private RuleBasePackage ruleBasePackage = null;
+    private Map<String, RuleBasePackage> ruleBasePackages = new HashMap<>();
     private MessageHandlerResolver messageHandlerResolver;
     private int MaxNumberRulesToExecute = 20000;
     private KieServerAddOnElement kieServerAddOnElement = null;
@@ -67,17 +70,23 @@ public class DroolsChtijbugRulesExecutionService {
         return kieServerAddOnElement;
     }
 
-    public ChtijbugObjectRequest FireAllRulesAndStartProcess(KieContainerInstance kci, ChtijbugObjectRequest chtijbugObjectRequest, String processID, String sessionName, int sessionMaxNumberRulesToExecute) {
+    public void removeRuleBasePackage(String id) {
+        if (this.ruleBasePackages.containsKey(id) == true) {
+            RuleBasePackage ruleBasePackage = this.ruleBasePackages.get(id);
+            ruleBasePackage.dispose();
+            this.ruleBasePackages.remove(id);
+        }
 
-        Object result = null;
-        try {
 
-            if (kci != null
-                    && kci.getKieContainer() != null
-                    && ruleBasePackage == null) {
+    }
+
+    public void createRuleBasePackage(String id, KieContainerInstance kci) {
+        if (kci != null
+                && kci.getKieContainer() != null) {
+            if (this.ruleBasePackages.containsKey(id) == false) {
 
                 KieContainer kieContainer = kci.getKieContainer();
-                ruleBasePackage = new RuleBaseSingleton(kieContainer, sessionMaxNumberRulesToExecute, kieServerAddOnElement);
+                RuleBasePackage ruleBasePackage = new RuleBaseSingleton(kieContainer, this.MaxNumberRulesToExecute, kieServerAddOnElement);
                 if (kieServerAddOnElement != null) {
                     for (KieServerGlobalVariableDefinition kieServerGlobalVariableDefinition : kieServerAddOnElement.getKieServerGlobalVariableDefinitions()) {
                         kieServerGlobalVariableDefinition.OnCreateKieBase(kieServerAddOnElement.getGlobals());
@@ -89,26 +98,39 @@ public class DroolsChtijbugRulesExecutionService {
                         kieServerLoggingDefinition.OnCreateKieBase();
                     }
                 }
+                this.ruleBasePackages.put(id, ruleBasePackage);
 
             }
-            ChtijbugHistoryListener chtijbugHistoryListener = new ChtijbugHistoryListener();
-            RuleBaseSession session = ruleBasePackage.createRuleBaseSession(sessionMaxNumberRulesToExecute, chtijbugHistoryListener, sessionName);
-            if (kieServerAddOnElement != null) {
+        }
+    }
 
-                for (KieServerListenerDefinition kieServerListenerDefinition : kieServerAddOnElement.getKieServerListenerDefinitions()) {
-                    kieServerListenerDefinition.OnCreateKieSession(session.getKnowledgeSession());
-                }
-                for (String globalVariableName : kieServerAddOnElement.getGlobals().keySet()) {
-                    session.setGlobal(globalVariableName, kieServerAddOnElement.getGlobals().get(globalVariableName));
-                }
+    public ChtijbugObjectRequest FireAllRulesAndStartProcess(KieContainerInstance kci, ChtijbugObjectRequest chtijbugObjectRequest, String processID, String sessionName, int sessionMaxNumberRulesToExecute) {
 
+        Object result = null;
+
+        try {
+
+            RuleBasePackage ruleBasePackage = this.ruleBasePackages.get(kci.getResource().getContainerId());
+            if (ruleBasePackage != null) {
+                ChtijbugHistoryListener chtijbugHistoryListener = new ChtijbugHistoryListener();
+                RuleBaseSession session = ruleBasePackage.createRuleBaseSession(sessionMaxNumberRulesToExecute, chtijbugHistoryListener, sessionName);
+                if (kieServerAddOnElement != null) {
+
+                    for (KieServerListenerDefinition kieServerListenerDefinition : kieServerAddOnElement.getKieServerListenerDefinitions()) {
+                        kieServerListenerDefinition.OnCreateKieSession(session.getKnowledgeSession());
+                    }
+                    for (String globalVariableName : kieServerAddOnElement.getGlobals().keySet()) {
+                        session.setGlobal(globalVariableName, kieServerAddOnElement.getGlobals().get(globalVariableName));
+                    }
+
+                }
+                result = session.fireAllRulesAndStartProcess(chtijbugObjectRequest.getObjectRequest(), processID);
+                SessionContext sessionContext = this.messageHandlerResolver.getSessionFromHistoryEvent(chtijbugHistoryListener.getHistoryEventLinkedList());
+                chtijbugObjectRequest.setSessionLogging(sessionContext);
+                chtijbugObjectRequest.setObjectRequest(result);
+                logger.debug("Returning OK response with content '{}'", chtijbugObjectRequest.getObjectRequest());
+                session.dispose();
             }
-            result = session.fireAllRulesAndStartProcess(chtijbugObjectRequest.getObjectRequest(), processID);
-            SessionContext sessionContext = this.messageHandlerResolver.getSessionFromHistoryEvent(chtijbugHistoryListener.getHistoryEventLinkedList());
-            chtijbugObjectRequest.setSessionLogging(sessionContext);
-            chtijbugObjectRequest.setObjectRequest(result);
-            logger.debug("Returning OK response with content '{}'", chtijbugObjectRequest.getObjectRequest());
-            session.dispose();
             return chtijbugObjectRequest;
 
         } catch (DroolsChtijbugException e) {
