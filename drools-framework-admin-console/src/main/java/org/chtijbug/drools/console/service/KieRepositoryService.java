@@ -2,6 +2,7 @@ package org.chtijbug.drools.console.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
+import org.chtijbug.drools.console.DroolsAdminConsole;
 import org.chtijbug.drools.console.service.model.kie.JobStatus;
 import org.chtijbug.drools.console.service.model.kie.Space;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ public class KieRepositoryService {
         return reponseMoteur;
     }
 
-    public JobStatus buildProject(String url, String username, String password, String space, String project, String command) {
+    public JobStatus buildProject(String url, String username, String password, String space, String project, String command, DroolsAdminConsole workOnGoingView) {
         String completeurl = url + "/spaces/" + space + "/projects/" + project + "/maven/" + command;
         logger.info("url Maven install : " + completeurl);
         ResponseEntity<JobStatus> response = restTemplateKiewb
@@ -70,6 +71,7 @@ public class KieRepositoryService {
         JobStatus reponseMoteur;
 
         reponseMoteur = response.getBody();
+        workOnGoingView.addRow(reponseMoteur.toString());
         return reponseMoteur;
     }
 
@@ -114,7 +116,7 @@ public class KieRepositoryService {
         };
     }
 
-    public String waitForJobToBeEnded(String url, String username, String password, String jobID) {
+    public String waitForJobToBeEnded(String url, String username, String password, String jobID, DroolsAdminConsole workOnGoingView) {
         String isJobDone = "NO";
         while ("NO".equals(isJobDone)) {
             JobStatus jobStatus = this.getStatusJobID(url,
@@ -123,11 +125,11 @@ public class KieRepositoryService {
             if ("DUPLICATE_RESOURCE".equals(jobStatus.getStatus())
                     || "SUCCESS".equals(jobStatus.getStatus())) {
                 isJobDone = "YES";
-                System.out.println("JonId=" + jobID + " finished");
+                workOnGoingView.addRow("JobID=" + jobID + " finished");
             } else if ("ACCEPTED".equals(jobStatus.getStatus())
                     || ("APPROVED".equals(jobStatus.getStatus()))) {
                 try {
-                    System.out.println("JonId=" + jobID + " not yet finished");
+                    workOnGoingView.addRow("JobID=" + jobID + " not yet finished");
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();

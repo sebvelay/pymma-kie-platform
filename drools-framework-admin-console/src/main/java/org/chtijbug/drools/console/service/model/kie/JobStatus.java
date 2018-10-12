@@ -1,5 +1,6 @@
 package org.chtijbug.drools.console.service.model.kie;
 
+import java.util.Arrays;
 import java.util.Date;
 
 public class JobStatus {
@@ -11,6 +12,19 @@ public class JobStatus {
     private Date lastModified;
     private String detailedResult[];
 
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("JobStatus{");
+        sb.append("status='").append(status).append('\'');
+        sb.append(", jobId='").append(jobId).append('\'');
+        sb.append(", spaceName='").append(spaceName).append('\'');
+        sb.append(", projectName='").append(projectName).append('\'');
+        sb.append(", result='").append(result).append('\'');
+        sb.append(", lastModified=").append(lastModified);
+        sb.append(", detailedResult=").append(detailedResult == null ? "null" : Arrays.asList(detailedResult).toString());
+        sb.append('}');
+        return sb.toString();
+    }
 
     public String getStatus() {
         return status;

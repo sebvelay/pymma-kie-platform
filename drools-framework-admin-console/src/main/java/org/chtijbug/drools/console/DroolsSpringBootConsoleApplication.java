@@ -13,6 +13,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @SpringBootApplication
+
 //@ComponentScan({"com.assurfleet.front.courtier.petiteflotte.maj","com.assurfleet.jms.services"})
 @PropertySource("classpath:application.properties")
 @ImportResource("classpath:applicationContext.xml")

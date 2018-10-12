@@ -3,6 +3,7 @@ package org.chtijbug.drools.console.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
+import org.chtijbug.drools.console.DroolsAdminConsole;
 import org.chtijbug.drools.console.service.model.kie.KieContainerInfo;
 import org.chtijbug.drools.console.service.model.kie.KieContainerRequest;
 import org.chtijbug.drools.console.service.model.kie.KieServerJobStatus;
@@ -74,7 +75,7 @@ public class KieServerRepositoryService {
         return results;
     }
 
-    public KieServerJobStatus stopContainer(String url, String username, String password, String containerId) {
+    public KieServerJobStatus stopContainer(String url, String username, String password, String containerId, DroolsAdminConsole workOnGoingView) {
         KieServerJobStatus results = null;
         String completeurl = url + "/containers/" + containerId;
         logger.info("url kie server container : " + completeurl);
@@ -92,10 +93,11 @@ public class KieServerRepositoryService {
                 });
         KieServerJobStatus reponseMoteur;
         reponseMoteur = response.getBody();
+        workOnGoingView.addRow(reponseMoteur.toString());
         return reponseMoteur;
     }
 
-    public KieContainerInfo createContainer(String url, String username, String password, String containerId, KieContainerRequest request) {
+    public KieContainerInfo createContainer(String url, String username, String password, String containerId, KieContainerRequest request, DroolsAdminConsole workOnGoingView) {
         String completeurl = url + "/containers/" + containerId;
         logger.info("url kie server container : " + completeurl);
         ResponseEntity<Map<String, Object>> response = restTemplateKiewb
@@ -117,7 +119,7 @@ public class KieServerRepositoryService {
         Map<String, Object> reponseMoteur;
 
         reponseMoteur = response.getBody();
-
+        workOnGoingView.addRow(reponseMoteur.toString());
         KieContainerInfo result = new KieContainerInfo();
         return result;
     }

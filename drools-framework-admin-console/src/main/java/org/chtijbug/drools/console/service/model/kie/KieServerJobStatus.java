@@ -28,4 +28,14 @@ public class KieServerJobStatus {
     public void setResult(String result) {
         this.result = result;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("KieServerJobStatus{");
+        sb.append("type='").append(type).append('\'');
+        sb.append(", msg='").append(msg).append('\'');
+        sb.append(", result='").append(result).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }
