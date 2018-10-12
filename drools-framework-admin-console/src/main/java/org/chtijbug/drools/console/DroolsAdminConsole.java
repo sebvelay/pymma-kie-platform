@@ -1,9 +1,13 @@
 package org.chtijbug.drools.console;
 
 import com.vaadin.annotations.PreserveOnRefresh;
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
+import com.vaadin.data.Container;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.MultiSelectMode;
 import com.vaadin.spring.annotation.SpringUI;
@@ -20,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 
+@Push
 @Theme("runo")
 @SpringUI
 @PreserveOnRefresh
@@ -28,7 +33,7 @@ public class DroolsAdminConsole extends UI {
 
     final private Button buttonDeployProject = new Button("Deploy project");
     final private List<DisplayData> currentSelected = new ArrayList<>();
-
+    final private Table table = new Table();
     //  @Autowired
     //  private GitLabRepositoryService gitLabRepositoryService;
 
@@ -86,10 +91,24 @@ public class DroolsAdminConsole extends UI {
         });
         layout.addComponent(button);
         layout.addComponent(gitReposTable);
-
-
         layout.addComponent(buttonDeployProject);
         buttonDeployProject.addStyleName(Runo.BUTTON_SMALL);
+
+
+        table.setCaption("Logging");
+        table.setSizeFull();
+        table.setPageLength(0);
+        table.setSelectable(false);
+        table.setColumnCollapsingAllowed(false);
+        table.setColumnReorderingAllowed(false);
+        table.setImmediate(true);
+        table.setNullSelectionAllowed(false);
+        table.setColumnHeaderMode(Table.ColumnHeaderMode.ID);
+        Container container = new IndexedContainer();
+        container.addContainerProperty("Message", String.class, "none");
+        table.setContainerDataSource(container);
+        layout.addComponent(table);
+
 
         gitReposTable.addValueChangeListener(new Property.ValueChangeListener() {
             public void valueChange(Property.ValueChangeEvent event) {
@@ -103,23 +122,28 @@ public class DroolsAdminConsole extends UI {
 
             }
         });
+
+
         buttonDeployProject.addClickListener((Button.ClickListener) event -> {
             if (currentSelected.size() == 1) {
+                table.removeAllItems();
                 DisplayData displayData = currentSelected.get(0);
                 KieConfigurationData config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
                 kieRepositoryService = AppContext.getApplicationContext().getBean(KieRepositoryService.class);
 
-                JobStatus result = kieRepositoryService.buildProject(config.getKiewbUrl(), userNameTextField.getValue(),
-                        userpasswdTextField.getValue(), displayData.getSpaceName(), displayData.getProjectName(), "compile");
 
+                JobStatus result = kieRepositoryService.buildProject(config.getKiewbUrl(), userNameTextField.getValue(),
+                        userpasswdTextField.getValue(), displayData.getSpaceName(), displayData.getProjectName(), "compile", this);
+                kieRepositoryService.waitForJobToBeEnded(config.getKiewbUrl(), userNameTextField.getValue(),
+                        userpasswdTextField.getValue(), result.getJobId(), this);
 
                 result = kieRepositoryService.buildProject(config.getKiewbUrl(), userNameTextField.getValue(),
-                        userpasswdTextField.getValue(), displayData.getSpaceName(), displayData.getProjectName(), "install");
+                        userpasswdTextField.getValue(), displayData.getSpaceName(), displayData.getProjectName(), "install", this);
 
                 kieRepositoryService.waitForJobToBeEnded(config.getKiewbUrl(), userNameTextField.getValue(),
-                        userpasswdTextField.getValue(), result.getJobId());
+                        userpasswdTextField.getValue(), result.getJobId(), this);
                 if (displayData.getContainerId() != null && displayData.getContainerId().length() > 0) {
-                    KieServerJobStatus jobresult = kieServerRepositoryService.stopContainer(config.getKieserverUrl(), config.getKieserverUserName(), config.getKieserverPassword(), displayData.getContainerId());
+                    KieServerJobStatus jobresult = kieServerRepositoryService.stopContainer(config.getKieserverUrl(), config.getKieserverUserName(), config.getKieserverPassword(), displayData.getContainerId(), this);
                     if (jobresult != null
                             && "SUCCESS".equals(jobresult.getType())) {
                     }
@@ -131,7 +155,7 @@ public class DroolsAdminConsole extends UI {
                 newContainer.getReleaseId().setArtifactId(displayData.getProjectName());
                 newContainer.getReleaseId().setGroupId(displayData.getProjectGroupID());
                 newContainer.getReleaseId().setVersion(displayData.getProjectVersion());
-                KieContainerInfo toto = kieServerRepositoryService.createContainer(config.getKieserverUrl(), config.getKieserverUserName(), config.getKieserverPassword(), displayData.getProjectName(), newContainer);
+                KieContainerInfo toto = kieServerRepositoryService.createContainer(config.getKieserverUrl(), config.getKieserverUserName(), config.getKieserverPassword(), displayData.getProjectName(), newContainer, this);
                 System.out.println("coucou");
                 this.refreshList();
             }
@@ -140,6 +164,21 @@ public class DroolsAdminConsole extends UI {
         });
         buttonDeployProject.setEnabled(false);
 
+
+    }
+
+    public void addRow(String textToAdd) {
+        int nbRows = table.getContainerDataSource().getItemIds().size() + 1;
+        Item item = table.getContainerDataSource().addItem(nbRows);
+        if (item != null) {
+            Property<String> nameProperty =
+                    item.getItemProperty("Message");
+
+            nameProperty.setValue(textToAdd);
+            table.setContainerDataSource(table.getContainerDataSource());
+        } else {
+            System.out.println("null");
+        }
 
     }
 
