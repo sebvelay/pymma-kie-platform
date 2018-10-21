@@ -192,6 +192,8 @@ public class DroolsAdminConsole extends UI {
                 userpasswdTextField.getValue());
         for (Space space : listSpaces) {
             for (SpaceProject spaceProject : space.getProjects()) {
+                //    kieServerRepositoryService.getProjectContent(config.getKiewbUrl(), userNameTextField.getValue(),
+                //           userpasswdTextField.getValue(),space.getName(),spaceProject.getName());
                 DisplayData displayData = new DisplayData();
                 displayData.setSpaceName(space.getName());
                 displayData.setSpaceDescription(space.getDescription());
@@ -209,7 +211,8 @@ public class DroolsAdminConsole extends UI {
                     }
                 }
                 for (KieContainerInfo kie : listcontainers) {
-                    if (kie.getGroupId().equals(displayData.getProjectGroupID())
+                    if (kie.getGroupId() != null
+                            && kie.getGroupId().equals(displayData.getProjectGroupID())
                             && kie.getArtifactId().equals(displayData.getProjectName())
                             && kie.getVersion().equals(displayData.getProjectVersion())) {
                         displayData.setKieServerArtifactId(kie.getArtifactId());

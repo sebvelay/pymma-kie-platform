@@ -15,15 +15,14 @@
         <module>drools-framework-runtime-base</module>
         <module>drools-framework-kie-server-parent</module>
         <module>kie-server</module>
-
-        <module>kie-wb</module>
         <module>drools-framework-examples</module>
         <module>drools-framework-admin-console</module>
+        <module>drools-framework-kie-wb-parent</module>
     </modules>
     <packaging>pom</packaging>
 
     <properties>
-        <jbpm.version>7.12.0.Final</jbpm.version>
+        <jbpm.version>7.13.0.Final</jbpm.version>
         <spring.boot.version>1.5.9.Release</spring.boot.version>
         <spring.version>4.3.3.Release</spring.version>
     </properties>

@@ -7,6 +7,7 @@ import org.chtijbug.drools.console.DroolsAdminConsole;
 import org.chtijbug.drools.console.service.model.kie.KieContainerInfo;
 import org.chtijbug.drools.console.service.model.kie.KieContainerRequest;
 import org.chtijbug.drools.console.service.model.kie.KieServerJobStatus;
+import org.chtijbug.drools.console.service.model.kie.SpaceProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +34,31 @@ public class KieServerRepositoryService {
     private RestTemplate restTemplateKiewb = new RestTemplate();
 
     private ObjectMapper mapper = new ObjectMapper();
+
+    ///spaces/{spaceName}/projects/{projectName}
+
+    public void getProjectContent(String url, String username, String password, String space, String project) {
+        String completeurl = url + "/spaces/" + space + "/projects/" + project;
+        logger.info("url project content : " + completeurl);
+        ResponseEntity<SpaceProject> response = restTemplateKiewb
+                .execute(completeurl, HttpMethod.GET, requestCallback(null, username, password), clientHttpResponse -> {
+                    SpaceProject extractedResponse = null;
+                    if (clientHttpResponse.getBody() != null) {
+                        Scanner s = new Scanner(clientHttpResponse.getBody()).useDelimiter("\\A");
+                        String result = s.hasNext() ? s.next() : "";
+
+                        SpaceProject values = mapper.readValue(result, SpaceProject.class);
+                        extractedResponse = values;
+                    }
+                    ResponseEntity<SpaceProject> extractedValue = new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
+                    return extractedValue;
+                });
+        SpaceProject reponseMoteur;
+
+        reponseMoteur = response.getBody();
+        System.out.println(reponseMoteur);
+    }
+
 
     public List<KieContainerInfo> getContainerList(String url, String username, String password) {
         List<KieContainerInfo> results = new ArrayList<>();
@@ -66,9 +92,11 @@ public class KieServerRepositoryService {
             System.out.println("coucou");
             kieContainerInfo.setContainerId((String) container.get("container-id"));
             Map artifact = (Map) container.get("resolved-release-id");
-            kieContainerInfo.setArtifactId((String) artifact.get("artifact-id"));
-            kieContainerInfo.setGroupId((String) artifact.get("group-id"));
-            kieContainerInfo.setVersion((String) artifact.get("version"));
+            if (artifact != null) {
+                kieContainerInfo.setArtifactId((String) artifact.get("artifact-id"));
+                kieContainerInfo.setGroupId((String) artifact.get("group-id"));
+                kieContainerInfo.setVersion((String) artifact.get("version"));
+            }
             kieContainerInfo.setContainerAlias((String) container.get("container-alias"));
             results.add(kieContainerInfo);
         }
