@@ -156,6 +156,7 @@ public class GenericResource {
         } catch (ClassCastException e) {
             logger.info("GenericResource.runSession", e);
         }
+        ChtijbugObjectRequest chtijbugObjectRequest = new ChtijbugObjectRequest();
         try {
 
             KieContainerInstance kci = registry.getContainer(id);
@@ -165,7 +166,7 @@ public class GenericResource {
             if (foundClass != null) {
                 ClassLoader classLoader = foundClass.getClassLoader();
                 Object input = mapper.readValue(objectRequest, classLoader.loadClass(className));
-                ChtijbugObjectRequest chtijbugObjectRequest = new ChtijbugObjectRequest();
+
                 chtijbugObjectRequest.setObjectRequest(input);
                 KieServerAddOnElement kieServerAddOnElement = rulesExecutionService.getKieServerAddOnElement();
                 if (kieServerAddOnElement != null) {
