@@ -14,13 +14,13 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>io.thorntail</groupId>
-    <artifactId>drools-chtijbug-server</artifactId>
+    <artifactId>drools-framework-thorntail-fraction</artifactId>
 
-    <name>Drools Chtijbug standalone Server</name>
-    <description>Drools Server thorntail</description>
+    <name>Drools Server thorntail fraction</name>
+    <description>Drools Server thorntail fraction</description>
 
     <packaging>jar</packaging>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -32,6 +32,25 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.thorntail</groupId>
+                <artifactId>thorntail-fraction-plugin</artifactId>
+                <version>90</version>
+                <executions>
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
     <dependencies>
         <dependency>
@@ -45,11 +64,23 @@
             <version>${version.thorntail}</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>io.thorntail</groupId>
             <artifactId>jaxrs</artifactId>
             <version>${version.thorntail}</version>
         </dependency>
+        <dependency>
+            <groupId>io.thorntail</groupId>
+            <artifactId>jaxrs-cdi</artifactId>
+            <version>${version.thorntail}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.thorntail</groupId>
+            <artifactId>ejb</artifactId>
+            <version>${version.thorntail}</version>
+        </dependency>
+
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
@@ -63,58 +94,17 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- kie drools server dependencies -->
-        <dependency>
-            <groupId>org.kie.server</groupId>
-            <artifactId>kie-server-services-common</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>dom4j</groupId>
-                    <artifactId>dom4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>javax.servlet</groupId>
-                    <artifactId>javax.servlet-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.jboss.spec.javax.security.jacc</groupId>
-                    <artifactId>jboss-jacc-api_1.4_spec</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>jcl-over-slf4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jaxrs-api</artifactId>
-                    <groupId>org.jboss.resteasy</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>resteasy-jaxrs</artifactId>
-                    <groupId>org.jboss.resteasy</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>resteasy-jaxb-provider</artifactId>
-                    <groupId>org.jboss.resteasy</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.kie.server</groupId>
-            <artifactId>kie-server-rest-common</artifactId>
-        </dependency>
 
         <!-- drools kie server dependencies -->
         <dependency>
-            <groupId>org.kie.server</groupId>
-            <artifactId>kie-server-services-drools</artifactId>
+            <groupId>com.pymmasoftware.jbpm</groupId>
+            <artifactId>drools-framework-kie-server-services-drools</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.kie.server</groupId>
-            <artifactId>kie-server-rest-drools</artifactId>
+            <groupId>com.pymmasoftware.jbpm</groupId>
+            <artifactId>drools-framework-kie-server-rest-drools</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

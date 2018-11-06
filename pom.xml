@@ -18,6 +18,7 @@
         <module>drools-framework-examples</module>
         <module>drools-framework-admin-console</module>
         <module>drools-framework-kie-wb-parent</module>
+        <module>drools-framework-thorntail-kie-server-parent</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -25,7 +26,7 @@
         <jbpm.version>7.13.0.Final</jbpm.version>
         <spring.boot.version>1.5.9.Release</spring.boot.version>
         <spring.version>4.3.3.Release</spring.version>
-        <version.thorntail>2.3.0.Final-SNAPSHOT</version.thorntail>
+        <version.thorntail>2.2.1.Final</version.thorntail>
     </properties>
 
     <build>

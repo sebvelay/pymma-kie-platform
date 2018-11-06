@@ -1,4 +1,4 @@
-package org.wildfly.swarm.drools.server.runtime;
+package org.chtijbug.swarm.drools.server.runtime;
 
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;

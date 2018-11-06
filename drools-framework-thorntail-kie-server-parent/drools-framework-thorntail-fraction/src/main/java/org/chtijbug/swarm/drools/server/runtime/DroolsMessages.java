@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-package org.wildfly.swarm.drools.server.runtime;
+package org.chtijbug.swarm.drools.server.runtime;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
