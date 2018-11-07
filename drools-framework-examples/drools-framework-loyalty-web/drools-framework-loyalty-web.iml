@@ -53,8 +53,8 @@
     <orderEntry type="library" name="Maven: javax.transaction:javax.transaction-api:1.2" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-aspects:4.3.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-data-rest:1.4.0.RELEASE" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.3.5" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.3.5" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.8.9" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.8.9" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.3.5" level="project" />
     <orderEntry type="module" module-name="drools-framework-loyalty-model" />
     <orderEntry type="library" name="Maven: joda-time:joda-time:1.6.2" level="project" />

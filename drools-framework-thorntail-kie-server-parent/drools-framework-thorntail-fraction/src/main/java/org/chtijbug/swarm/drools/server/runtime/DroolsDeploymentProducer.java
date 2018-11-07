@@ -36,7 +36,7 @@ public class DroolsDeploymentProducer {
 
         DroolsMessages.MESSAGES.configurationDirectory(configFolder);
 
-        JAXRSArchive deployment = ShrinkWrap.create(JAXRSArchive.class, "drools-server.war");
+        JAXRSArchive deployment = ShrinkWrap.create(JAXRSArchive.class, "kie-server.war");
         deployment.addAllDependencies();
 
         deployment.addAsWebInfResource(new File(configFolder + "/web.xml"), "web.xml");
