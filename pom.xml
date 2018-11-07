@@ -16,9 +16,9 @@
         <module>drools-framework-kie-server-parent</module>
         <module>kie-server</module>
         <module>drools-framework-examples</module>
-        <module>drools-framework-admin-console</module>
         <module>drools-framework-kie-wb-parent</module>
         <module>drools-framework-thorntail-kie-server-parent</module>
+        <module>drools-framework-admin-console-parent</module>
     </modules>
     <packaging>pom</packaging>
 
