@@ -1,9 +1,9 @@
 package org.chtijbug.kie.rest.backend;
 
+
 import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.rest.client.ProjectResponse;
-import org.guvnor.rest.client.Space;
 import org.guvnor.structure.organizationalunit.OrganizationalUnit;
 import org.guvnor.structure.organizationalunit.OrganizationalUnitService;
 import org.guvnor.structure.repositories.PublicURI;
@@ -12,6 +12,7 @@ import org.guvnor.structure.repositories.RepositoryService;
 import org.slf4j.LoggerFactory;
 import org.uberfire.io.IOService;
 import org.uberfire.java.nio.file.DirectoryStream;
+import org.uberfire.spaces.Space;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
 
 @Path("/chtijbug")
 @Named
@@ -57,30 +59,26 @@ public class PackageResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/detailedSpaces")
     // @RolesAllowed({REST_ROLE, REST_PROJECT_ROLE})
-    public Collection<Space> getProjects() {
+    public Collection<ProjectResponse> getProjects() {
         logger.debug("-----getSpaces--- ");
 
-        final List<Space> spaces = new ArrayList<Space>();
+        final List<ProjectResponse> spaces = new ArrayList<>();
         for (OrganizationalUnit ou : organizationalUnitService.getOrganizationalUnits()) {
-            spaces.add(getSpace(ou));
+            spaces.addAll(getSpace(ou));
         }
 
         return spaces;
     }
 
-    private Space getSpace(OrganizationalUnit ou) {
-        final Space space = new Space();
-        space.setName(ou.getName());
-        space.setOwner(ou.getOwner());
-        space.setDefaultGroupId(ou.getDefaultGroupId());
+    private List<ProjectResponse> getSpace(OrganizationalUnit ou) {
+        final Space space = new Space(ou.getName());
 
         final List<ProjectResponse> repoNames = new ArrayList<>();
         for (WorkspaceProject workspaceProject : workspaceProjectService.getAllWorkspaceProjects(ou)) {
             repoNames.add(getProjectResponse(workspaceProject));
         }
 
-        space.setProjects(repoNames);
-        return space;
+        return repoNames;
     }
 
     private ProjectResponse getProjectResponse(WorkspaceProject workspaceProject) {

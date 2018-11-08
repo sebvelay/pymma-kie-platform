@@ -16,6 +16,76 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.jboss.spec.javax.ejb</groupId>
+            <artifactId>jboss-ejb-api_3.2_spec</artifactId>
+            <version>1.0.0.Final</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.spec.javax.ws.rs</groupId>
+            <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
+            <version>1.0.0.Final</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.uberfire</groupId>
+            <artifactId>uberfire-nio2-model</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.uberfire</groupId>
+            <artifactId>uberfire-nio2-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.uberfire</groupId>
+            <artifactId>uberfire-io</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.uberfire</groupId>
+            <artifactId>uberfire-project-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.uberfire</groupId>
+            <artifactId>uberfire-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.uberfire</groupId>
+            <artifactId>uberfire-commons</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.uberfire</groupId>
+            <artifactId>uberfire-rest-client</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.uberfire</groupId>
+            <artifactId>uberfire-structure-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--dependency>
             <groupId>org.uberfire</groupId>
             <artifactId>uberfire-rest-client</artifactId>
         </dependency>
@@ -40,10 +110,7 @@
             <groupId>org.uberfire</groupId>
             <artifactId>uberfire-project-api</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
+
         <dependency>
             <groupId>org.uberfire</groupId>
             <artifactId>uberfire-api</artifactId>
@@ -113,8 +180,7 @@
             <artifactId>uberfire-services-api</artifactId>
         </dependency>
 
-        <!-- The version of commons-io in droolsjbpm-build-bootstrap pom is way too old-->
-        <dependency>
+         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
@@ -148,7 +214,7 @@
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
             <version>1.3.1</version>
-        </dependency>
+        </dependency-->
     </dependencies>
 
 

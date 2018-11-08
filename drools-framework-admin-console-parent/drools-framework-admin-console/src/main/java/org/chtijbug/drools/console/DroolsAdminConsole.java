@@ -19,6 +19,8 @@ import org.chtijbug.drools.console.service.KieServerRepositoryService;
 import org.chtijbug.drools.console.service.model.DisplayData;
 import org.chtijbug.drools.console.service.model.kie.*;
 import org.chtijbug.drools.console.service.util.AppContext;
+import org.guvnor.rest.client.ProjectResponse;
+import org.guvnor.rest.client.PublicURI;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
@@ -133,12 +135,12 @@ public class DroolsAdminConsole extends UI {
 
 
                 JobStatus result = kieRepositoryService.buildProject(config.getKiewbUrl(), userNameTextField.getValue(),
-                        userpasswdTextField.getValue(), displayData.getSpaceName(), displayData.getProjectName(), "compile", this);
+                        userpasswdTextField.getValue(), displayData.getSpaceName(), displayData.getProjectArtifactID(), "compile", this);
                 kieRepositoryService.waitForJobToBeEnded(config.getKiewbUrl(), userNameTextField.getValue(),
                         userpasswdTextField.getValue(), result.getJobId(), this);
 
                 result = kieRepositoryService.buildProject(config.getKiewbUrl(), userNameTextField.getValue(),
-                        userpasswdTextField.getValue(), displayData.getSpaceName(), displayData.getProjectName(), "install", this);
+                        userpasswdTextField.getValue(), displayData.getSpaceName(), displayData.getProjectArtifactID(), "install", this);
 
                 kieRepositoryService.waitForJobToBeEnded(config.getKiewbUrl(), userNameTextField.getValue(),
                         userpasswdTextField.getValue(), result.getJobId(), this);
@@ -152,10 +154,10 @@ public class DroolsAdminConsole extends UI {
                 KieContainerRequest newContainer = new KieContainerRequest();
                 newContainer.setContainerId(displayData.getContainerId());
                 newContainer.setReleaseId(new ReleaseDefinition());
-                newContainer.getReleaseId().setArtifactId(displayData.getProjectName());
+                newContainer.getReleaseId().setArtifactId(displayData.getProjectArtifactID());
                 newContainer.getReleaseId().setGroupId(displayData.getProjectGroupID());
                 newContainer.getReleaseId().setVersion(displayData.getProjectVersion());
-                KieContainerInfo toto = kieServerRepositoryService.createContainer(config.getKieserverUrl(), config.getKieserverUserName(), config.getKieserverPassword(), displayData.getProjectName(), newContainer, this);
+                KieContainerInfo toto = kieServerRepositoryService.createContainer(config.getKieserverUrl(), config.getKieserverUserName(), config.getKieserverPassword(), displayData.getProjectArtifactID(), newContainer, this);
                 System.out.println("coucou");
                 this.refreshList();
             }
@@ -188,22 +190,22 @@ public class DroolsAdminConsole extends UI {
         kieRepositoryService = AppContext.getApplicationContext().getBean(KieRepositoryService.class);
         List<KieContainerInfo> listcontainers = kieServerRepositoryService.getContainerList(config.getKieserverUrl(), config.getKieserverUserName(), config.getKieserverPassword());
 
-        List<Space> listSpaces = kieRepositoryService.getListSpaces(config.getKiewbUrl(), userNameTextField.getValue(),
+
+        List<ProjectResponse> listSpacesuberfire = kieRepositoryService.getListSpaces2(config.getKiewbUrl(), userNameTextField.getValue(),
                 userpasswdTextField.getValue());
-        for (Space space : listSpaces) {
-            for (SpaceProject spaceProject : space.getProjects()) {
-                //    kieServerRepositoryService.getProjectContent(config.getKiewbUrl(), userNameTextField.getValue(),
-                //           userpasswdTextField.getValue(),space.getName(),spaceProject.getName());
-                DisplayData displayData = new DisplayData();
-                displayData.setSpaceName(space.getName());
-                displayData.setSpaceDescription(space.getDescription());
-                displayData.setSpaceDefaultGroupID(space.getDefaultGroupId());
-                displayData.setSpaceOwner(space.getOwner());
-                displayData.setProjectName(spaceProject.getName());
-                displayData.setProjectGroupID(spaceProject.getGroupId());
-                displayData.setProjectVersion(spaceProject.getVersion());
-                displayData.setProjectDescription(spaceProject.getDescription());
-                for (SpaceProjectURI uri : spaceProject.getPublicURIs()) {
+
+        //    List<Space> listSpaces = kieRepositoryService.getListSpaces(config.getKiewbUrl(), userNameTextField.getValue(),
+        //           userpasswdTextField.getValue());
+
+
+        for (ProjectResponse projectResponse : listSpacesuberfire) {
+            DisplayData displayData = new DisplayData();
+            displayData.setSpaceName(projectResponse.getSpaceName());
+            displayData.setProjectArtifactID(projectResponse.getName());
+            displayData.setProjectGroupID(projectResponse.getGroupId());
+            displayData.setProjectVersion(projectResponse.getVersion());
+            displayData.setProjectDescription(projectResponse.getDescription());
+            for (PublicURI uri : projectResponse.getPublicURIs()) {
                     if (uri.getProtocol().equals("git")) {
                         displayData.setProjectGitAddress(uri.getUri());
                     } else {
@@ -213,17 +215,16 @@ public class DroolsAdminConsole extends UI {
                 for (KieContainerInfo kie : listcontainers) {
                     if (kie.getGroupId() != null
                             && kie.getGroupId().equals(displayData.getProjectGroupID())
-                            && kie.getArtifactId().equals(displayData.getProjectName())
+                            && kie.getArtifactId().equals(displayData.getProjectArtifactID())
                             && kie.getVersion().equals(displayData.getProjectVersion())) {
                         displayData.setKieServerArtifactId(kie.getArtifactId());
                         displayData.setKieServerGroupId(kie.getGroupId());
                         displayData.setKieServerVersion(kie.getVersion());
                         displayData.setContainerId(kie.getContainerId());
-                        displayData.setContainerAlias(kie.getContainerAlias());
                     }
                 }
                 gitReposListContainer.addBean(displayData);
-            }
+
         }
 
         System.out.println("coucou");

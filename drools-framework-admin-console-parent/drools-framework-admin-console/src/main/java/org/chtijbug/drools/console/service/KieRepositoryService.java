@@ -5,6 +5,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.chtijbug.drools.console.DroolsAdminConsole;
 import org.chtijbug.drools.console.service.model.kie.JobStatus;
 import org.chtijbug.drools.console.service.model.kie.Space;
+import org.guvnor.rest.client.ProjectResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -31,6 +32,27 @@ public class KieRepositoryService {
 
     private ObjectMapper mapper = new ObjectMapper();
 
+
+    public List<ProjectResponse> getListSpaces2(String url, String username, String password) {
+        String completeurl = url + "/chtijbug/detailedSpaces";
+        logger.info("url moteur reco : " + completeurl);
+        ResponseEntity<List<ProjectResponse>> response = restTemplateKiewb
+                .execute(completeurl, HttpMethod.GET, requestCallback(null, username, password), clientHttpResponse -> {
+                    List<ProjectResponse> extractedResponse = null;
+                    if (clientHttpResponse.getBody() != null) {
+                        Scanner s = new Scanner(clientHttpResponse.getBody()).useDelimiter("\\A");
+                        String result = s.hasNext() ? s.next() : "";
+                        ProjectResponse[] values = mapper.readValue(result, ProjectResponse[].class);
+                        extractedResponse = Arrays.asList(values);
+                    }
+                    ResponseEntity<List<ProjectResponse>> extractedValue = new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
+                    return extractedValue;
+                });
+        List<ProjectResponse> reponseMoteur;
+
+        reponseMoteur = response.getBody();
+        return reponseMoteur;
+    }
 
     public List<Space> getListSpaces(String url, String username, String password) {
         String completeurl = url + "/spaces";

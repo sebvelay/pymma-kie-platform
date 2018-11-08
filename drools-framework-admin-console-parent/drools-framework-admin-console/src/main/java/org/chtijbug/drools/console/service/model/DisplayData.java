@@ -2,20 +2,17 @@ package org.chtijbug.drools.console.service.model;
 
 public class DisplayData {
     private String spaceName;
-    private String spaceDescription;
-    private String projectName;
+    private String projectArtifactID;
     private String projectGroupID;
     private String projectVersion;
     private String projectDescription;
     private String projectGitAddress;
     private String projectSSHAdress;
     private String spaceOwner;
-    private String spaceDefaultGroupID;
     private String containerId;
     private String kieServerArtifactId;
     private String kieServerGroupId;
     private String kieServerVersion;
-    private String containerAlias;
 
     public String getSpaceName() {
         return spaceName;
@@ -25,20 +22,13 @@ public class DisplayData {
         this.spaceName = spaceName;
     }
 
-    public String getSpaceDescription() {
-        return spaceDescription;
+
+    public String getProjectArtifactID() {
+        return projectArtifactID;
     }
 
-    public void setSpaceDescription(String spaceDescription) {
-        this.spaceDescription = spaceDescription;
-    }
-
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
+    public void setProjectArtifactID(String projectArtifactID) {
+        this.projectArtifactID = projectArtifactID;
     }
 
     public String getProjectGroupID() {
@@ -89,13 +79,6 @@ public class DisplayData {
         this.spaceOwner = spaceOwner;
     }
 
-    public String getSpaceDefaultGroupID() {
-        return spaceDefaultGroupID;
-    }
-
-    public void setSpaceDefaultGroupID(String spaceDefaultGroupID) {
-        this.spaceDefaultGroupID = spaceDefaultGroupID;
-    }
 
     public String getContainerId() {
         return containerId;
@@ -129,11 +112,4 @@ public class DisplayData {
         this.kieServerVersion = kieServerVersion;
     }
 
-    public String getContainerAlias() {
-        return containerAlias;
-    }
-
-    public void setContainerAlias(String containerAlias) {
-        this.containerAlias = containerAlias;
-    }
 }

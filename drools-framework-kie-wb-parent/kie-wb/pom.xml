@@ -12,16 +12,15 @@
   <artifactId>kie-wb</artifactId>
 
   <packaging>pom</packaging>
-  <name>Pymma platform jbpm-console</name>
-  <description>Pymma Plarform Kie-wb
-  </description>
+    <name>Pymma platform workbench</name>
+    <description>Pymma Plarform Kie-wb</description>
   <dependencies>
 
-    <!--dependency>
+      <dependency>
       <groupId>com.pymmasoftware.jbpm</groupId>
       <artifactId>kie-drools-framework-rest-backend</artifactId>
       <version>${project.version}</version>
-    </dependency-->
+      </dependency>
 
     <dependency>
       <groupId>org.kie</groupId>
