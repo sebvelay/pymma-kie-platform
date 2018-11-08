@@ -24,8 +24,8 @@
 
     <properties>
         <jbpm.version>7.13.0.Final</jbpm.version>
-        <spring.boot.version>1.5.9.Release</spring.boot.version>
-        <spring.version>4.3.1.Release</spring.version>
+        <spring.boot.version>1.5.9.RELEASE</spring.boot.version>
+        <spring.version>4.3.1.RELEASE</spring.version>
         <version.thorntail>2.2.1.Final</version.thorntail>
     </properties>
 
