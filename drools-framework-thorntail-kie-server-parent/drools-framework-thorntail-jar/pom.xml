@@ -30,6 +30,7 @@
             <artifactId>drools-framework-thorntail-fraction</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <!-- kie drools server dependencies -->
         <dependency>
             <groupId>org.kie.server</groupId>
