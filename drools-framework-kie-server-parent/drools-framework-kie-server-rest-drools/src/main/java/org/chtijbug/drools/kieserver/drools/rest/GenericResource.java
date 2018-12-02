@@ -1,6 +1,7 @@
 package org.chtijbug.drools.kieserver.drools.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.Api;
 import org.apache.commons.io.FileUtils;
 import org.chtijbug.drools.common.rest.InputElement;
 import org.chtijbug.drools.common.rest.MultipleInputs;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+@Api(value = "Rules evaluation :: Chtijbug Rest interface")
 @Path("server/containers/instances/generic/")
 public class GenericResource {
 
@@ -142,9 +144,9 @@ public class GenericResource {
 **/
     @POST
     @Path("/run/{id}/{processId}/{className}")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Object runSession(@PathParam("id") String id,
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    public String runSession(@PathParam("id") String id,
                              @PathParam("processId") String processID,
                              @PathParam("className") String className,
                              String objectRequest) {
@@ -212,7 +214,8 @@ public class GenericResource {
             }
             //response.setSessionLogging(jsonInString);
             logger.debug("Returning OK response with content '{}'", response);
-            return response;
+            String responseText = mapper.writeValueAsString(response);
+            return responseText;
         } catch (Exception e) {
             // in case marshalling failed return the FireAllRulesAndStartProcess container response to keep backward compatibility
             String responseMessage = "Execution failed with error : " + e.getMessage();
@@ -230,7 +233,7 @@ public class GenericResource {
     @Path("/runSessionName/{id}/{processId}/{className}/{sessionName}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Object runSessionWithName(@PathParam("id") String id,
+    public String runSessionWithName(@PathParam("id") String id,
                                      @PathParam("processId") String processID,
                                      @PathParam("className") String className,
                                      @PathParam("sessionName") String sessionName,
@@ -260,7 +263,8 @@ public class GenericResource {
             }
             //response.setSessionLogging(jsonInString);
             logger.debug("Returning OK response with content '{}'", objectRequest);
-            return response;
+            String responseText = mapper.writeValueAsString(response);
+            return responseText;
         } catch (Exception e) {
             // in case marshalling failed return the FireAllRulesAndStartProcess container response to keep backward compatibility
             String responseMessage = "Execution failed with error : " + e.getMessage();

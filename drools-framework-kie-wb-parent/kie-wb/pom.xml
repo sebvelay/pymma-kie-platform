@@ -25,7 +25,7 @@
     <dependency>
       <groupId>org.kie</groupId>
       <artifactId>kie-wb</artifactId>
-      <classifier>wildfly11</classifier>
+        <classifier>wildfly14</classifier>
       <version>${jbpm.version}</version>
       <type>war</type>
       <exclusions>
@@ -58,7 +58,7 @@
                   <artifactItem>
                     <groupId>org.kie</groupId>
                     <artifactId>kie-wb</artifactId>
-                    <classifier>wildfly11</classifier>
+                      <classifier>wildfly14</classifier>
                     <version>${jbpm.version}</version>
                     <type>war</type>
                       <outputDirectory>${project.build.directory}/unpack-tmp</outputDirectory>

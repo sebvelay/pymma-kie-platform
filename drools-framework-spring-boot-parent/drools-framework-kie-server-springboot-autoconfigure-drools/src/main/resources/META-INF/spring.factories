@@ -1,0 +1,1 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=org.chtijbug.drools.springboot.autoconfigure.ChtijbugDroolsKieServerAutoConfiguration

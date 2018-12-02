@@ -1,0 +1,3 @@
+${Ansi.GREEN}
+${Ansi.RED}                                                    Chtijbug Kie-server  :: v.1.0-SNAPSHOT
+
