@@ -24,7 +24,7 @@
 
     <dependency>
       <groupId>org.kie</groupId>
-      <artifactId>kie-wb</artifactId>
+        <artifactId>business-central</artifactId>
         <classifier>wildfly14</classifier>
       <version>${jbpm.version}</version>
       <type>war</type>
@@ -57,7 +57,7 @@
               <artifactItems>
                   <artifactItem>
                     <groupId>org.kie</groupId>
-                    <artifactId>kie-wb</artifactId>
+                      <artifactId>business-central</artifactId>
                       <classifier>wildfly14</classifier>
                     <version>${jbpm.version}</version>
                     <type>war</type>

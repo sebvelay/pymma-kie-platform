@@ -13,6 +13,7 @@
     <modules>
         <module>kie-wb</module>
         <module>kie-drools-framework-rest-backend</module>
+        <module>drools-framework-kie-wb-rest-pojo</module>
     </modules>
 
     <dependencyManagement>
