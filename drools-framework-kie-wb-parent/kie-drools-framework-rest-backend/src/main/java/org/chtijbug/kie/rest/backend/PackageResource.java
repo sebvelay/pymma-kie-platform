@@ -151,7 +151,7 @@ public class PackageResource {
         try {
             List<Asset> contentList = new LinkedList<>();
             WorkspaceProject project = getProject(organizationalUnitName, repositoryName, packageName);
-            if (project != null && project.getName().equals(packageName)) {
+            if (project != null) {
                 org.uberfire.backend.vfs.Path rootPath = project.getRootPath();
                 org.uberfire.java.nio.file.Path nioPath = Paths.get(rootPath.toURI());
                 DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream = ioService.newDirectoryStream(nioPath);
@@ -167,10 +167,10 @@ public class PackageResource {
 
     private WorkspaceProject getProject(String organizationalUnitName, String repositoryName, String packageName) {
         OrganizationalUnit organizationalUnit = organizationalUnitService.getOrganizationalUnit(organizationalUnitName);
-        Collection<Repository> repositories = organizationalUnit.getRepositories();
-        for (Repository repository : repositories) {
-            if (repository.getAlias().equals(repositoryName)) {
-                Optional<Branch> branch = repository.getDefaultBranch();
+        //Collection<Repository> repositories = organizationalUnit.getRepositories();
+        // for (Repository repository : repositories) {
+        //  if (repository.getAlias().equals(repositoryName)) {
+        //   Optional<Branch> branch = repository.getDefaultBranch();
                 Collection<WorkspaceProject> workspaceProjects = projectService.getAllWorkspaceProjects(organizationalUnit);
 
                 for (WorkspaceProject project : workspaceProjects) {
@@ -178,8 +178,8 @@ public class PackageResource {
                         return project;
                     }
                 }
-            }
-        }
+        // }
+        //}
         return null;
     }
 

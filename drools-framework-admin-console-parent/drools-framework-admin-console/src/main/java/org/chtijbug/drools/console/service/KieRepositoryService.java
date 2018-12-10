@@ -2,7 +2,7 @@ package org.chtijbug.drools.console.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
-import org.chtijbug.drools.console.DroolsAdminConsole;
+import org.chtijbug.drools.console.AddLog;
 import org.chtijbug.drools.console.service.model.kie.JobStatus;
 import org.chtijbug.drools.console.service.model.kie.Space;
 import org.guvnor.rest.client.ProjectResponse;
@@ -75,7 +75,7 @@ public class KieRepositoryService {
         return reponseMoteur;
     }
 
-    public JobStatus buildProject(String url, String username, String password, String space, String project, String command, DroolsAdminConsole workOnGoingView) {
+    public JobStatus buildProject(String url, String username, String password, String space, String project, String command, AddLog workOnGoingView) {
         String completeurl = url + "/spaces/" + space + "/projects/" + project + "/maven/" + command;
         logger.info("url Maven install : " + completeurl);
         ResponseEntity<JobStatus> response = restTemplateKiewb
@@ -138,7 +138,7 @@ public class KieRepositoryService {
         };
     }
 
-    public String waitForJobToBeEnded(String url, String username, String password, String jobID, DroolsAdminConsole workOnGoingView) {
+    public String waitForJobToBeEnded(String url, String username, String password, String jobID, AddLog workOnGoingView) {
         String isJobDone = "NO";
         while ("NO".equals(isJobDone)) {
             JobStatus jobStatus = this.getStatusJobID(url,

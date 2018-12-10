@@ -3,7 +3,7 @@ package org.chtijbug.drools.console.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
-import org.chtijbug.drools.console.DroolsAdminConsole;
+import org.chtijbug.drools.console.AddLog;
 import org.chtijbug.drools.console.service.model.kie.KieContainerInfo;
 import org.chtijbug.drools.console.service.model.kie.KieContainerRequest;
 import org.chtijbug.drools.console.service.model.kie.KieServerJobStatus;
@@ -103,7 +103,7 @@ public class KieServerRepositoryService {
         return results;
     }
 
-    public KieServerJobStatus stopContainer(String url, String username, String password, String containerId, DroolsAdminConsole workOnGoingView) {
+    public KieServerJobStatus stopContainer(String url, String username, String password, String containerId, AddLog workOnGoingView) {
         KieServerJobStatus results = null;
         String completeurl = url + "/containers/" + containerId;
         logger.info("url kie server container : " + completeurl);
@@ -125,7 +125,7 @@ public class KieServerRepositoryService {
         return reponseMoteur;
     }
 
-    public KieContainerInfo createContainer(String url, String username, String password, String containerId, KieContainerRequest request, DroolsAdminConsole workOnGoingView) {
+    public KieContainerInfo createContainer(String url, String username, String password, String containerId, KieContainerRequest request, AddLog workOnGoingView) {
         String completeurl = url + "/containers/" + containerId;
         logger.info("url kie server container : " + completeurl);
         ResponseEntity<Map<String, Object>> response = restTemplateKiewb
