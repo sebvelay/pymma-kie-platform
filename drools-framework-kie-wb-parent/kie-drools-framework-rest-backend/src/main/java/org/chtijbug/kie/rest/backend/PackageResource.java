@@ -142,15 +142,13 @@ public class PackageResource {
     }
 
     @GET
-    @Path("{organizationalUnitName}/{repositoryName}/{packageName}/assets")
+    @Path("{organizationalUnitName}/{projectName}/assets")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Collection<Asset> getAssetsAsJAXB(
-            @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("repositoryName") String repositoryName,
-            @PathParam("packageName") String packageName,
-            @QueryParam("format") List<String> formats) {
+            @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName) {
         try {
             List<Asset> contentList = new LinkedList<>();
-            WorkspaceProject project = getProject(organizationalUnitName, repositoryName, packageName);
+            WorkspaceProject project = getProject(organizationalUnitName, projectName);
             if (project != null) {
                 org.uberfire.backend.vfs.Path rootPath = project.getRootPath();
                 org.uberfire.java.nio.file.Path nioPath = Paths.get(rootPath.toURI());
@@ -165,19 +163,15 @@ public class PackageResource {
         }
     }
 
-    private WorkspaceProject getProject(String organizationalUnitName, String repositoryName, String packageName) {
+    private WorkspaceProject getProject(String organizationalUnitName, String projectName) {
         OrganizationalUnit organizationalUnit = organizationalUnitService.getOrganizationalUnit(organizationalUnitName);
-        //Collection<Repository> repositories = organizationalUnit.getRepositories();
-        // for (Repository repository : repositories) {
-        //  if (repository.getAlias().equals(repositoryName)) {
-        //   Optional<Branch> branch = repository.getDefaultBranch();
-                Collection<WorkspaceProject> workspaceProjects = projectService.getAllWorkspaceProjects(organizationalUnit);
+        Collection<WorkspaceProject> workspaceProjects = projectService.getAllWorkspaceProjects(organizationalUnit);
 
-                for (WorkspaceProject project : workspaceProjects) {
-                    if (project.getName().equals(packageName)) {
-                        return project;
-                    }
-                }
+        for (WorkspaceProject project : workspaceProjects) {
+            if (project.getName().equals(projectName)) {
+                return project;
+            }
+        }
         // }
         //}
         return null;
@@ -218,6 +212,26 @@ public class PackageResource {
         }
     }
 
+    private String getContentSource(DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream, String assetName) {
+        for (org.uberfire.java.nio.file.Path elementPath : directoryStream) {
+            if (org.uberfire.java.nio.file.Files.isDirectory(elementPath)) {
+                DirectoryStream<org.uberfire.java.nio.file.Path> adirectoryStream = ioService.newDirectoryStream(elementPath);
+                String result = getContentSource(adirectoryStream, assetName);
+                if (result != null && result.length() > 0) {
+                    return result;
+                }
+            } else {
+
+                if (elementPath.getFileName().toString().startsWith(".") == false) {
+                    if (elementPath.getFileName().toString().equals(assetName)) {
+                        return ioService.readAllString(elementPath);
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     private org.uberfire.java.nio.file.Path getFileElementPath(DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream, String assetName) {
         for (org.uberfire.java.nio.file.Path elementPath : directoryStream) {
             if (org.uberfire.java.nio.file.Files.isDirectory(elementPath)) {
@@ -252,15 +266,14 @@ public class PackageResource {
     }
 
     @GET
-    @Path("{organizationalUnitName}/{repositoryName}/{packageName}/assets/{assetName}")
+    @Path("{organizationalUnitName}/{projectName}/assets/{assetName}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Collection<Asset> getAssetAsJaxB(
-            @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("repositoryName") String repositoryName,
-            @PathParam("packageName") String packageName, @PathParam("assetName") String assetName) {
+            @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName, @PathParam("assetName") String assetName) {
         List<Asset> resultList = new LinkedList<>();
         try {
-            WorkspaceProject project = getProject(organizationalUnitName, repositoryName, packageName);
-            if (project != null && project.getName().equals(packageName)) {
+            WorkspaceProject project = getProject(organizationalUnitName, projectName);
+            if (project != null) {
                 List<Asset> contentList = new LinkedList<>();
                 org.uberfire.backend.vfs.Path rootPath = project.getRootPath();
                 org.uberfire.java.nio.file.Path nioPath = Paths.get(rootPath.toURI());
@@ -280,58 +293,44 @@ public class PackageResource {
     }
 
     @GET
-    @Path("{organizationalUnitName}/{repositoryName}/{packageName}/assets/{assetName}/source")
+    @Path("{organizationalUnitName}/{projectName}/assets/{assetName}/source")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public String getAssetSource(
-            @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("repositoryName") String repositoryName,
-            @PathParam("packageName") String packageName, @PathParam("assetName") String assetName) {
+            @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName, @PathParam("assetName") String assetName) {
         List<Asset> resultList = new LinkedList<>();
         String result = "";
         try {
-            WorkspaceProject project = getProject(organizationalUnitName, repositoryName, packageName);
-            if (project != null && project.getName().equals(packageName)) {
-                List<Asset> contentList = new LinkedList<>();
-                List<org.uberfire.java.nio.file.Path> pathLinkedList = new LinkedList<>();
+            WorkspaceProject project = getProject(organizationalUnitName, projectName);
+            if (project != null) {
                 org.uberfire.backend.vfs.Path rootPath = project.getRootPath();
                 org.uberfire.java.nio.file.Path nioPath = Paths.get(rootPath.toURI());
                 DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream = ioService.newDirectoryStream(nioPath);
-                getContent(directoryStream, contentList);
-                for (Asset asset : contentList) {
-                    if (asset.getTitle().equals(assetName)) {
-                        resultList.add(asset);
-                        DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream2 = ioService.newDirectoryStream(nioPath);
-                        getContentSource(directoryStream2, asset, pathLinkedList);
-                        if (pathLinkedList.size() == 1) {
-                            result = ioService.readAllString(pathLinkedList.get(0));
-                        }
-                    }
-                }
+                result = getContentSource(directoryStream, assetName);
             }
             return result;
         } catch (RuntimeException e) {
             throw new WebApplicationException(e);
         }
+
     }
 
     @PUT
-    @Path("{organizationalUnitName}/{repositoryName}/{packageName}/asset/{assetName}")
+    @Path("{organizationalUnitName}/{projectName}/asset/{assetName}")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public void updateAssetFromJAXB(
-            @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("repositoryName") String repositoryName,
-            @PathParam("packageName") String packageName,
+            @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName,
             @PathParam("assetName") String assetName, String asset) {
-        updateAssetContent(organizationalUnitName, repositoryName, packageName, assetName, asset);
+        updateAssetContent(organizationalUnitName, projectName, assetName, asset);
     }
 
     @POST
-    @Path("{organizationalUnitName}/{repositoryName}/{packageName}/newAsset")
+    @Path("{organizationalUnitName}/{projectName}/newAsset")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Asset createAssetFromSourceAndJAXB(
-            @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("repositoryName") String repositoryName,
-            @PathParam("packageName") String packageName, Asset asset) {
+            @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName, Asset asset) {
         try {
-            WorkspaceProject project = getProject(organizationalUnitName, repositoryName, packageName);
+            WorkspaceProject project = getProject(organizationalUnitName, projectName);
             org.uberfire.backend.vfs.Path rootPath = project.getRootPath();
             org.uberfire.java.nio.file.Path nioPathDirectory = Paths.get(rootPath.toURI());
             DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream = ioService.newDirectoryStream(nioPathDirectory);
@@ -350,21 +349,20 @@ public class PackageResource {
     }
 
     @PUT
-    @Path("{organizationalUnitName}/{repositoryName}/{packageName}/asset/{assetName}/source")
+    @Path("{organizationalUnitName}/{projectName}/asset/{assetName}/source")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
     @Produces({MediaType.WILDCARD})
     public void updateAssetSource(
-            @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("repositoryName") String repositoryName,
-            @PathParam("packageName") String packageName, @PathParam("assetName") String assetName, String content) {
-        updateAssetContent(organizationalUnitName, repositoryName, packageName, assetName, content);
+            @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName, @PathParam("assetName") String assetName, String content) {
+        updateAssetContent(organizationalUnitName, projectName, assetName, content);
 
     }
 
-    private void updateAssetContent(String organizationalUnitName, String repositoryName, String packageName, String assetName, String content) {
+    private void updateAssetContent(String organizationalUnitName, String projectName, String assetName, String content) {
         try {
-            WorkspaceProject project = getProject(organizationalUnitName, repositoryName, packageName);
+            WorkspaceProject project = getProject(organizationalUnitName, projectName);
 
-            if (project != null && project.getName().equals(packageName)) {
+            if (project != null) {
                 org.uberfire.backend.vfs.Path rootPath = project.getRootPath();
                 org.uberfire.java.nio.file.Path nioPath = Paths.get(rootPath.toURI());
                 DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream = ioService.newDirectoryStream(nioPath);

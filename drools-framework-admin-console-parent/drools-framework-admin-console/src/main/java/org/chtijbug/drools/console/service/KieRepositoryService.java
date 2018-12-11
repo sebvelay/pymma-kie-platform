@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.chtijbug.drools.console.AddLog;
 import org.chtijbug.drools.console.service.model.kie.JobStatus;
-import org.chtijbug.drools.console.service.model.kie.Space;
+import org.drools.guvnor.server.jaxrs.jaxb.Asset;
 import org.guvnor.rest.client.ProjectResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +33,26 @@ public class KieRepositoryService {
     private ObjectMapper mapper = new ObjectMapper();
 
 
+    public String getAssetSource(String url, String username, String password, String spaceName, String projectName, String assetName) {
+        String completeurl = url + "/chtijbug/" + spaceName + "/" + projectName + "/assets/" + assetName + "/source";
+        logger.info("url moteur reco : " + completeurl);
+        ResponseEntity<String> response = restTemplateKiewb
+                .execute(completeurl, HttpMethod.GET, requestCallback(null, username, password), clientHttpResponse -> {
+                    String extractedResponse = null;
+                    if (clientHttpResponse.getBody() != null) {
+                        Scanner s = new Scanner(clientHttpResponse.getBody()).useDelimiter("\\A");
+                        String result = s.hasNext() ? s.next() : "";
+                        extractedResponse = result;
+                    }
+                    ResponseEntity<String> extractedValue = new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
+                    return extractedValue;
+                });
+        String reponseMoteur;
+
+        reponseMoteur = response.getBody();
+        return reponseMoteur;
+    }
+
     public List<ProjectResponse> getListSpaces2(String url, String username, String password) {
         String completeurl = url + "/chtijbug/detailedSpaces";
         logger.info("url moteur reco : " + completeurl);
@@ -54,22 +74,22 @@ public class KieRepositoryService {
         return reponseMoteur;
     }
 
-    public List<Space> getListSpaces(String url, String username, String password) {
-        String completeurl = url + "/spaces";
+    public List<Asset> getListAssets(String url, String username, String password, String spaceName, String projectName) {
+        String completeurl = url + "/chtijbug/" + spaceName + "/" + projectName + "/assets";
         logger.info("url moteur reco : " + completeurl);
-        ResponseEntity<List<Space>> response = restTemplateKiewb
+        ResponseEntity<List<Asset>> response = restTemplateKiewb
                 .execute(completeurl, HttpMethod.GET, requestCallback(null, username, password), clientHttpResponse -> {
-                    List<Space> extractedResponse = null;
+                    List<Asset> extractedResponse = null;
                     if (clientHttpResponse.getBody() != null) {
                         Scanner s = new Scanner(clientHttpResponse.getBody()).useDelimiter("\\A");
                         String result = s.hasNext() ? s.next() : "";
-                        Space[] values = mapper.readValue(result, Space[].class);
+                        Asset[] values = mapper.readValue(result, Asset[].class);
                         extractedResponse = Arrays.asList(values);
                     }
-                    ResponseEntity<List<Space>> extractedValue = new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
+                    ResponseEntity<List<Asset>> extractedValue = new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
                     return extractedValue;
                 });
-        List<Space> reponseMoteur;
+        List<Asset> reponseMoteur;
 
         reponseMoteur = response.getBody();
         return reponseMoteur;
