@@ -3,8 +3,10 @@ package org.chtijbug.drools.console.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.chtijbug.drools.console.AddLog;
+import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.JobStatus;
-import org.drools.guvnor.server.jaxrs.jaxb.Asset;
+import org.chtijbug.guvnor.server.jaxrs.api.UserLoginInformation;
+import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
 import org.guvnor.rest.client.ProjectResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +74,33 @@ public class KieRepositoryService {
 
         reponseMoteur = response.getBody();
         return reponseMoteur;
+    }
+
+    public UserConnected login(String url, String username, String password) {
+        String completeurl = url + "/chtijbug/login";
+        logger.info("url moteur reco : " + completeurl);
+        ResponseEntity<UserLoginInformation> response = restTemplateKiewb
+                .execute(completeurl, HttpMethod.GET, requestCallback(null, username, password), clientHttpResponse -> {
+                    UserLoginInformation extractedResponse = null;
+                    if (clientHttpResponse.getBody() != null) {
+                        Scanner s = new Scanner(clientHttpResponse.getBody()).useDelimiter("\\A");
+                        String result = s.hasNext() ? s.next() : "";
+                        extractedResponse = mapper.readValue(result, UserLoginInformation.class);
+
+                    }
+                    ResponseEntity<UserLoginInformation> extractedValue = new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
+                    return extractedValue;
+                });
+        UserConnected userConnected = new UserConnected();
+
+        UserLoginInformation responseBody = response.getBody();
+        userConnected.setUserName(username);
+        userConnected.setUserPassword(password);
+        userConnected.setUserPassword(password);
+        userConnected.getProjectResponses().addAll(responseBody.getProjects());
+        userConnected.setUserName(username);
+
+        return userConnected;
     }
 
     public List<Asset> getListAssets(String url, String username, String password, String spaceName, String projectName) {

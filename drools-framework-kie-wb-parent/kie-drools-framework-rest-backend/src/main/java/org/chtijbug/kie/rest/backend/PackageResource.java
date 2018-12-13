@@ -1,7 +1,9 @@
 package org.chtijbug.kie.rest.backend;
 
 
-import org.drools.guvnor.server.jaxrs.jaxb.Asset;
+import org.chtijbug.guvnor.server.jaxrs.api.UserLoginInformation;
+import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
+import org.chtijbug.guvnor.server.jaxrs.jaxb.Package;
 import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.rest.client.ProjectResponse;
@@ -16,7 +18,6 @@ import org.uberfire.io.IOService;
 import org.uberfire.java.nio.base.options.CommentedOption;
 import org.uberfire.java.nio.file.DirectoryStream;
 import org.uberfire.java.nio.file.Paths;
-import org.uberfire.spaces.Space;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -24,6 +25,7 @@ import javax.inject.Named;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -42,6 +44,9 @@ public class PackageResource {
 
     @Context
     protected UriInfo uriInfo;
+
+    @Context
+    protected SecurityContext sc;
 
     @Inject
     @Named("ioStrategy")
@@ -64,6 +69,26 @@ public class PackageResource {
         System.out.println("coucou");
     }
 
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/login")
+    public UserLoginInformation login() {
+
+        UserLoginInformation userLoginInformation = new UserLoginInformation();
+
+        userLoginInformation.setUsername(sc.getUserPrincipal().getName());
+        for (String role : PermissionConstants.tableauChaine) {
+            if (sc.isUserInRole(role) == true) {
+                userLoginInformation.getRoles().add(role);
+            }
+        }
+        userLoginInformation.setProjects(getAllProjects());
+        return userLoginInformation;
+
+    }
+
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/detailedSpaces")
@@ -71,6 +96,11 @@ public class PackageResource {
     public Collection<ProjectResponse> getProjects() {
         logger.debug("-----getSpaces--- ");
 
+
+        return getAllProjects();
+    }
+
+    private List<ProjectResponse> getAllProjects() {
         final List<ProjectResponse> spaces = new ArrayList<>();
         for (OrganizationalUnit ou : organizationalUnitService.getOrganizationalUnits()) {
             spaces.addAll(getSpace(ou));
@@ -80,7 +110,6 @@ public class PackageResource {
     }
 
     private List<ProjectResponse> getSpace(OrganizationalUnit ou) {
-        final Space space = new Space(ou.getName());
 
         final List<ProjectResponse> repoNames = new ArrayList<>();
         for (WorkspaceProject workspaceProject : workspaceProjectService.getAllWorkspaceProjects(ou)) {
@@ -117,7 +146,7 @@ public class PackageResource {
     @GET
     @Path("{organizationalUnitName}/{repositoryName}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Collection<org.drools.guvnor.server.jaxrs.jaxb.Package> getPackagesAsJAXB(@PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("repositoryName") String repositoryName) {
+    public Collection<Package> getPackagesAsJAXB(@PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("repositoryName") String repositoryName) {
         OrganizationalUnit organizationalUnit = organizationalUnitService.getOrganizationalUnit(organizationalUnitName);
         Collection<Repository> repositories = organizationalUnit.getRepositories();
         for (Repository repository : repositories) {
@@ -125,9 +154,9 @@ public class PackageResource {
 
                 Optional<Branch> branch = repository.getDefaultBranch();
                 Collection<WorkspaceProject> projects = projectService.getAllWorkspaceProjects(organizationalUnit);
-                Collection<org.drools.guvnor.server.jaxrs.jaxb.Package> packages = new ArrayList<>();
+                Collection<Package> packages = new ArrayList<>();
                 for (WorkspaceProject project : projects) {
-                    org.drools.guvnor.server.jaxrs.jaxb.Package aPackage = new org.drools.guvnor.server.jaxrs.jaxb.Package();
+                    Package aPackage = new Package();
                     aPackage.setTitle(project.getName());
                     aPackage.setGroupID(project.getMainModule().getPom().getGav().getGroupId());
                     aPackage.setArtifactID(project.getMainModule().getPom().getGav().getArtifactId());

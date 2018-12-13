@@ -59,6 +59,7 @@ public class DeploymentView extends VerticalLayout implements AddLog, View {
 
         spaceContainer =
                 new BeanItemContainer<ProjectResponse>(ProjectResponse.class);
+
         ComboBox spaceSelection = new ComboBox("Project", spaceContainer);
 
         spaceSelection.setNullSelectionAllowed(false);
@@ -147,10 +148,8 @@ public class DeploymentView extends VerticalLayout implements AddLog, View {
     }
 
     public void refreshCombo() {
-        List<ProjectResponse> projectResponses = kieRepositoryService.getListSpaces2(config.getKiewbUrl(), userConnected.getUserName(), userConnected.getUserPassword());
         spaceContainer.removeAllItems();
-
-        spaceContainer.addAll(projectResponses);
+        spaceContainer.addAll(userConnected.getProjectResponses());
 
     }
 
@@ -188,6 +187,7 @@ public class DeploymentView extends VerticalLayout implements AddLog, View {
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent viewChangeEvent) {
-
+        spaceContainer.removeAllItems();
+        spaceContainer.addAll(userConnected.getProjectResponses());
     }
 }

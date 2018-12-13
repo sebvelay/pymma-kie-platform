@@ -15,7 +15,7 @@ import org.chtijbug.drools.console.service.KieServerRepositoryService;
 import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
-import org.drools.guvnor.server.jaxrs.jaxb.Asset;
+import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
 import org.guvnor.rest.client.ProjectResponse;
 
 import java.util.List;
@@ -140,15 +140,15 @@ public class TableLikeArtefactView extends VerticalLayout implements AddLog, Vie
 
 
     public void refreshList() {
-        List<ProjectResponse> projectResponses = kieRepositoryService.getListSpaces2(config.getKiewbUrl(), userConnected.getUserName(), userConnected.getUserPassword());
         spaceContainer.removeAllItems();
-        spaceContainer.addAll(projectResponses);
+        spaceContainer.addAll(userConnected.getProjectResponses());
     }
 
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent viewChangeEvent) {
-
+        spaceContainer.removeAllItems();
+        spaceContainer.addAll(userConnected.getProjectResponses());
     }
 
     @Override
