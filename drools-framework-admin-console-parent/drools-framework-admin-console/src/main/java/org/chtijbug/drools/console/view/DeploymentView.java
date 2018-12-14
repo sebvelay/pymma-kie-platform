@@ -1,6 +1,5 @@
 package org.chtijbug.drools.console.view;
 
-import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
@@ -22,7 +21,7 @@ import java.util.List;
 public class DeploymentView extends VerticalLayout implements AddLog, View {
 
 
-    final private Table table = new Table();
+    final private Grid gridLogging = new Grid();
     final private Button buttonDeployProject = new Button("Deploy project");
     final private KieConfigurationData config;
     final private BeanItemContainer<ProjectResponse> spaceContainer;
@@ -97,7 +96,7 @@ public class DeploymentView extends VerticalLayout implements AddLog, View {
         buttonDeployProject.addClickListener((Button.ClickListener) event -> {
             //  if (containerIdTextField.getValue() != null
             //      && containerIdTextField.getValue().length() > 0) {
-            table.removeAllItems();
+
 
             ProjectResponse response = (ProjectResponse) spaceSelection.getValue();
 
@@ -131,19 +130,18 @@ public class DeploymentView extends VerticalLayout implements AddLog, View {
 
         });
         buttonDeployProject.setEnabled(false);
-        table.setCaption("Logging");
-        table.setSizeFull();
-        table.setPageLength(0);
-        table.setSelectable(false);
-        table.setColumnCollapsingAllowed(false);
-        table.setColumnReorderingAllowed(false);
-        table.setImmediate(true);
-        table.setNullSelectionAllowed(false);
-        table.setColumnHeaderMode(Table.ColumnHeaderMode.ID);
-        Container container = new IndexedContainer();
+        gridLogging.setCaption("Logging");
+        gridLogging.setSizeFull();
+
+        gridLogging.setColumnReorderingAllowed(false);
+        gridLogging.setImmediate(true);
+
+
+        IndexedContainer container = new IndexedContainer();
         container.addContainerProperty("Message", String.class, "none");
-        table.setContainerDataSource(container);
-        this.addComponent(table);
+
+        gridLogging.setContainerDataSource(container);
+        this.addComponent(gridLogging);
 
     }
 
@@ -171,14 +169,14 @@ public class DeploymentView extends VerticalLayout implements AddLog, View {
     }
 
     public void addRow(String textToAdd) {
-        int nbRows = table.getContainerDataSource().getItemIds().size() + 1;
-        Item item = table.getContainerDataSource().addItem(nbRows);
+        int nbRows = gridLogging.getContainerDataSource().getItemIds().size() + 1;
+        Item item = gridLogging.getContainerDataSource().addItem(nbRows);
         if (item != null) {
             Property<String> nameProperty =
                     item.getItemProperty("Message");
 
             nameProperty.setValue(textToAdd);
-            table.setContainerDataSource(table.getContainerDataSource());
+            gridLogging.setContainerDataSource(gridLogging.getContainerDataSource());
         } else {
             System.out.println("null");
         }
