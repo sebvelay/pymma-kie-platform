@@ -2,11 +2,8 @@ package org.chtijbug.drools.console.view;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.event.Action;
-import com.vaadin.event.ItemClickEvent;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.shared.ui.MultiSelectMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.Runo;
 import org.chtijbug.drools.console.AddLog;
@@ -36,7 +33,14 @@ public class TableLikeArtefactView extends VerticalLayout implements AddLog, Vie
 
     final private BeanItemContainer<Asset> assetBeanItemContainer = new BeanItemContainer<>(Asset.class);
 
-    private Table assetTable;
+    private Grid assetListGrid;
+
+
+    private Button deleteRow;
+
+    private Button editRow;
+
+    private Button duplicateRow;
 
     public TableLikeArtefactView(UserConnected userConnected) {
 
@@ -81,6 +85,14 @@ public class TableLikeArtefactView extends VerticalLayout implements AddLog, Vie
             }
         });
         this.addComponent(spaceSelection);
+        HorizontalLayout actionButtons = new HorizontalLayout();
+        this.addComponent(actionButtons);
+        duplicateRow = new Button("Duplicate");
+        actionButtons.addComponent(duplicateRow);
+        editRow = new Button("Edit");
+        actionButtons.addComponent(editRow);
+        deleteRow = new Button("Delete");
+        actionButtons.addComponent(deleteRow);
         assetBeanItemContainer.removeContainerProperty("author");
         assetBeanItemContainer.removeContainerProperty("binaryLink");
         assetBeanItemContainer.removeContainerProperty("sourceLink");
@@ -94,45 +106,18 @@ public class TableLikeArtefactView extends VerticalLayout implements AddLog, Vie
         assetBeanItemContainer.removeContainerProperty("metadata");
 
 
-        assetTable = new Table("List of assets", assetBeanItemContainer);
-        assetTable.setSelectable(true);
-        assetTable.setSizeFull();
-        assetTable.setMultiSelectMode(MultiSelectMode.SIMPLE);
-        assetTable.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-            @Override
-            public void itemClick(ItemClickEvent itemClickEvent) {
-                if (itemClickEvent.isCtrlKey()) {
-                    Asset selected = (Asset) itemClickEvent.getItemId();
-                    System.out.println(itemClickEvent.getItemId().toString());
-                }
+        assetListGrid = new Grid("List of assets", assetBeanItemContainer);
+        assetListGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        assetListGrid.setSizeFull();
 
-            }
-        });
-        this.addComponent(assetTable);
-        final Action actionDuplicate = new Action("Duplicate");
-        final Action actionEdit = new Action("Edit");
-        final Action actionDelete = new Action("Delete");
-        assetTable.addActionHandler(new Action.Handler() {
-
-            public void handleAction(Action action, Object sender,
-                                     Object target) {
-                if (action.equals(actionDuplicate)) {
-                    Notification.show("Duplicate not yet implemented");
-                } else if (action.equals(actionEdit)) {
-                    Notification.show("Edit/modification not yet implemented");
-                    Asset selected = (Asset) target;
-                    ProjectResponse response = (ProjectResponse) spaceSelection.getValue();
-                    AssetEditView assetEditView = new AssetEditView(userConnected, response.getSpaceName(), response.getName(), selected);
-                    UI.getCurrent().getNavigator().addView("Asset-" + selected.getTitle(), assetEditView);
-                    UI.getCurrent().getNavigator().navigateTo("Asset-" + selected.getTitle());
-                } else if (action.equals(actionDelete)) {
-                    Notification.show("Delete not yet implemented");
-                }
-
-            }
-
-            public Action[] getActions(Object target, Object sender) {
-                return new Action[]{actionDuplicate, actionEdit, actionDelete};
+        this.addComponent(assetListGrid);
+        editRow.addClickListener(clickEvent -> {
+            Asset selected = (Asset) assetListGrid.getSelectedRow();
+            if (selected != null) {
+                ProjectResponse response = (ProjectResponse) spaceSelection.getValue();
+                AssetEditView assetEditView = new AssetEditView(userConnected, response.getSpaceName(), response.getName(), selected);
+                UI.getCurrent().getNavigator().addView("Asset-" + selected.getTitle(), assetEditView);
+                UI.getCurrent().getNavigator().navigateTo("Asset-" + selected.getTitle());
             }
         });
 

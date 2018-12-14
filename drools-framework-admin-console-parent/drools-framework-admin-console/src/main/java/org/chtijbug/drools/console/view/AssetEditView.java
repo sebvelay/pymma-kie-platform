@@ -6,8 +6,8 @@ import com.vaadin.data.Item;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import org.chtijbug.drools.console.AddLog;
 import org.chtijbug.drools.console.service.KieRepositoryService;
@@ -18,8 +18,6 @@ import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
 import org.drools.workbench.models.datamodel.rule.InterpolationVariable;
 import org.drools.workbench.models.guided.template.backend.RuleTemplateModelXMLPersistenceImpl;
 import org.drools.workbench.models.guided.template.shared.TemplateModel;
-import org.vaadin.haijian.ExcelExporter;
-import org.vaadin.winnid.excelimporttable.ExcelImportTable;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -36,12 +34,11 @@ public class AssetEditView extends VerticalLayout implements AddLog, View {
     private XmlMapper mapper = new XmlMapper();
     private String spaceName;
     private String projectName;
-    private Table assetTable;
+    private Grid gridAssetTable;
     private Button startUpdate;
     private Button commitUpdate;
     private Button undoUpdate;
-    private ExcelExporter excelExporter;
-    private ExcelImportTable excelImportTable;
+
 
     public AssetEditView(UserConnected userConnected, String spaceName, String projectName, Asset assetToUpdate) {
         this.userConnected = userConnected;
@@ -63,9 +60,9 @@ public class AssetEditView extends VerticalLayout implements AddLog, View {
             startUpdate.setEnabled(false);
             commitUpdate.setEnabled(true);
             undoUpdate.setEnabled(true);
-            assetTable.setEditable(true);
-            excelExporter.setEnabled(false);
-            excelImportTable.setEnabled(false);
+            gridAssetTable.setEditorEnabled(true);
+            gridAssetTable.setReadOnly(false);
+
         });
         commitUpdate = new Button("Commit");
         commitUpdate.setEnabled(false);
@@ -73,9 +70,11 @@ public class AssetEditView extends VerticalLayout implements AddLog, View {
             startUpdate.setEnabled(true);
             commitUpdate.setEnabled(false);
             undoUpdate.setEnabled(false);
-            assetTable.setEditable(false);
-            excelExporter.setEnabled(true);
-            excelImportTable.setEnabled(false);
+            gridAssetTable.cancelEditor();
+            gridAssetTable.setEditorEnabled(false);
+            gridAssetTable.setReadOnly(true);
+
+
         });
         actionButtons.addComponent(commitUpdate);
         undoUpdate = new Button("undo");
@@ -84,54 +83,59 @@ public class AssetEditView extends VerticalLayout implements AddLog, View {
             startUpdate.setEnabled(true);
             commitUpdate.setEnabled(false);
             undoUpdate.setEnabled(false);
-            assetTable.setEditable(false);
+            gridAssetTable.cancelEditor();
+            gridAssetTable.setEditorEnabled(false);
+            gridAssetTable.cancelEditor();
+            gridAssetTable.setReadOnly(true);
             fillTable(model);
-            excelExporter.setEnabled(true);
-            excelImportTable.setEnabled(false);
+
         });
         actionButtons.addComponent(undoUpdate);
         InterpolationVariable[] variablesList = model.getInterpolationVariablesList();
-        assetTable = new Table("Data");
-        this.addComponent(assetTable);
-        assetTable.setSelectable(true);
-        assetTable.setMultiSelect(false);
+        gridAssetTable = new Grid("Data");
+        this.addComponent(gridAssetTable);
+        gridAssetTable.setEditorEnabled(false);
+        gridAssetTable.setSelectionMode(Grid.SelectionMode.SINGLE);
+        gridAssetTable.setReadOnly(true);
         for (InterpolationVariable i : variablesList) {
             if (i.getDataType().equals("String")) {
-                assetTable.addContainerProperty(i.getVarName(), String.class, null);
+                gridAssetTable.addColumn(i.getVarName(), String.class);
             } else if (i.getDataType().equals("Date")) {
-                assetTable.addContainerProperty(i.getVarName(), Date.class, null);
+                gridAssetTable.addColumn(i.getVarName(), Date.class);
             } else {
-                assetTable.addContainerProperty(i.getVarName(), String.class, null);
+                gridAssetTable.addColumn(i.getVarName(), String.class);
             }
 
         }
+
         fillTable(model);
 
-        assetTable.setSizeFull();
-
+        gridAssetTable.setSizeFull();
+/**
         excelExporter = new ExcelExporter();
         excelExporter.setDateFormat("dd-MM-yyyy");
         excelExporter.setLocale(Locale.FRANCE);
-        excelExporter.setTableToBeExported(assetTable);
+ excelExporter.setTableToBeExported(gridAssetTable);
         excelExporter.setCaption("Export to Excel");
         actionButtons.addComponent(excelExporter);
         excelExporter.setEnabled(true);
 
-        excelImportTable = new ExcelImportTable(assetTable);
+ excelImportTable = new ExcelImportTable(gridAssetTable);
         excelImportTable.setLocale(Locale.FRANCE);
         actionButtons.addComponent(excelImportTable);
+ **/
     }
 
     private void fillTable(TemplateModel model) {
         InterpolationVariable[] variablesList = model.getInterpolationVariablesList();
         DateFormat format = new SimpleDateFormat("dd-MMM-yyyy", Locale.FRANCE);
         String[][] contenuTable = model.getTableAsArray();
-        Container dataSource = assetTable.getContainerDataSource();
+        Container dataSource = gridAssetTable.getContainerDataSource();
         dataSource.removeAllItems();
         for (int i = 0; i < model.getRowsCount(); i++) {
             String[] ligne = contenuTable[i];
-            Object newItemId = assetTable.addItem();
-            Item row1 = assetTable.getItem(newItemId);
+            Object item = dataSource.addItem();
+            Item row1 = dataSource.getItem(item);
             int k = 0;
             for (InterpolationVariable j : variablesList) {
                 if (j.getDataType().equals("String")) {

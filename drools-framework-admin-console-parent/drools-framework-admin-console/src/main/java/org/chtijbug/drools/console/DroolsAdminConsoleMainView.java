@@ -58,9 +58,9 @@ public class DroolsAdminConsoleMainView extends UI {
         MenuBar.MenuItem submenuAsset = menuBar.addItem("Asset", null);
 
 
-        subMenuDeployment.addItem("Option 2", null);
+        // subMenuDeployment.addItem("Option 2", null);
 
-        submenuAsset.addItem("Option 4", null);
+        //submenuAsset.addItem("Option 4", null);
 
         subMenuDeployment.addItem("Deploy", (MenuBar.Command) menuItem -> {
             navigator.navigateTo("Deployment");
