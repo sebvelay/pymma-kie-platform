@@ -1,30 +1,37 @@
 package org.chtijbug.drools.console.view;
 
-import com.vaadin.data.HasValue;
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.ui.*;
-import org.chtijbug.drools.console.AddLog;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dependency.StyleSheet;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.Route;
+import org.chtijbug.drools.console.DroolsAdminConsoleMainView;
 import org.chtijbug.drools.console.service.KieRepositoryService;
 import org.chtijbug.drools.console.service.KieServerRepositoryService;
+import org.chtijbug.drools.console.service.UserConnectedService;
 import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
 import org.guvnor.rest.client.ProjectResponse;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
-public class TableLikeArtefactView extends VerticalLayout implements AddLog, View {
+@Route("AssetUpdate")
+@StyleSheet("css/accueil.css")
+public class TableLikeArtefactView extends DroolsAdminConsoleMainView {
 
-    final private KieConfigurationData config;
+    private KieConfigurationData config;
 
 
-    final private KieRepositoryService kieRepositoryService;
+    private KieRepositoryService kieRepositoryService;
 
-    final private KieServerRepositoryService kieServerRepositoryService;
+    private KieServerRepositoryService kieServerRepositoryService;
 
-    final private UserConnected userConnected;
+    private UserConnected userConnected;
 
 
     private Grid<Map<String, String>> assetListGrid;
@@ -35,26 +42,29 @@ public class TableLikeArtefactView extends VerticalLayout implements AddLog, Vie
     private Button editRow;
 
     private Button duplicateRow;
+    private UserConnectedService userConnectedService;
 
-    public TableLikeArtefactView(UserConnected userConnected) {
+    @PostConstruct
+    public void buildUI() {
 
         this.kieRepositoryService = AppContext.getApplicationContext().getBean(KieRepositoryService.class);
-
+        this.userConnectedService = AppContext.getApplicationContext().getBean(UserConnectedService.class);
         this.kieServerRepositoryService = AppContext.getApplicationContext().getBean(KieServerRepositoryService.class);
 
-        this.userConnected = userConnected;
+        this.userConnected = userConnectedService.getUserConnected();
 
         this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
+        VerticalLayout verticalLayout = new VerticalLayout();
         Button button = new Button("Refresh");
-        button.addClickListener((Button.ClickListener) event -> {
+        button.addClickListener(event -> {
             this.refreshList();
         });
-        this.addComponent(button);
+        verticalLayout.add(button);
         spaceSelection = new ComboBox("Project", userConnected.getProjectResponses());
-        spaceSelection.setItemCaptionGenerator(ProjectResponse::getName);
-        spaceSelection.addValueChangeListener((HasValue.ValueChangeListener<ProjectResponse>) valueChangeEvent -> {
+        spaceSelection.setItemLabelGenerator(ProjectResponse::getName);
+        spaceSelection.addValueChangeListener(valueChangeEvent -> {
             ProjectResponse response = (ProjectResponse) spaceSelection.getValue();
-            spaceSelection.setSelectedItem(response);
+            //spaceSelection.setSelectedItem(response);
             assetListGrid.addColumn(hashmap -> hashmap.get("title"));
             List<Asset> assets = kieRepositoryService.getListAssets(config.getKiewbUrl(), userConnected.getUserName(), userConnected.getUserPassword(), response.getSpaceName(), response.getName());
             List<Map<String, String>> rows = new ArrayList<>();
@@ -70,34 +80,38 @@ public class TableLikeArtefactView extends VerticalLayout implements AddLog, Vie
 
 
         });
-        this.addComponent(spaceSelection);
+        verticalLayout.add(spaceSelection);
         HorizontalLayout actionButtons = new HorizontalLayout();
-        this.addComponent(actionButtons);
+        verticalLayout.add(actionButtons);
         duplicateRow = new Button("Duplicate");
-        actionButtons.addComponent(duplicateRow);
+        actionButtons.add(duplicateRow);
         editRow = new Button("Edit");
-        actionButtons.addComponent(editRow);
+        actionButtons.add(editRow);
         deleteRow = new Button("Delete");
 
 
-        assetListGrid = new Grid("List of assets");
+        assetListGrid = new Grid();
+        assetListGrid.setClassName("grid-perso");
         assetListGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
         assetListGrid.setSizeFull();
 
-        this.addComponent(assetListGrid);
+        verticalLayout.add(assetListGrid);
         editRow.addClickListener(clickEvent -> {
             Set<Map<String, String>> selectedElements = assetListGrid.getSelectedItems();
             if (selectedElements.toArray().length > 0) {
                 String assetName = ((Map<String, String>) selectedElements.toArray()[0]).get("title");
                 if (assetName != null) {
                     ProjectResponse response = (ProjectResponse) spaceSelection.getValue();
-                    AssetEditView assetEditView = new AssetEditView(userConnected, response.getSpaceName(), response.getName(), assetName);
-                    UI.getCurrent().getNavigator().addView("Asset-" + assetName, assetEditView);
-                    UI.getCurrent().getNavigator().navigateTo("Asset-" + assetName);
+                    userConnectedService.addAssetToSession(assetName);
+                    userConnectedService.addProjectToSession(response.getName());
+                    userConnectedService.addSpaceToSession(response.getSpaceName());
+                    getUI().get().navigate("AssetDetail");
+                    // AssetEditView assetEditView = new AssetEditView(userConnected, response.getSpaceName(), response.getName(), assetName);
+
                 }
             }
         });
-
+        setActionView(verticalLayout);
     }
 
 
@@ -107,13 +121,4 @@ public class TableLikeArtefactView extends VerticalLayout implements AddLog, Vie
     }
 
 
-    @Override
-    public void enter(ViewChangeListener.ViewChangeEvent viewChangeEvent) {
-        spaceSelection.setItems(userConnected.getProjectResponses());
-    }
-
-    @Override
-    public void addRow(String textToAdd) {
-
-    }
 }

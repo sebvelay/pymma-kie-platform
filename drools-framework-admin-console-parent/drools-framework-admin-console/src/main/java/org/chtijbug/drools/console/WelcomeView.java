@@ -1,64 +1,70 @@
 package org.chtijbug.drools.console;
 
-import com.vaadin.data.HasValue;
-import com.vaadin.navigator.View;
-import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.ui.*;
+
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.PasswordField;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.router.Route;
 import org.chtijbug.drools.console.service.KieRepositoryService;
+import org.chtijbug.drools.console.service.UserConnectedService;
 import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
-import org.chtijbug.drools.console.service.util.AppContext;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class WelcomeView extends VerticalLayout implements View {
+import javax.annotation.PostConstruct;
+
+@Route("")
+public class WelcomeView extends DroolsAdminConsoleMainView {
 
     private UserConnected userConnected;
     private TextField userNameTextField;
     private PasswordField userpasswdTextField;
     private Button loginButton;
     private Button logoutButton;
+
+    @Autowired
     private KieRepositoryService kieRepositoryService;
+    @Autowired
     private KieConfigurationData configKie;
 
-    public WelcomeView(UserConnected userConnected, MenuBar menuBar) {
-        this.kieRepositoryService = AppContext.getApplicationContext().getBean(KieRepositoryService.class);
+    @Autowired
+    private UserConnectedService userConnectedService;
 
-        this.userConnected = userConnected;
-        final VerticalLayout layout = new VerticalLayout();
-        layout.addComponent(menuBar);
-        this.configKie = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
-        //  GitLabConfigurationData configGitLab = AppContext.getApplicationContext().getBean(GitLabConfigurationData.class);
-        //  JenkinsConfigurationData jenkinsConfigurationData = AppContext.getApplicationContext().getBean(JenkinsConfigurationData.class);
+    public WelcomeView() {
+        super();
+    }
 
-        // gitLabRepositoryService = AppContext.getApplicationContext().getBean(GitLabRepositoryService.class);
+    @PostConstruct
+    public void buildUI() {
 
-        //jenkinsService = AppContext.getApplicationContext().getBean(JenkinsService.class);
-
-        layout.setMargin(true);
-        this.addComponent(layout);
+        userConnected = new UserConnected();
+        VerticalLayout verticalLayout = new VerticalLayout();
         HorizontalLayout userHorizontal = new HorizontalLayout();
+        verticalLayout.add(userHorizontal);
         TextField urlTextField = new TextField("Kie-Wb url");
         urlTextField.setValue(configKie.getKiewbUrl());
         urlTextField.setMaxLength(200);
-        userHorizontal.addComponent(urlTextField);
-        layout.addComponent(userHorizontal);
+        userHorizontal.add(urlTextField);
         userNameTextField = new TextField("User name");
         userNameTextField.setValue(configKie.getUserName());
         userConnected.setUserName(configKie.getUserName());
-        userNameTextField.addValueChangeListener((HasValue.ValueChangeListener<String>) valueChangeEvent -> userConnected.setUserName(valueChangeEvent.getValue()));
+        userNameTextField.addValueChangeListener(valueChangeEvent -> userConnected.setUserName(valueChangeEvent.getValue()));
 
-        userHorizontal.addComponent(userNameTextField);
+        userHorizontal.add(userNameTextField);
         userpasswdTextField = new PasswordField("Password");
         userpasswdTextField.setValue(configKie.getPassword());
         userConnected.setUserPassword(configKie.getPassword());
-        userpasswdTextField.addValueChangeListener((HasValue.ValueChangeListener<String>) valueChangeEvent -> userConnected.setUserPassword(valueChangeEvent.getValue()));
-        userHorizontal.addComponent(userpasswdTextField);
+        userpasswdTextField.addValueChangeListener(valueChangeEvent -> userConnected.setUserPassword(valueChangeEvent.getValue()));
+        userHorizontal.add(userpasswdTextField);
         loginButton = new Button("login");
-        userHorizontal.addComponent(loginButton);
+        userHorizontal.add(loginButton);
         logoutButton = new Button("logout");
         logoutButton.setEnabled(false);
-        userHorizontal.addComponent(logoutButton);
+        userHorizontal.add(logoutButton);
 
-        loginButton.addClickListener((Button.ClickListener) event -> {
+        loginButton.addClickListener(event -> {
             UserConnected connected = kieRepositoryService.login(this.configKie.getKiewbUrl(), userConnected.getUserName(), userConnected.getUserPassword());
             userConnected.getProjectResponses().clear();
             userConnected.getProjectResponses().addAll(connected.getProjectResponses());
@@ -67,21 +73,20 @@ public class WelcomeView extends VerticalLayout implements View {
             loginButton.setEnabled(false);
             logoutButton.setEnabled(true);
             userConnected.setConnected(true);
+            userConnectedService.addToSession(userConnected);
         });
-        logoutButton.addClickListener((Button.ClickListener) event -> {
+        logoutButton.addClickListener(event -> {
             userConnected.getRoles().clear();
             userConnected.getProjectResponses().clear();
             userConnected.setConnected(false);
             loginButton.setEnabled(true);
             logoutButton.setEnabled(false);
+            userConnectedService.addToSession(null);
         });
-
-
-    }
-
-    @Override
-    public void enter(ViewChangeListener.ViewChangeEvent viewChangeEvent) {
+        setActionView(verticalLayout);
 
     }
+
+
 
 }
