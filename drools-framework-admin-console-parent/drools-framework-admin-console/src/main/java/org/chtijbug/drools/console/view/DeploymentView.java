@@ -1,13 +1,8 @@
 package org.chtijbug.drools.console.view;
 
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.ui.*;
-import com.vaadin.ui.themes.Runo;
 import org.chtijbug.drools.console.AddLog;
 import org.chtijbug.drools.console.service.KieRepositoryService;
 import org.chtijbug.drools.console.service.KieServerRepositoryService;
@@ -16,15 +11,16 @@ import org.chtijbug.drools.console.service.model.kie.*;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.guvnor.rest.client.ProjectResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DeploymentView extends VerticalLayout implements AddLog, View {
 
 
-    final private Grid gridLogging = new Grid();
+    final private Grid<List<String>> gridLogging = new Grid();
     final private Button buttonDeployProject = new Button("Deploy project");
     final private KieConfigurationData config;
-    final private BeanItemContainer<ProjectResponse> spaceContainer;
+    private ComboBox<ProjectResponse> spaceSelection;
 
     final private TextField projectArtifactIDTextField = new TextField("Project Artifact ID");
     final private TextField projectGroupIDTextField = new TextField("Project Group ID");
@@ -36,6 +32,7 @@ public class DeploymentView extends VerticalLayout implements AddLog, View {
     final private KieServerRepositoryService kieServerRepositoryService;
 
     final private UserConnected userConnected;
+    private List<String> logs = new ArrayList<>();
 
     public DeploymentView(UserConnected userConnected) {
 
@@ -46,7 +43,7 @@ public class DeploymentView extends VerticalLayout implements AddLog, View {
         this.userConnected = userConnected;
         this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
         Button button = new Button("Refresh");
-        button.addStyleName(Runo.BUTTON_SMALL);
+        //  button.addStyleName(Runo.BUTTON_SMALL);
 
         button.addClickListener((Button.ClickListener) event -> {
             this.refreshCombo();
@@ -56,27 +53,17 @@ public class DeploymentView extends VerticalLayout implements AddLog, View {
         this.addComponent(button);
 
 
-        spaceContainer =
-                new BeanItemContainer<ProjectResponse>(ProjectResponse.class);
-
-        ComboBox spaceSelection = new ComboBox("Project", spaceContainer);
-
-        spaceSelection.setNullSelectionAllowed(false);
-
-        spaceSelection.setItemCaptionPropertyId("name");
-
-        spaceSelection.setNewItemsAllowed(false);
-        spaceSelection.setImmediate(true);
-        spaceSelection.addListener(new Property.ValueChangeListener() {
-            @Override
-            public void valueChange(Property.ValueChangeEvent valueChangeEvent) {
-                ProjectResponse response = (ProjectResponse) spaceSelection.getValue();
-                projectArtifactIDTextField.setValue(response.getName());
-                projectGroupIDTextField.setValue(response.getGroupId());
-                projectVersionTextField.setValue(response.getVersion());
-                refreshList();
-            }
+        spaceSelection = new ComboBox("Project", userConnected.getProjectResponses());
+        spaceSelection.setItemCaptionGenerator(ProjectResponse::getName);
+        spaceSelection.addValueChangeListener(valueChangeEvent -> {
+            ProjectResponse response = (ProjectResponse) spaceSelection.getValue();
+            projectArtifactIDTextField.setValue(response.getName());
+            projectGroupIDTextField.setValue(response.getGroupId());
+            projectVersionTextField.setValue(response.getVersion());
+            refreshList();
         });
+
+
         this.addComponent(spaceSelection);
 
         projectArtifactIDTextField.setEnabled(false);
@@ -90,7 +77,7 @@ public class DeploymentView extends VerticalLayout implements AddLog, View {
 
         this.buttonDeployProject.setEnabled(false);
         this.addComponent(buttonDeployProject);
-        buttonDeployProject.addStyleName(Runo.BUTTON_SMALL);
+        // buttonDeployProject.addStyleName(Runo.BUTTON_SMALL);
 
 
         buttonDeployProject.addClickListener((Button.ClickListener) event -> {
@@ -134,20 +121,17 @@ public class DeploymentView extends VerticalLayout implements AddLog, View {
         gridLogging.setSizeFull();
 
         gridLogging.setColumnReorderingAllowed(false);
-        gridLogging.setImmediate(true);
 
 
-        IndexedContainer container = new IndexedContainer();
-        container.addContainerProperty("Message", String.class, "none");
+        // gridLogging.addColumn("Message", new com.vaadin.ui.renderers.TextRenderer()).setCaption("Message");
 
-        gridLogging.setContainerDataSource(container);
+
         this.addComponent(gridLogging);
 
     }
 
     public void refreshCombo() {
-        spaceContainer.removeAllItems();
-        spaceContainer.addAll(userConnected.getProjectResponses());
+        spaceSelection.setItems(userConnected.getProjectResponses());
 
     }
 
@@ -169,23 +153,13 @@ public class DeploymentView extends VerticalLayout implements AddLog, View {
     }
 
     public void addRow(String textToAdd) {
-        int nbRows = gridLogging.getContainerDataSource().getItemIds().size() + 1;
-        Item item = gridLogging.getContainerDataSource().addItem(nbRows);
-        if (item != null) {
-            Property<String> nameProperty =
-                    item.getItemProperty("Message");
-
-            nameProperty.setValue(textToAdd);
-            gridLogging.setContainerDataSource(gridLogging.getContainerDataSource());
-        } else {
-            System.out.println("null");
-        }
+        logs.add(textToAdd);
+        gridLogging.setItems(logs);
 
     }
 
     @Override
     public void enter(ViewChangeListener.ViewChangeEvent viewChangeEvent) {
-        spaceContainer.removeAllItems();
-        spaceContainer.addAll(userConnected.getProjectResponses());
+        spaceSelection.setItems(userConnected.getProjectResponses());
     }
 }

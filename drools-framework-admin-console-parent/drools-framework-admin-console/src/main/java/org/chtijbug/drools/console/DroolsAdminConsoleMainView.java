@@ -17,7 +17,7 @@ import org.chtijbug.drools.console.view.TableLikeArtefactView;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Push
-@Theme("runo")
+@Theme("mytheme")
 @SpringUI
 @PreserveOnRefresh
 @SuppressWarnings("serial")

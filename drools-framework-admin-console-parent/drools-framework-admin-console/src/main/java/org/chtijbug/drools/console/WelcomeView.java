@@ -1,6 +1,6 @@
 package org.chtijbug.drools.console;
 
-import com.vaadin.event.FieldEvents;
+import com.vaadin.data.HasValue;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.ui.*;
@@ -44,13 +44,13 @@ public class WelcomeView extends VerticalLayout implements View {
         userNameTextField = new TextField("User name");
         userNameTextField.setValue(configKie.getUserName());
         userConnected.setUserName(configKie.getUserName());
-        userNameTextField.addTextChangeListener((FieldEvents.TextChangeListener) textChangeEvent -> userConnected.setUserName(textChangeEvent.getText()));
+        userNameTextField.addValueChangeListener((HasValue.ValueChangeListener<String>) valueChangeEvent -> userConnected.setUserName(valueChangeEvent.getValue()));
 
         userHorizontal.addComponent(userNameTextField);
         userpasswdTextField = new PasswordField("Password");
         userpasswdTextField.setValue(configKie.getPassword());
         userConnected.setUserPassword(configKie.getPassword());
-        userpasswdTextField.addTextChangeListener((FieldEvents.TextChangeListener) textChangeEvent -> userConnected.setUserPassword(textChangeEvent.getText()));
+        userpasswdTextField.addValueChangeListener((HasValue.ValueChangeListener<String>) valueChangeEvent -> userConnected.setUserPassword(valueChangeEvent.getValue()));
         userHorizontal.addComponent(userpasswdTextField);
         loginButton = new Button("login");
         userHorizontal.addComponent(loginButton);

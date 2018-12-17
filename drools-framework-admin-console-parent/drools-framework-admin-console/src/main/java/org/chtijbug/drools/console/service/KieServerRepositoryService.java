@@ -149,6 +149,10 @@ public class KieServerRepositoryService {
         reponseMoteur = response.getBody();
         workOnGoingView.addRow(reponseMoteur.toString());
         KieContainerInfo result = new KieContainerInfo();
+        if (reponseMoteur.get("result") != null) {
+            String containerID = (String) ((Map) ((Map) reponseMoteur.get("result")).get("kie-container")).get("container-id");
+            result.setContainerId(containerID);
+        }
         return result;
     }
 
