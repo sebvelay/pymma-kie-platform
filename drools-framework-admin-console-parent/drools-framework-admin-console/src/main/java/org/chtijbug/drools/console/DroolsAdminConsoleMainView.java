@@ -37,6 +37,7 @@ public class DroolsAdminConsoleMainView extends VerticalLayout {
                 });
 
         actionView = new VerticalLayout();
+
         //this.add(actionView);
     }
 
