@@ -31,11 +31,7 @@
     <name>Chtijbug :: Business Proxy :: app</name>
 
 
-    <properties>
-        <category>Rest</category>
-        <spring.boot-version>2.1.0.RELEASE</spring.boot-version>
-        <camel.version>2.23.0</camel.version>
-    </properties>
+
 
     <!-- Spring-Boot and Camel BOM -->
     <dependencyManagement>
@@ -58,6 +54,11 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>com.pymmasoftware.jbpm</groupId>
+            <artifactId>drools-framewwork-business-proxy-persistence</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- Spring Boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -107,6 +108,107 @@
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-core</artifactId>
             <version>9.0.13</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-api</artifactId>
+            <version>${jbpm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-internal</artifactId>
+            <version>${jbpm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-compiler</artifactId>
+            <version>${jbpm.version}</version>
+        </dependency>
+
+        <!-- kie-server -->
+        <dependency>
+            <groupId>org.kie.server</groupId>
+            <artifactId>kie-server-api</artifactId>
+            <version>${jbpm.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.optaplanner</groupId>
+                    <artifactId>optaplanner-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.optaplanner</groupId>
+                    <artifactId>optaplanner-persistence-xstream</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.optaplanner</groupId>
+                    <artifactId>optaplanner-persistence-jaxb</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.kie.server</groupId>
+            <artifactId>kie-server-services-common</artifactId>
+            <version>${jbpm.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.pymmasoftware.jbpm</groupId>
+            <artifactId>drools-framework-kie-server-services-drools</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.thoughtworks.xstream</groupId>
+                    <artifactId>xstream</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.activemq</groupId>
+                    <artifactId>artemis-jms-client</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.errai</groupId>
+                    <artifactId>errai-marshalling</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-buffer</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-transport-native-kqueue</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-codec-http</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-handler</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-codec</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-transport-native-epoll</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-transport</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-transport-native-unix-common</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>io.netty</groupId>
+                    <artifactId>netty-resolver</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 

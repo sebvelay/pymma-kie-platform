@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
 import org.chtijbug.drools.console.AddLog;
 import org.chtijbug.drools.console.service.model.kie.KieContainerInfo;
-import org.chtijbug.drools.console.service.model.kie.KieContainerRequest;
 import org.chtijbug.drools.console.service.model.kie.KieServerJobStatus;
 import org.chtijbug.drools.console.service.model.kie.SpaceProject;
+import org.kie.server.api.model.KieContainerResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -62,7 +62,7 @@ public class KieServerRepositoryService {
 
     public List<KieContainerInfo> getContainerList(String url, String username, String password) {
         List<KieContainerInfo> results = new ArrayList<>();
-        String completeurl = url + "/containers";
+        String completeurl = url ;
         logger.info("url kie server container : " + completeurl);
         ResponseEntity<Map<String, Object>> response = restTemplateKiewb
                 .execute(completeurl, HttpMethod.GET, requestCallback(null, username, password), clientHttpResponse -> {
@@ -83,29 +83,32 @@ public class KieServerRepositoryService {
         Map<String, Object> reponseMoteur;
 
         reponseMoteur = response.getBody();
-        Object resultMap = reponseMoteur.get("result");
-        Object containersMap = ((Map) resultMap).get("kie-containers");
-        Map containerMap = ((Map) containersMap);
-        List<Map<String, Object>> listContainers = (List) containerMap.get("kie-container");
-        for (Map<String, Object> container : listContainers) {
-            KieContainerInfo kieContainerInfo = new KieContainerInfo();
-            System.out.println("coucou");
-            kieContainerInfo.setContainerId((String) container.get("container-id"));
-            Map artifact = (Map) container.get("resolved-release-id");
-            if (artifact != null) {
-                kieContainerInfo.setArtifactId((String) artifact.get("artifact-id"));
-                kieContainerInfo.setGroupId((String) artifact.get("group-id"));
-                kieContainerInfo.setVersion((String) artifact.get("version"));
+  //      Object resultMap = reponseMoteur.get("containers");
+    //    Object containersMap = ((Map) resultMap).get("kie-containers");
+      //  Map containerMap = ((Map) containersMap);
+        if (reponseMoteur != null
+            && reponseMoteur.get("containers")!= null) {
+            List<Map<String, Object>> listContainers = (List) reponseMoteur.get("containers");
+            for (Map<String, Object> container : listContainers) {
+                KieContainerInfo kieContainerInfo = new KieContainerInfo();
+                System.out.println("coucou");
+                kieContainerInfo.setContainerId((String) container.get("containerId"));
+                Map artifact = (Map) container.get("resolvedReleaseId");
+                if (artifact != null) {
+                    kieContainerInfo.setArtifactId((String) artifact.get("artifactId"));
+                    kieContainerInfo.setGroupId((String) artifact.get("groupId"));
+                    kieContainerInfo.setVersion((String) artifact.get("version"));
+                }
+                kieContainerInfo.setContainerAlias((String) container.get("container-alias"));
+                results.add(kieContainerInfo);
             }
-            kieContainerInfo.setContainerAlias((String) container.get("container-alias"));
-            results.add(kieContainerInfo);
         }
         return results;
     }
 
     public KieServerJobStatus stopContainer(String url, String username, String password, String containerId, AddLog workOnGoingView) {
         KieServerJobStatus results = null;
-        String completeurl = url + "/containers/" + containerId;
+        String completeurl = url  + containerId;
         logger.info("url kie server container : " + completeurl);
         ResponseEntity<KieServerJobStatus> response = restTemplateKiewb
                 .execute(completeurl, HttpMethod.DELETE, requestCallback(null, username, password), clientHttpResponse -> {
@@ -125,8 +128,8 @@ public class KieServerRepositoryService {
         return reponseMoteur;
     }
 
-    public KieContainerInfo createContainer(String url, String username, String password, String containerId, KieContainerRequest request, AddLog workOnGoingView) {
-        String completeurl = url + "/containers/" + containerId;
+    public KieContainerInfo createContainer(String url, String username, String password, String containerId, KieContainerResource request, AddLog workOnGoingView) {
+        String completeurl = url  + "/"+containerId;
         logger.info("url kie server container : " + completeurl);
         ResponseEntity<Map<String, Object>> response = restTemplateKiewb
                 .execute(completeurl, HttpMethod.PUT, requestCallback(request, username, password), clientHttpResponse -> {

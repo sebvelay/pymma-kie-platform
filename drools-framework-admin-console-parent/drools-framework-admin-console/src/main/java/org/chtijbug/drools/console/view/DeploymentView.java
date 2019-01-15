@@ -16,6 +16,8 @@ import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.*;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.guvnor.rest.client.ProjectResponse;
+import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.ReleaseId;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -116,15 +118,15 @@ public class DeploymentView extends DroolsAdminConsoleMainView implements AddLog
                 }
 
             }
-            KieContainerRequest newContainer = new KieContainerRequest();
+            KieContainerResource newContainer = new KieContainerResource();
             newContainer.setContainerId(containerIdTextField.getValue());
-            newContainer.setReleaseId(new ReleaseDefinition());
+            newContainer.setReleaseId(new ReleaseId());
             newContainer.getReleaseId().setArtifactId(projectArtifactIDTextField.getValue());
             newContainer.getReleaseId().setGroupId(projectGroupIDTextField.getValue());
             newContainer.getReleaseId().setVersion(projectVersionTextField.getValue());
             KieContainerInfo createdContainer = kieServerRepositoryService.createContainer(config.getKieserverUrl(), config.getKieserverUserName(), config.getKieserverPassword(), projectArtifactIDTextField.getValue(), newContainer, this);
             containerIdTextField.setValue(createdContainer.getContainerId());
-            // }
+            refreshList();
 
 
         });

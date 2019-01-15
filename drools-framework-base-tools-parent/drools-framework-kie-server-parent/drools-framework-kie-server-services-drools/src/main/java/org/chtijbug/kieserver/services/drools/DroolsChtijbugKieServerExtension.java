@@ -3,7 +3,7 @@
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.chtijbug.kieserver.services.drools;
 
@@ -20,10 +20,14 @@ import org.chtijbug.drools.kieserver.extension.KieServerGlobalVariableDefinition
 import org.chtijbug.drools.kieserver.extension.KieServerListenerDefinition;
 import org.chtijbug.drools.kieserver.extension.KieServerLoggingDefinition;
 import org.chtijbug.kieserver.services.drools.sftp.SftpServerService;
+import org.drools.compiler.kie.builder.impl.InternalKieModule;
+import org.drools.compiler.kie.builder.impl.KieRepositoryImpl;
+import org.kie.api.builder.KieRepository;
 import org.kie.api.remote.Remotable;
 import org.kie.scanner.KieModuleMetaData;
 import org.kie.server.api.KieServerConstants;
 import org.kie.server.services.api.*;
+import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.KieServerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,6 +102,7 @@ public class DroolsChtijbugKieServerExtension implements KieServerExtension {
 
 
     }
+
     @Override
     public void destroy(KieServerImpl kieServer, KieServerRegistry registry) {
         // no-op?
@@ -146,8 +151,8 @@ public class DroolsChtijbugKieServerExtension implements KieServerExtension {
 
     @Override
     public void updateContainer(String id, KieContainerInstance kieContainerInstance, Map<String, Object> map) {
-        this.disposeContainer(id,kieContainerInstance,map);
-        this.createContainer(id,kieContainerInstance,map);
+        this.disposeContainer(id, kieContainerInstance, map);
+        this.createContainer(id, kieContainerInstance, map);
     }
 
     @Override
@@ -173,6 +178,15 @@ public class DroolsChtijbugKieServerExtension implements KieServerExtension {
         }
         kieContainerInstance.clearExtraClasses();
         rulesExecutionService.removeRuleBasePackage(id);
+        if (kieContainerInstance instanceof KieContainerInstanceImpl) {
+            KieContainerInstanceImpl internalContainer = (KieContainerInstanceImpl) kieContainerInstance;
+            KieRepository kieRepository = KieRepositoryImpl.INSTANCE;
+
+            if (internalContainer.getKieContainer().getMainKieModule() instanceof InternalKieModule) {
+                InternalKieModule kie = (InternalKieModule) internalContainer.getKieContainer().getMainKieModule();
+                kie.getFile().delete();
+            }
+        }
     }
 
     @Override
@@ -202,7 +216,7 @@ public class DroolsChtijbugKieServerExtension implements KieServerExtension {
 
     @Override
     public String getImplementedCapability() {
-        return KieServerConstants.CAPABILITY_BRM;
+        return "BRules";
     }
 
     @Override
@@ -223,6 +237,10 @@ public class DroolsChtijbugKieServerExtension implements KieServerExtension {
     @Override
     public String toString() {
         return EXTENSION_NAME + " KIE Server extension";
+    }
+
+    public DroolsChtijbugRulesExecutionService getRulesExecutionService() {
+        return rulesExecutionService;
     }
 
     protected void addExtraClass(Set<Class<?>> extraClasses, Class classToAdd, boolean filtered) {
@@ -262,5 +280,6 @@ public class DroolsChtijbugKieServerExtension implements KieServerExtension {
         } else {
             extraClasses.add(classToAdd);
         }
+
     }
 }

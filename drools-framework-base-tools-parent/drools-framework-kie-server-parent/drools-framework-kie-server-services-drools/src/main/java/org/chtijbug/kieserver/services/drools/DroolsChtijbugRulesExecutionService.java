@@ -42,6 +42,7 @@ public class DroolsChtijbugRulesExecutionService {
 
     private KieServerRegistry context;
     private Map<String, RuleBasePackage> ruleBasePackages = new HashMap<>();
+    private Map<String, RuleBasePackage> ruleBasePackagesClass = new HashMap<>();
     private MessageHandlerResolver messageHandlerResolver;
     private int MaxNumberRulesToExecute = 20000;
     private KieServerAddOnElement kieServerAddOnElement = null;
@@ -75,6 +76,9 @@ public class DroolsChtijbugRulesExecutionService {
             RuleBasePackage ruleBasePackage = this.ruleBasePackages.get(id);
             ruleBasePackage.dispose();
             this.ruleBasePackages.remove(id);
+        }
+        if (this.ruleBasePackagesClass.containsKey(id) == true) {
+            this.ruleBasePackagesClass.remove(id);
         }
 
 

@@ -15,7 +15,7 @@
  */
 package org.chtijbug.drools.logging;
 
-import com.google.common.base.Predicate;
+
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
@@ -144,12 +144,7 @@ public class SessionExecution {
     public java.util.Collection<Fact> getFactsByType(final FactType factType) {
         if (this.getFacts().isEmpty())
             return Lists.newArrayList();
-        return Collections2.filter(this.getFacts(), new Predicate<Fact>() {
-            @Override
-            public boolean apply(Fact fact) {
-                return fact.getFactType().equals(factType);
-            }
-        });
+        return Collections2.filter(this.getFacts(), fact -> fact.getFactType().equals(factType));
     }
 
     public Date getProcessingStartDate() {

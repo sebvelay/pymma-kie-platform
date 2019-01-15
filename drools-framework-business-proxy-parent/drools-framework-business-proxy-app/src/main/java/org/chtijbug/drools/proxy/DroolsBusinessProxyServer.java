@@ -14,20 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.chtijbug.drools.proxy.camel;
+package org.chtijbug.drools.proxy;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 // CHECKSTYLE:OFF
 @SpringBootApplication
-public class Application {
+public class DroolsBusinessProxyServer {
+
+
+
 
     /**
      * Main method to start the application.
      */
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(DroolsBusinessProxyServer.class, args);
     }
 
 }
