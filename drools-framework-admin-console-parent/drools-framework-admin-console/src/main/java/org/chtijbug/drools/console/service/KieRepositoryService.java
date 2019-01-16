@@ -7,7 +7,7 @@ import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.JobStatus;
 import org.chtijbug.guvnor.server.jaxrs.api.UserLoginInformation;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
-import org.guvnor.rest.client.ProjectResponse;
+import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -55,22 +55,22 @@ public class KieRepositoryService {
         return reponseMoteur;
     }
 
-    public List<ProjectResponse> getListSpaces2(String url, String username, String password) {
+    public List<PlatformProjectResponse> getListSpaces2(String url, String username, String password) {
         String completeurl = url + "/chtijbug/detailedSpaces";
         logger.info("url moteur reco : " + completeurl);
-        ResponseEntity<List<ProjectResponse>> response = restTemplateKiewb
+        ResponseEntity<List<PlatformProjectResponse>> response = restTemplateKiewb
                 .execute(completeurl, HttpMethod.GET, requestCallback(null, username, password), clientHttpResponse -> {
-                    List<ProjectResponse> extractedResponse = null;
+                    List<PlatformProjectResponse> extractedResponse = null;
                     if (clientHttpResponse.getBody() != null) {
                         Scanner s = new Scanner(clientHttpResponse.getBody()).useDelimiter("\\A");
                         String result = s.hasNext() ? s.next() : "";
-                        ProjectResponse[] values = mapper.readValue(result, ProjectResponse[].class);
+                        PlatformProjectResponse[] values = mapper.readValue(result, PlatformProjectResponse[].class);
                         extractedResponse = Arrays.asList(values);
                     }
-                    ResponseEntity<List<ProjectResponse>> extractedValue = new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
+                    ResponseEntity<List<PlatformProjectResponse>> extractedValue = new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
                     return extractedValue;
                 });
-        List<ProjectResponse> reponseMoteur;
+        List<PlatformProjectResponse> reponseMoteur;
 
         reponseMoteur = response.getBody();
         return reponseMoteur;

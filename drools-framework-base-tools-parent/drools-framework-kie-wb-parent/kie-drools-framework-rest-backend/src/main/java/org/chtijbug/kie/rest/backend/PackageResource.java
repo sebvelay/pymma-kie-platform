@@ -4,15 +4,21 @@ package org.chtijbug.kie.rest.backend;
 import org.chtijbug.guvnor.server.jaxrs.api.UserLoginInformation;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Package;
+import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
+import org.guvnor.common.services.project.model.Module;
 import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.guvnor.common.services.project.service.WorkspaceProjectService;
-import org.guvnor.rest.client.ProjectResponse;
 import org.guvnor.structure.organizationalunit.OrganizationalUnit;
 import org.guvnor.structure.organizationalunit.OrganizationalUnitService;
 import org.guvnor.structure.repositories.Branch;
 import org.guvnor.structure.repositories.PublicURI;
 import org.guvnor.structure.repositories.Repository;
 import org.guvnor.structure.repositories.RepositoryService;
+import org.kie.workbench.common.screens.datamodeller.model.EditorModelContent;
+import org.kie.workbench.common.screens.datamodeller.service.DataModelerService;
+import org.kie.workbench.common.services.datamodeller.core.DataObject;
+import org.kie.workbench.common.services.datamodeller.core.impl.DataModelImpl;
+import org.kie.workbench.common.services.shared.project.KieModule;
 import org.slf4j.LoggerFactory;
 import org.uberfire.io.IOService;
 import org.uberfire.java.nio.base.options.CommentedOption;
@@ -61,6 +67,8 @@ public class PackageResource {
     private WorkspaceProjectService projectService;
 
     private RestTypeDefinition dotFileFilter = new RestTypeDefinition();
+    @Inject
+    private DataModelerService dataModelerService;
 
     @Inject
     private WorkspaceProjectService workspaceProjectService;
@@ -93,15 +101,15 @@ public class PackageResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/detailedSpaces")
     // @RolesAllowed({REST_ROLE, REST_PROJECT_ROLE})
-    public Collection<ProjectResponse> getProjects() {
+    public Collection<PlatformProjectResponse> getProjects() {
         logger.debug("-----getSpaces--- ");
 
 
         return getAllProjects();
     }
 
-    private List<ProjectResponse> getAllProjects() {
-        final List<ProjectResponse> spaces = new ArrayList<>();
+    private List<PlatformProjectResponse> getAllProjects() {
+        final List<PlatformProjectResponse> spaces = new ArrayList<>();
         for (OrganizationalUnit ou : organizationalUnitService.getOrganizationalUnits()) {
             spaces.addAll(getSpace(ou));
         }
@@ -109,22 +117,36 @@ public class PackageResource {
         return spaces;
     }
 
-    private List<ProjectResponse> getSpace(OrganizationalUnit ou) {
+    private List<PlatformProjectResponse> getSpace(OrganizationalUnit ou) {
 
-        final List<ProjectResponse> repoNames = new ArrayList<>();
+        final List<PlatformProjectResponse> repoNames = new ArrayList<>();
         for (WorkspaceProject workspaceProject : workspaceProjectService.getAllWorkspaceProjects(ou)) {
             repoNames.add(getProjectResponse(workspaceProject));
         }
 
         return repoNames;
     }
+    private void toto(){
 
-    private ProjectResponse getProjectResponse(WorkspaceProject workspaceProject) {
-        final ProjectResponse projectResponse = new ProjectResponse();
+    }
+
+
+    private PlatformProjectResponse getProjectResponse(WorkspaceProject workspaceProject) {
+        final PlatformProjectResponse projectResponse = new PlatformProjectResponse();
         projectResponse.setName(workspaceProject.getName());
         projectResponse.setSpaceName(workspaceProject.getOrganizationalUnit().getName());
 
         if (workspaceProject.getMainModule() != null) {
+            Module kmodule = workspaceProject.getMainModule();
+            EditorModelContent econtent = dataModelerService.loadContent(((KieModule) kmodule).getImportsPath());
+            DataModelImpl econtentDataModel = (DataModelImpl)econtent.getDataModel();
+            List<DataObject> dataObjects = econtentDataModel.getExternalClasses();
+            for (DataObject dataObject : dataObjects){
+                System.out.println(dataObject.toString());
+                String className="class="+dataObject.getPackageName()+"."+dataObject.getName();
+                projectResponse.getJavaClasses().add(className);
+
+              }
             projectResponse.setGroupId(workspaceProject.getMainModule().getPom().getGav().getGroupId());
             projectResponse.setVersion(workspaceProject.getMainModule().getPom().getGav().getVersion());
             projectResponse.setDescription(workspaceProject.getMainModule().getPom().getDescription());

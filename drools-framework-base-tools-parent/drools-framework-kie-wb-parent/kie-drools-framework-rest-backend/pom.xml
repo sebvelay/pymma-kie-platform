@@ -26,6 +26,15 @@
             <version>1.0.0.Final</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.kie.workbench.screens</groupId>
+            <artifactId>kie-wb-common-data-modeller-api</artifactId>
+            <version>${jbpm.version}</version>
+            <scope>provided</scope>
+
+        </dependency>
+
         <dependency>
             <groupId>org.kie</groupId>
             <artifactId>kie-api</artifactId>
