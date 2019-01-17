@@ -96,7 +96,8 @@ public class KieServiceCommon {
                     Class<?> theClass = classLoader.loadClass(className);
                     camelContext.setApplicationContextClassLoader(classLoader);
                     String projectName = container.getProjectName();
-                    DroolsRouter droolsRouter = new DroolsRouter(camelContext, theClass, projectName, kieContainerInstance);
+                    String processId = container.getProcessID();
+                    DroolsRouter droolsRouter = new DroolsRouter(camelContext, theClass, projectName, kieContainerInstance,processId);
                     camelContext.addRoutes(droolsRouter);
                 }
             }
@@ -132,11 +133,9 @@ public class KieServiceCommon {
     }
 
 
-    public KieContainerResource createContainerWithRestBusinessService(String id, KieContainerResource container, String className, String projectName) {
+    public KieContainerResource createContainerWithRestBusinessService(String id, KieContainerResource container, String className,String processID) {
 
-        if (projectName==null){
-            projectName=id;
-        }
+
         KieContainerResource containerResource = this.createContainer(id, container);
         if (containerResource.getMessages().size()==1
                 && containerResource.getMessages().get(0).getSeverity()!= null
@@ -158,7 +157,7 @@ public class KieServiceCommon {
                     ClassLoader classLoader = foundClass.getClassLoader();
                     Class<?> theClass = classLoader.loadClass(className);
                     camelContext.setApplicationContextClassLoader(classLoader);
-                    DroolsRouter droolsRouter = new DroolsRouter(camelContext, theClass, projectName,kci);
+                    DroolsRouter droolsRouter = new DroolsRouter(camelContext, theClass, id,kci,processID);
                     camelContext.addRoutes(droolsRouter);
                     String serverName= System.getProperty("org.kie.server.id");
                     ContainerPojoPersist containerPojoPersist = containerRepository.findByServerNameAndContainerId(serverName,id);
@@ -167,13 +166,15 @@ public class KieServiceCommon {
                         containerPojoPersist.setId(UUID.randomUUID().toString());
                         containerPojoPersist.setContainerId(id);
                         containerPojoPersist.setClassName(className);
-                        containerPojoPersist.setProjectName(projectName);
+                        containerPojoPersist.setProjectName(id);
                         containerPojoPersist.setServerName(serverName);
+                        containerPojoPersist.setProcessID(processID);
                         containerRepository.save(containerPojoPersist);
                     }else{
                         containerPojoPersist.setContainerId(id);
                         containerPojoPersist.setClassName(className);
-                        containerPojoPersist.setProjectName(projectName);
+                        containerPojoPersist.setProjectName(id);
+                        containerPojoPersist.setProcessID(processID);
                         containerPojoPersist.setServerName(serverName);
                         containerRepository.save(containerPojoPersist);
                     }

@@ -18,6 +18,7 @@ public class ContainerPojoPersist {
     @Indexed
     private String serverName;
 
+    private String processID;
 
     private String projectName;
 
@@ -61,6 +62,14 @@ public class ContainerPojoPersist {
         this.projectName = projectName;
     }
 
+    public String getProcessID() {
+        return processID;
+    }
+
+    public void setProcessID(String processID) {
+        this.processID = processID;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("ContainerPojoPersist{");
@@ -68,6 +77,7 @@ public class ContainerPojoPersist {
         sb.append(", className='").append(className).append('\'');
         sb.append(", containerId='").append(containerId).append('\'');
         sb.append(", serverName='").append(serverName).append('\'');
+        sb.append(", processID='").append(processID).append('\'');
         sb.append(", projectName='").append(projectName).append('\'');
         sb.append('}');
         return sb.toString();

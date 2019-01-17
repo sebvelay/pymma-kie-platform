@@ -15,12 +15,14 @@ public class DroolsRouter extends RouteBuilder {
     private String projectName ;
     private KieContainerInstance kci;
     private Class<?> clazzUser;
+    private String processID;
 
-    public DroolsRouter(CamelContext camelContext,Class<?> clazzUser, String projectName,KieContainerInstance kci) {
+    public DroolsRouter(CamelContext camelContext,Class<?> clazzUser, String projectName,KieContainerInstance kci,String processID) {
         super(camelContext);
         this.clazzUser = clazzUser;
         this.projectName=projectName;
         this.kci = kci;
+        this.processID = processID;
     }
 
     @Override
@@ -32,12 +34,11 @@ public class DroolsRouter extends RouteBuilder {
                     .consumes("application/json")
                     .produces("application/json")
 
-                    .put("/{containerId}/{processID}").description("Execute Business Service").type(clazzUser).outType(clazzUser)
+                    .put("/{containerId}").description("Execute Business Service").type(clazzUser).outType(clazzUser)
                     .param().name("containerId").type(path).description("Container  ID where the rule artefact id deployed").dataType("integer").endParam()
-                    .param().name("processID").type(path).description("process ID sot start").dataType("integer").endParam()
                     .param().name("body").type(body).description("The Data drools should work on").endParam()
                     .responseMessage().code(200).message("Data drools worked on").endResponseMessage()
-                    .to("bean:ruleService?method=runSessionObject(${header.containerId},${header.processID},${body})");
+                    .to("bean:ruleService?method=runSessionObject(${header.containerId},"+this.processID+",${body})");
 
 
     }

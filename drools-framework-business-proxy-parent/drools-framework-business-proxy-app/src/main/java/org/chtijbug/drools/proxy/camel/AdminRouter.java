@@ -82,12 +82,13 @@ public class AdminRouter extends RouteBuilder {
                 .consumes("application/json")
                 .produces("application/json")
 
-                .post("/{id}/{className}").description("Container id to be assigned to deployed KIE Container").type(KieContainerResource.class).outType(KieContainerResource.class)
+                .post("/{id}/{className}/{processID}").description("Container id to be assigned to deployed KIE Container").type(KieContainerResource.class).outType(KieContainerResource.class)
                 .param().name("id").type(path).description("Container id to be assigned to deployed KIE Container").dataType("string").endParam()
                 .param().name("className").type(path).description("Class Name of the Business Service").dataType("string").endParam()
+                .param().name("processID").type(path).description("Process Id of the Business Service").dataType("string").endParam()
                  .param().name("body").type(body).description("KIE Container resource to be deployed as KieContainerResourcee").endParam()
                 .responseMessage().code(200).message("Container successfully created").endResponseMessage()
-                .to("bean:kieService?method=createContainerWithRestBusinessService(${header.id},${body},${header.className})");
+                .to("bean:kieService?method=createContainerWithRestBusinessService(${header.id},${body},${header.className},${header.processID})");
 
     }
 }
