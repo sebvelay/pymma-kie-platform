@@ -7,20 +7,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.apache.camel.model.rest.RestParamType.body;
-import static org.apache.camel.model.rest.RestParamType.path;
 
 public class DroolsRouter extends RouteBuilder {
 
     private static final Logger logger = LoggerFactory.getLogger(DroolsRouter.class);
-    private String projectName ;
+    private String containerId;
     private KieContainerInstance kci;
     private Class<?> clazzUser;
     private String processID;
 
-    public DroolsRouter(CamelContext camelContext,Class<?> clazzUser, String projectName,KieContainerInstance kci,String processID) {
+    public DroolsRouter(CamelContext camelContext, Class<?> clazzUser, String containerId, KieContainerInstance kci, String processID) {
         super(camelContext);
         this.clazzUser = clazzUser;
-        this.projectName=projectName;
+        this.containerId = containerId;
         this.kci = kci;
         this.processID = processID;
     }
@@ -30,15 +29,15 @@ public class DroolsRouter extends RouteBuilder {
 
             System.out.println("coucou");
 
-            rest("/" + projectName).description(projectName + " Rest service")
+            rest("/" + containerId).description(containerId + " Rest service")
                     .consumes("application/json")
                     .produces("application/json")
 
-                    .put("/{containerId}").description("Execute Business Service").type(clazzUser).outType(clazzUser)
-                    .param().name("containerId").type(path).description("Container  ID where the rule artefact id deployed").dataType("integer").endParam()
+                    .put("/").description("Execute Business Service").type(clazzUser).outType(clazzUser)
+                  //  .param().name("containerId").type(path).description("Container  ID where the rule artefact id deployed").dataType("integer").endParam()
                     .param().name("body").type(body).description("The Data drools should work on").endParam()
                     .responseMessage().code(200).message("Data drools worked on").endResponseMessage()
-                    .to("bean:ruleService?method=runSessionObject(${header.containerId},"+this.processID+",${body})");
+                    .to("bean:ruleService?method=runSessionObject("+this.containerId+","+this.processID+",${body})");
 
 
     }
