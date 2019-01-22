@@ -39,7 +39,10 @@ import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Service("kieService")
 public class KieServiceCommon {
@@ -80,28 +83,43 @@ public class KieServiceCommon {
         this.marshallerHelper = new MarshallerHelper(this.server.getServerRegistry());
 
     }
+
     @PostConstruct
-    private void initCamelBusinessRoutes(){
+    private void initCamelBusinessRoutes() {
         try {
             String serverName = System.getProperty("org.kie.server.id");
             List<ContainerPojoPersist> containers = containerRepository.findByServerName(serverName);
             for (ContainerPojoPersist container : containers) {
+                ClassLoader localClassLoader = null;
                 String containerId = container.getContainerId();
                 KieContainerInstanceImpl kieContainerInstance = registry.getContainer(containerId);
-                if (kieContainerInstance!= null) {
-                    Set<Class<?>> classes = kieContainerInstance.getExtraClasses();
-                    String className = container.getClassName();
-                    Class foundClass = this.getClassFromName(classes, className);
-                    ClassLoader classLoader = foundClass.getClassLoader();
-                    Class<?> theClass = classLoader.loadClass(className);
-                    camelContext.setApplicationContextClassLoader(classLoader);
-                    String projectName = container.getProjectName();
-                    String processId = container.getProcessID();
-                    DroolsRouter droolsRouter = new DroolsRouter(camelContext, theClass, projectName, kieContainerInstance,processId);
-                    camelContext.addRoutes(droolsRouter);
+                if (kieContainerInstance != null) {
+                    try {
+                        localClassLoader = Thread.currentThread()
+                                .getContextClassLoader();
+                    } catch (ClassCastException e) {
+                        logger.info("GenericResource.runSession", e);
+                    }
+                    try {
+                        Set<Class<?>> classes = kieContainerInstance.getExtraClasses();
+                        String className = container.getClassName();
+                        Class foundClass = this.getClassFromName(classes, className);
+                        ClassLoader classLoader = foundClass.getClassLoader();
+                        Class<?> theClass = classLoader.loadClass(className);
+                        camelContext.setApplicationContextClassLoader(classLoader);
+                        Thread.currentThread().setContextClassLoader(classLoader);
+                        String projectName = container.getProjectName();
+                        String processId = container.getProcessID();
+                        DroolsRouter droolsRouter = new DroolsRouter(camelContext, theClass, projectName, kieContainerInstance, processId);
+                        camelContext.addRoutes(droolsRouter);
+                    } finally {
+                        if (localClassLoader != null) {
+                            Thread.currentThread().setContextClassLoader(localClassLoader);
+                        }
+                    }
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.info("CreationContainer", e);
         }
     }
@@ -133,12 +151,12 @@ public class KieServiceCommon {
     }
 
 
-    public KieContainerResource createContainerWithRestBusinessService(String id, KieContainerResource container, String className,String processID) {
+    public KieContainerResource createContainerWithRestBusinessService(String id, KieContainerResource container, String className, String processID) {
 
 
         KieContainerResource containerResource = this.createContainer(id, container);
-        if (containerResource.getMessages().size()==1
-                && containerResource.getMessages().get(0).getSeverity()!= null
+        if (containerResource.getMessages().size() == 1
+                && containerResource.getMessages().get(0).getSeverity() != null
                 && containerResource.getMessages().get(0).getSeverity().equals(Severity.INFO)) {
             ClassLoader localClassLoader = null;
 
@@ -156,12 +174,13 @@ public class KieServiceCommon {
                 if (foundClass != null) {
                     ClassLoader classLoader = foundClass.getClassLoader();
                     Class<?> theClass = classLoader.loadClass(className);
+                    Thread.currentThread().setContextClassLoader(classLoader);
                     camelContext.setApplicationContextClassLoader(classLoader);
-                    DroolsRouter droolsRouter = new DroolsRouter(camelContext, theClass, id,kci,processID);
+                    DroolsRouter droolsRouter = new DroolsRouter(camelContext, theClass, id, kci, processID);
                     camelContext.addRoutes(droolsRouter);
-                    String serverName= System.getProperty("org.kie.server.id");
-                    ContainerPojoPersist containerPojoPersist = containerRepository.findByServerNameAndContainerId(serverName,id);
-                    if (containerPojoPersist==null){
+                    String serverName = System.getProperty("org.kie.server.id");
+                    ContainerPojoPersist containerPojoPersist = containerRepository.findByServerNameAndContainerId(serverName, id);
+                    if (containerPojoPersist == null) {
                         containerPojoPersist = new ContainerPojoPersist();
                         containerPojoPersist.setId(UUID.randomUUID().toString());
                         containerPojoPersist.setContainerId(id);
@@ -170,7 +189,7 @@ public class KieServiceCommon {
                         containerPojoPersist.setServerName(serverName);
                         containerPojoPersist.setProcessID(processID);
                         containerRepository.save(containerPojoPersist);
-                    }else{
+                    } else {
                         containerPojoPersist.setContainerId(id);
                         containerPojoPersist.setClassName(className);
                         containerPojoPersist.setProjectName(id);
@@ -238,7 +257,7 @@ public class KieServiceCommon {
         ServiceResponse<Void> result = server.disposeContainer(id);
         String serverName = System.getProperty("org.kie.server.id");
         ContainerPojoPersist element = containerRepository.findByServerNameAndContainerId(serverName, id);
-        if (element!= null){
+        if (element != null) {
             containerRepository.delete(element);
         }
         return result;
