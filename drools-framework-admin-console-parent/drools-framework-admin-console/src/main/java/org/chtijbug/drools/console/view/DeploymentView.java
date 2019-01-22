@@ -15,6 +15,7 @@ import org.chtijbug.drools.console.service.UserConnectedService;
 import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.*;
 import org.chtijbug.drools.console.service.util.AppContext;
+import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
 import org.guvnor.rest.client.ProjectResponse;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
@@ -30,7 +31,7 @@ public class DeploymentView extends DroolsAdminConsoleMainView implements AddLog
     final private Grid<List<String>> gridLogging = new Grid();
     final private Button buttonDeployProject = new Button("Deploy project");
     private KieConfigurationData config;
-    private ComboBox<ProjectResponse> spaceSelection;
+    private ComboBox<PlatformProjectResponse> spaceSelection;
 
     final private TextField projectArtifactIDTextField = new TextField("Project Artifact ID");
     final private TextField projectGroupIDTextField = new TextField("Project Group ID");
@@ -73,8 +74,8 @@ public class DeploymentView extends DroolsAdminConsoleMainView implements AddLog
         spaceSelection = new ComboBox("Project", userConnected.getProjectResponses());
         spaceSelection.setItemLabelGenerator(ProjectResponse::getName);
         spaceSelection.addValueChangeListener(valueChangeEvent -> {
-            ProjectResponse response = (ProjectResponse) spaceSelection.getValue();
-            projectArtifactIDTextField.setValue(response.getName());
+            PlatformProjectResponse response =  spaceSelection.getValue();
+            projectArtifactIDTextField.setValue(response.getArtifactId());
             projectGroupIDTextField.setValue(response.getGroupId());
             projectVersionTextField.setValue(response.getVersion());
             refreshList();

@@ -7,6 +7,8 @@ import java.util.List;
 
 public class PlatformProjectResponse extends ProjectResponse {
 
+    private String artifactId;
+
     private List<String> javaClasses = new ArrayList<>();
 
     public PlatformProjectResponse() {
@@ -19,5 +21,13 @@ public class PlatformProjectResponse extends ProjectResponse {
 
     public void setJavaClasses(List<String> javaClasses) {
         this.javaClasses = javaClasses;
+    }
+
+    public String getArtifactId() {
+        return artifactId;
+    }
+
+    public void setArtifactId(String artifactId) {
+        this.artifactId = artifactId;
     }
 }

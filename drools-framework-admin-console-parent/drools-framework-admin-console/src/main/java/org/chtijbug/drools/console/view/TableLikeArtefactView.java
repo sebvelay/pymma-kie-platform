@@ -15,7 +15,7 @@ import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
-import org.guvnor.rest.client.ProjectResponse;
+import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
@@ -36,7 +36,7 @@ public class TableLikeArtefactView extends DroolsAdminConsoleMainView {
 
     private Grid<Map<String, String>> assetListGrid;
 
-    private ComboBox<ProjectResponse> spaceSelection;
+    private ComboBox<PlatformProjectResponse> spaceSelection;
     private Button deleteRow;
 
     private Button editRow;
@@ -61,9 +61,9 @@ public class TableLikeArtefactView extends DroolsAdminConsoleMainView {
         });
         verticalLayout.add(button);
         spaceSelection = new ComboBox("Project", userConnected.getProjectResponses());
-        spaceSelection.setItemLabelGenerator(ProjectResponse::getName);
+        spaceSelection.setItemLabelGenerator(PlatformProjectResponse::getName);
         spaceSelection.addValueChangeListener(valueChangeEvent -> {
-            ProjectResponse response = (ProjectResponse) spaceSelection.getValue();
+            PlatformProjectResponse response = (PlatformProjectResponse) spaceSelection.getValue();
             //spaceSelection.setSelectedItem(response);
             assetListGrid.addColumn(hashmap -> hashmap.get("title"));
             List<Asset> assets = kieRepositoryService.getListAssets(config.getKiewbUrl(), userConnected.getUserName(), userConnected.getUserPassword(), response.getSpaceName(), response.getName());
@@ -101,7 +101,7 @@ public class TableLikeArtefactView extends DroolsAdminConsoleMainView {
             if (selectedElements.toArray().length > 0) {
                 String assetName = ((Map<String, String>) selectedElements.toArray()[0]).get("title");
                 if (assetName != null) {
-                    ProjectResponse response = (ProjectResponse) spaceSelection.getValue();
+                    PlatformProjectResponse response =  spaceSelection.getValue();
                     userConnectedService.addAssetToSession(assetName);
                     userConnectedService.addProjectToSession(response.getName());
                     userConnectedService.addSpaceToSession(response.getSpaceName());

@@ -147,6 +147,7 @@ public class PackageResource {
                 projectResponse.getJavaClasses().add(className);
 
               }
+            projectResponse.setArtifactId(workspaceProject.getMainModule().getPom().getGav().getArtifactId());
             projectResponse.setGroupId(workspaceProject.getMainModule().getPom().getGav().getGroupId());
             projectResponse.setVersion(workspaceProject.getMainModule().getPom().getGav().getVersion());
             projectResponse.setDescription(workspaceProject.getMainModule().getPom().getDescription());

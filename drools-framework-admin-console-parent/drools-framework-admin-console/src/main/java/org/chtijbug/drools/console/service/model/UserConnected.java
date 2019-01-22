@@ -1,6 +1,6 @@
 package org.chtijbug.drools.console.service.model;
 
-import org.guvnor.rest.client.ProjectResponse;
+import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ public class UserConnected {
 
     private String userPassword;
 
-    private List<ProjectResponse> projectResponses = new ArrayList<>();
+    private List<PlatformProjectResponse> projectResponses = new ArrayList<>();
 
     private List<String> roles = new ArrayList<>();
 
@@ -41,11 +41,11 @@ public class UserConnected {
     }
 
 
-    public List<ProjectResponse> getProjectResponses() {
+    public List<PlatformProjectResponse> getProjectResponses() {
         return projectResponses;
     }
 
-    public void setProjectResponses(List<ProjectResponse> projectResponses) {
+    public void setProjectResponses(List<PlatformProjectResponse> projectResponses) {
         this.projectResponses = projectResponses;
     }
 
