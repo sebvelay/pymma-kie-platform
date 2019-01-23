@@ -1,0 +1,14 @@
+.menu-secondaire-content{
+    width: 100%;
+    background-color: #32cbcb;
+    box-shadow: 5px 4px 10px #A0A0A0A0;
+    height: 7%;
+    padding: 0;
+}
+.menu-secondaire-button{
+    background-color: transparent;
+    height: 100%;
+    color: white;
+    cursor: pointer;
+    font-size: 1vw;
+}

@@ -1,0 +1,11 @@
+-DM2_HOME=/Users/nheron/m2_kieserver
+-Dorg.chtijbug.server.tracedir=/Users/nheron/kie-base-jbpm-710/trace
+-Dorg.appformer.m2repo.url=http://localhost:8080/kie-wb/maven2
+-Dorg.uberfire.nio.git.dir=/Users/nheron/kie-base-jbpm-710/niodir-kieserver
+-Dkie.maven.settings.custom=/Users/nheron/m2_kieserver/settings.xml
+-Dorg.kie.server.repo=/Users/nheron/kie-base-jbpm-710/niodir-kieserver
+-Dfile.encoding=UTF-8
+-Duser.language=fr
+-Duser.country=FR
+-Dorg.kie.server.id=server1
+-Dorg.chtijbug.server.sftpPort=9080
