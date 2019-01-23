@@ -6,6 +6,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.chtijbug.drools.console.vaadinComponent.leftMenu.LeftMenuGlobal;
 import org.chtijbug.drools.console.vaadinComponent.menu.MenuPrincipal;
 import org.chtijbug.drools.console.vaadinComponent.menu.MenuScondaireDeployement;
+import org.chtijbug.drools.console.vaadinComponent.menu.MenuSecondaireAssets;
 import org.chtijbug.drools.console.vaadinComponent.menu.MenuSecondaireInfoUser;
 
 @StyleSheet("css/accueil.css")
@@ -18,6 +19,8 @@ public class SqueletteComposant extends VerticalLayout {
     private MenuScondaireDeployement menuScondaireDeployement;
 
     private MenuSecondaireInfoUser menuSecondaireInfoUser;
+
+    private MenuSecondaireAssets menuSecondaireAssets;
 
     private VerticalLayout content;
 
@@ -45,6 +48,9 @@ public class SqueletteComposant extends VerticalLayout {
         menuSecondaireInfoUser=new MenuSecondaireInfoUser();
         content.add(menuSecondaireInfoUser);
 
+        menuSecondaireAssets=new MenuSecondaireAssets();
+        content.add(menuSecondaireAssets);
+
         infoPage=new VerticalLayout();
         infoPage.setClassName("squelette-component-infoPage");
         content.add(infoPage);
@@ -65,6 +71,14 @@ public class SqueletteComposant extends VerticalLayout {
 
     public LeftMenuGlobal getLeftMenuGlobal() {
         return leftMenuGlobal;
+    }
+
+    public MenuSecondaireAssets getMenuSecondaireAssets() {
+        return menuSecondaireAssets;
+    }
+
+    public void setMenuSecondaireAssets(MenuSecondaireAssets menuSecondaireAssets) {
+        this.menuSecondaireAssets = menuSecondaireAssets;
     }
 
     public void setLeftMenuGlobal(LeftMenuGlobal leftMenuGlobal) {
