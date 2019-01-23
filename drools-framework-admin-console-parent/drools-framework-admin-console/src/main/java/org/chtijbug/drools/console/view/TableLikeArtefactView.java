@@ -7,13 +7,13 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
-import org.chtijbug.drools.console.DroolsAdminConsoleMainView;
 import org.chtijbug.drools.console.service.KieRepositoryService;
 import org.chtijbug.drools.console.service.KieServerRepositoryService;
 import org.chtijbug.drools.console.service.UserConnectedService;
 import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
+import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
 import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
 
@@ -22,7 +22,7 @@ import java.util.*;
 
 @Route("AssetUpdate")
 @StyleSheet("css/accueil.css")
-public class TableLikeArtefactView extends DroolsAdminConsoleMainView {
+public class TableLikeArtefactView extends SqueletteComposant {
 
     private KieConfigurationData config;
 
@@ -44,8 +44,7 @@ public class TableLikeArtefactView extends DroolsAdminConsoleMainView {
     private Button duplicateRow;
     private UserConnectedService userConnectedService;
 
-    @PostConstruct
-    public void buildUI() {
+    public TableLikeArtefactView() {
 
         this.kieRepositoryService = AppContext.getApplicationContext().getBean(KieRepositoryService.class);
         this.userConnectedService = AppContext.getApplicationContext().getBean(UserConnectedService.class);
@@ -111,7 +110,7 @@ public class TableLikeArtefactView extends DroolsAdminConsoleMainView {
                 }
             }
         });
-        setActionView(verticalLayout);
+        getInfoPage().add(verticalLayout);
     }
 
 

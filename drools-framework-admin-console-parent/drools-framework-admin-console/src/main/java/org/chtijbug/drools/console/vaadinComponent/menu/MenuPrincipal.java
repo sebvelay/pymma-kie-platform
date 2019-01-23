@@ -24,6 +24,8 @@ public class MenuPrincipal extends HorizontalLayout {
 
     private Button deployement;
 
+    private Button assets;
+
     private Button infoUser;
 
     private Button hamburger;
@@ -77,10 +79,32 @@ public class MenuPrincipal extends HorizontalLayout {
                 active(deployement);
                 squeletteComposant.getMenuScondaireDeployement().setVisible(true);
                 squeletteComposant.getMenuSecondaireInfoUser().setVisible(false);
+                squeletteComposant.getMenuSecondaireAssets().setVisible(false);
             }else {
                 removeActive(deployement);
                 squeletteComposant.getMenuScondaireDeployement().setVisible(false);
                 squeletteComposant.getMenuSecondaireInfoUser().setVisible(false);
+                squeletteComposant.getMenuSecondaireAssets().setVisible(false);
+
+            }
+        });
+
+        assets=new Button("Assets");
+        assets.setClassName("menu-principal-button");
+        add(assets);
+        assets.addClickListener(buttonClickEvent -> {
+
+            if(!isActive(assets)) {
+                active(assets);
+                squeletteComposant.getMenuScondaireDeployement().setVisible(false);
+                squeletteComposant.getMenuSecondaireInfoUser().setVisible(false);
+                squeletteComposant.getMenuSecondaireAssets().setVisible(true);
+
+            }else {
+                removeActive(assets);
+                squeletteComposant.getMenuScondaireDeployement().setVisible(false);
+                squeletteComposant.getMenuSecondaireInfoUser().setVisible(false);
+                squeletteComposant.getMenuSecondaireAssets().setVisible(false);
             }
         });
 
@@ -93,10 +117,14 @@ public class MenuPrincipal extends HorizontalLayout {
                 active(infoUser);
                 squeletteComposant.getMenuScondaireDeployement().setVisible(false);
                 squeletteComposant.getMenuSecondaireInfoUser().setVisible(true);
+                squeletteComposant.getMenuSecondaireAssets().setVisible(false);
+
             }else {
                 removeActive(infoUser);
                 squeletteComposant.getMenuScondaireDeployement().setVisible(false);
                 squeletteComposant.getMenuSecondaireInfoUser().setVisible(false);
+                squeletteComposant.getMenuSecondaireAssets().setVisible(false);
+
             }
         });
 

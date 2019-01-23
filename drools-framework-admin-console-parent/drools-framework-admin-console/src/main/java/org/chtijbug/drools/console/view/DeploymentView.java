@@ -8,13 +8,13 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import org.chtijbug.drools.console.AddLog;
-import org.chtijbug.drools.console.DroolsAdminConsoleMainView;
 import org.chtijbug.drools.console.service.KieRepositoryService;
 import org.chtijbug.drools.console.service.KieServerRepositoryService;
 import org.chtijbug.drools.console.service.UserConnectedService;
 import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.*;
 import org.chtijbug.drools.console.service.util.AppContext;
+import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
 import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
 import org.guvnor.rest.client.ProjectResponse;
 import org.kie.server.api.model.KieContainerResource;
@@ -24,8 +24,8 @@ import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
-@Route("Deployment")
-public class DeploymentView extends DroolsAdminConsoleMainView implements AddLog {
+@Route("deployment")
+public class DeploymentView extends SqueletteComposant implements AddLog {
 
 
     final private Grid<List<String>> gridLogging = new Grid();
@@ -46,11 +46,6 @@ public class DeploymentView extends DroolsAdminConsoleMainView implements AddLog
     private List<String> logs = new ArrayList<>();
 
     public DeploymentView() {
-        super();
-    }
-
-    @PostConstruct
-    public void buildUI() {
 
         this.kieRepositoryService = AppContext.getApplicationContext().getBean(KieRepositoryService.class);
         this.userConnectedService = AppContext.getApplicationContext().getBean(UserConnectedService.class);
@@ -141,7 +136,7 @@ public class DeploymentView extends DroolsAdminConsoleMainView implements AddLog
 
 
         verticalLayout.add(gridLogging);
-        setActionView(verticalLayout);
+        getInfoPage().add(verticalLayout);
 
     }
 

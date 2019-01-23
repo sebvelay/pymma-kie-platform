@@ -10,12 +10,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
-import org.chtijbug.drools.console.DroolsAdminConsoleMainView;
 import org.chtijbug.drools.console.service.KieRepositoryService;
 import org.chtijbug.drools.console.service.UserConnectedService;
 import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
+import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
 import org.drools.workbench.models.datamodel.rule.InterpolationVariable;
 import org.drools.workbench.models.guided.template.backend.RuleTemplateModelXMLPersistenceImpl;
 import org.drools.workbench.models.guided.template.shared.TemplateModel;
@@ -31,7 +31,7 @@ import java.util.*;
 
 @Route("AssetDetail")
 @StyleSheet("css/accueil.css")
-public class AssetEditView extends DroolsAdminConsoleMainView {
+public class AssetEditView extends SqueletteComposant {
 
     private KieRepositoryService kieRepositoryService;
     private KieConfigurationData config;
@@ -48,11 +48,6 @@ public class AssetEditView extends DroolsAdminConsoleMainView {
     private String projectName;
 
     public AssetEditView() {
-        super();
-    }
-
-    @PostConstruct
-    public void buildUI() {
 
         this.kieRepositoryService = AppContext.getApplicationContext().getBean(KieRepositoryService.class);
         this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
@@ -132,7 +127,7 @@ public class AssetEditView extends DroolsAdminConsoleMainView {
         binder.setBean(giveInitRow(model));
         fillTable(model);
         gridAssetTable.setSizeFull();
-        setActionView(verticalLayout);
+        getInfoPage().add(verticalLayout);
 /**
  *
  */

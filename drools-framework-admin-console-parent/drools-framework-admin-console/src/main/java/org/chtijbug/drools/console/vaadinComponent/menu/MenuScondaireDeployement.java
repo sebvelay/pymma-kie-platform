@@ -26,10 +26,16 @@ public class MenuScondaireDeployement extends HorizontalLayout {
         accueilDeployment=new Button("Accueil deployement",VaadinIcon.ARCHIVE.create());
         accueilDeployment.setClassName("menu-secondaire-button");
         add(accueilDeployment);
+        accueilDeployment.addClickListener(buttonClickEvent -> {
+           getUI().get().navigate("AssetUpdate");
+        });
 
         projectDeploy=new Button("Deployable project",VaadinIcon.EJECT.create());
         projectDeploy.setClassName("menu-secondaire-button");
         add(projectDeploy);
+        projectDeploy.addClickListener(buttonClickEvent -> {
+            getUI().get().navigate("deployment");
+        });
 
         addRuntime=new Button("add runtime", VaadinIcon.PLUS.create());
         addRuntime.setClassName("menu-secondaire-button");
