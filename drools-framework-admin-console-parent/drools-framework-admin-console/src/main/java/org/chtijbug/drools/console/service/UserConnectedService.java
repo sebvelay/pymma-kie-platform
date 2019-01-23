@@ -20,6 +20,10 @@ public class UserConnectedService {
         VaadinSession.getCurrent().setAttribute(USER, userConnected);
     }
 
+    public void disconnect(){
+        VaadinSession.getCurrent().setAttribute(USER, null);
+    }
+
     public void addAssetToSession(String asset) {
         VaadinSession.getCurrent().setAttribute(ASSET, asset);
     }
