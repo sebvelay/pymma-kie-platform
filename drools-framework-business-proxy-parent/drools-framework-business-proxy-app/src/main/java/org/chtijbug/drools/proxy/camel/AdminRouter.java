@@ -41,7 +41,7 @@ public class AdminRouter extends RouteBuilder {
                 .apiProperty("api.title","KIE Server :: Core")
                 .apiProperty("api.version", "1.0.0");
 
-        rest("/server/").description("Retrieves containers deployed to this server, optionally filtered by group, artifact, version or status")
+        rest("/server/details").description("Retrieves containers deployed to this server, optionally filtered by group, artifact, version or status")
                 .produces("application/json")
                 .consumes("application/json")
                 .get("/").description("Retrieves KIE Server information - id, name, location, capabilities, messages").outType(KieServerInfo.class)
