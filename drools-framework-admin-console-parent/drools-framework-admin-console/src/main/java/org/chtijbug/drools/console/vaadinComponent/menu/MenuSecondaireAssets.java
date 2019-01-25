@@ -4,30 +4,45 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
+import org.chtijbug.drools.console.vaadinComponent.leftMenu.Action.TemplatesAction;
+import org.chtijbug.drools.console.view.TemplateView;
 
 @StyleSheet("css/accueil.css")
 public class MenuSecondaireAssets extends HorizontalLayout {
 
-    private Button details;
+    private Button assetsView;
 
-    public MenuSecondaireAssets(){
+    public MenuSecondaireAssets(SqueletteComposant squeletteComposant){
         setVisible(false);
 
         setClassName("menu-secondaire-content");
 
-        details=new Button("Détails", VaadinIcon.INFO.create());
-        details.setClassName("menu-secondaire-button");
-        add(details);
-        details.addClickListener(buttonClickEvent -> {
-            getUI().get().navigate("AssetDetail");
+        assetsView =new Button("Templates",VaadinIcon.ARCHIVE.create());
+        assetsView.setClassName("menu-secondaire-button");
+        add(assetsView);
+        assetsView.addClickListener(buttonClickEvent -> {
+            if(!isActive(assetsView)) {
+                active(assetsView);
+            }
+            TemplateView templateView=new TemplateView();
+            TemplatesAction templatesAction=new TemplatesAction(templateView);
+            templateView.setTemplatesAction(templatesAction);
+            squeletteComposant.navigate(templateView,TemplateView.pageName,templatesAction);
         });
     }
-
-    public Button getDetails() {
-        return details;
+    private boolean isActive(Button button){
+        return button.getClassNames().contains("active");
     }
+    private void removeActive(Button button) {
 
-    public void setDetails(Button details) {
-        this.details = details;
+        if(button.getClassNames().contains("active")){
+            button.getClassNames().remove("active");
+        }
+    }
+    private void active(Button button){
+        removeActive(assetsView);
+
+        button.getClassNames().add("active");
     }
 }

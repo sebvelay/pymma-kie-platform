@@ -18,7 +18,7 @@ package org.chtijbug.drools.proxy.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.CamelContext;
 import org.chtijbug.drools.proxy.camel.DroolsRouter;
-import org.chtijbug.drools.proxy.persistence.ContainerRepository;
+import org.chtijbug.drools.proxy.persistence.repository.ContainerRepository;
 import org.chtijbug.drools.proxy.persistence.model.ContainerPojoPersist;
 import org.chtijbug.kieserver.services.drools.DroolsChtijbugKieServerExtension;
 import org.chtijbug.kieserver.services.drools.DroolsChtijbugRulesExecutionService;

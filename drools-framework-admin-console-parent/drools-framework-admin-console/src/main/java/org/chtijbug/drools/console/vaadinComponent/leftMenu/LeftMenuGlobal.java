@@ -11,38 +11,23 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 @StyleSheet("css/accueil.css")
 public class LeftMenuGlobal extends VerticalLayout {
 
-    private Button actionOne;
-
-    private Button actionTwo;
-
     private Boolean visibility=true;
+
+    private InformationStructure informationStructure;
+
+    private VerticalLayout contentAction;
 
 
     public LeftMenuGlobal(){
 
         setClassName("leftMenu-global-content");
 
-        InformationStructure informationStructure=new InformationStructure();
+        informationStructure=new InformationStructure();
         add(informationStructure);
 
-        VerticalLayout verticalLayout=new VerticalLayout();
-        verticalLayout.setClassName("leftMenu-global-action");
-        add(verticalLayout);
-
-        actionOne=new Button("ActionOne", VaadinIcon.TOOLS.create());
-        actionOne.setClassName("leftMenu-global-button");
-        verticalLayout.add(actionOne);
-        actionOne.addClickListener(buttonClickEvent -> {
-            active(actionOne);
-        });
-
-        actionTwo=new Button("ActionTwo",VaadinIcon.TOOLS.create());
-        actionTwo.setClassName("leftMenu-global-button");
-        verticalLayout.add(actionTwo);
-        actionTwo.addClickListener(buttonClickEvent -> {
-            active(actionTwo);
-
-        });
+        contentAction=new VerticalLayout();
+        contentAction.setClassName("leftMenu-content-action");
+        add(contentAction);
 
 
         HorizontalLayout horizontalLayout=new HorizontalLayout();
@@ -58,36 +43,21 @@ public class LeftMenuGlobal extends VerticalLayout {
         horizontalLayout.add(contactFooter);
 
     }
-    private boolean isActive(Button button){
-        return button.getClassNames().contains("active");
-    }
-    private void removeActive(Button button) {
 
-        if(button.getClassNames().contains("active")){
-            button.getClassNames().remove("active");
-        }
-    }
-    private void active(Button button){
-        removeActive(actionOne);
-        removeActive(actionTwo);
-
-        button.getClassNames().add("active");
+    public InformationStructure getInformationStructure() {
+        return informationStructure;
     }
 
-    public Button getActionOne() {
-        return actionOne;
+    public void setInformationStructure(InformationStructure informationStructure) {
+        this.informationStructure = informationStructure;
     }
 
-    public void setActionOne(Button actionOne) {
-        this.actionOne = actionOne;
+    public VerticalLayout getContentAction() {
+        return contentAction;
     }
 
-    public Button getActionTwo() {
-        return actionTwo;
-    }
-
-    public void setActionTwo(Button actionTwo) {
-        this.actionTwo = actionTwo;
+    public void setContentAction(VerticalLayout contentAction) {
+        this.contentAction = contentAction;
     }
 
     public Boolean getVisibility() {

@@ -1,4 +1,4 @@
-package org.chtijbug.drools.proxy.persistence;
+package org.chtijbug.drools.proxy.persistence.repository;
 
 import org.chtijbug.drools.proxy.persistence.model.ContainerPojoPersist;
 import org.springframework.data.mongodb.repository.MongoRepository;

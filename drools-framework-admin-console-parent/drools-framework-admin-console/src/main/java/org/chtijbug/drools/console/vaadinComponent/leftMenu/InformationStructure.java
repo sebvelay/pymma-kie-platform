@@ -6,8 +6,13 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.server.InputStreamFactory;
 import com.vaadin.flow.server.StreamResource;
+import org.chtijbug.drools.console.service.RuntimeService;
+import org.chtijbug.drools.console.service.UserConnectedService;
+import org.chtijbug.drools.console.service.util.AppContext;
+import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
 
 import java.io.InputStream;
+import java.util.List;
 
 @StyleSheet("css/accueil.css")
 public class InformationStructure extends VerticalLayout {
@@ -28,7 +33,13 @@ public class InformationStructure extends VerticalLayout {
 
     private String strKieServer="Number of Kie-Server : ";
 
+    private UserConnectedService userConnectedService;
+    private RuntimeService runtimeService;
+
     public InformationStructure(){
+
+        userConnectedService= AppContext.getApplicationContext().getBean(UserConnectedService.class);
+        runtimeService=AppContext.getApplicationContext().getBean(RuntimeService.class);
 
         setClassName("leftMenu-global-infoStructure-content");
 
@@ -61,6 +72,10 @@ public class InformationStructure extends VerticalLayout {
         numberKieServer.setClassName("leftMenu-global-inforStructure-label");
         verticalLayout1.add(numberKieServer);
 
+        List<RuntimePersist> runtimePersists=runtimeService.getRuntimeRepository().findAll();
+
+        actualiseKieServer(runtimePersists!=null?runtimePersists.size():0);
+
         numberKieWb=new Label(strKieWb+"0");
         numberKieWb.setClassName("leftMenu-global-inforStructure-label");
         verticalLayout1.add(numberKieWb);
@@ -68,6 +83,7 @@ public class InformationStructure extends VerticalLayout {
         numberProject=new Label(strProject+"0");
         numberProject.setClassName("leftMenu-global-inforStructure-label");
         verticalLayout1.add(numberProject);
+        actualiseProject(userConnectedService.getUserConnected().getProjectResponses().size());
     }
 
     public void actualiseKieWb(Integer numberOfKieWb){

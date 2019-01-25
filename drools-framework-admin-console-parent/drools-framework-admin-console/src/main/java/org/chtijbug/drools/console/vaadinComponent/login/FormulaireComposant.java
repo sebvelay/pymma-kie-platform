@@ -8,6 +8,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import org.chtijbug.drools.console.service.KieRepositoryService;
+import org.chtijbug.drools.console.service.ProjectPersistService;
 import org.chtijbug.drools.console.service.UserConnectedService;
 import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
@@ -41,8 +42,11 @@ public class FormulaireComposant extends VerticalLayout {
 
     private UserConnectedService userConnectedService;
 
+    private ProjectPersistService projectPersistService;
+
     public FormulaireComposant(){
 
+        projectPersistService=AppContext.getApplicationContext().getBean(ProjectPersistService.class);
         kieRepositoryService= AppContext.getApplicationContext().getBean(KieRepositoryService.class);
         configKie= AppContext.getApplicationContext().getBean(KieConfigurationData.class);
         userConnectedService=AppContext.getApplicationContext().getBean(UserConnectedService.class);
@@ -120,12 +124,9 @@ public class FormulaireComposant extends VerticalLayout {
                 userConnectedBinder.getBean().getUserPassword());
 
         if(connected!=null) {
-            connected.getProjectResponses().clear();
-            connected.getProjectResponses().addAll(connected.getProjectResponses());
-            connected.getRoles().clear();
-            connected.getRoles().addAll(connected.getRoles());
             connected.setConnected(true);
-            userConnectedService.addToSession(connected);
+            userConnectedService.addUserToSession(connected);
+            projectPersistService.saveIfnotExist(connected.getProjectResponses());
 
             return true;
         }else {

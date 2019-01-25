@@ -1,13 +1,22 @@
-package org.chtijbug.drools.console.view;
+package org.chtijbug.drools.console.vaadinComponent.componentView;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.value.ValueChangeMode;
+import org.chtijbug.drools.console.service.RuntimeService;
+import org.chtijbug.drools.console.service.model.ReturnPerso;
+import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.TextFieldPerso;
+import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
+import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
+import org.kie.server.api.model.KieServerInfo;
+
+import java.util.List;
 
 @StyleSheet("css/accueil.css")
 public class AddRuntime extends VerticalLayout {
@@ -16,13 +25,15 @@ public class AddRuntime extends VerticalLayout {
 
     private TextFieldPerso port;
 
-    private TextFieldPerso runtimeName;
-
     private Button testConnexion;
 
     private Label label;
 
-    public AddRuntime(Dialog dialog){
+    private RuntimeService runtimeService;
+
+    public AddRuntime(Dialog dialog, SqueletteComposant squeletteComposant){
+
+        runtimeService = AppContext.getApplicationContext().getBean(RuntimeService.class);
 
         setClassName("creation-runtime-content");
 
@@ -30,15 +41,7 @@ public class AddRuntime extends VerticalLayout {
         label.setClassName("creation-runtime-title");
         add(label);
 
-        runtimeName=new TextFieldPerso("Runtime name","", VaadinIcon.USER.create());
-        runtimeName.getTextField().setRequired(true);
-        runtimeName.getTextField().setValueChangeMode(ValueChangeMode.EAGER);
-        runtimeName.getTextField().addValueChangeListener(textFieldStringComponentValueChangeEvent -> {
-           verify();
-        });
-        add(runtimeName);
-
-        host=new TextFieldPerso("Host","111.111.1.111",VaadinIcon.HARDDRIVE.create());
+        host=new TextFieldPerso("Host","http://111.111.1.111",VaadinIcon.HARDDRIVE.create());
         host.getTextField().setRequired(true);
         host.getTextField().setValueChangeMode(ValueChangeMode.EAGER);
         host.getTextField().addValueChangeListener(textFieldStringComponentValueChangeEvent -> {
@@ -62,13 +65,31 @@ public class AddRuntime extends VerticalLayout {
         testConnexion.setClassName("login-application-connexion");
         add(testConnexion);
         testConnexion.addClickListener(buttonClickEvent -> {
-           dialog.close();
+
+            ReturnPerso<KieServerInfo> returnPerso= runtimeService.verifyIfKieServerExist(
+                    host.getTextField().getValue()+":"+port.getTextField().getValue()
+            );
+
+            if(returnPerso.getaBoolean()){
+                Notification.show(returnPerso.getError());
+                runtimeService.saveRuntime(new RuntimePersist(
+                        returnPerso.getBody().getName(),
+                        returnPerso.getBody().getVersion(),host.getTextField().getValue()+":"+port.getTextField().getValue()
+                        ));
+
+                List<RuntimePersist> runtimePersists=runtimeService.getRuntimeRepository().findAll();
+                squeletteComposant.getLeftMenuGlobal().getInformationStructure().actualiseKieServer(runtimePersists!=null?runtimePersists.size():0);
+                dialog.close();
+            }else {
+                Notification.show(returnPerso.getError());
+                testConnexion.setClassName("login-application-connexion-error");
+                testConnexion.setIcon(VaadinIcon.ROTATE_LEFT.create());
+            }
         });
     }
 
     public void verify(){
-        if(runtimeName.getTextField().isInvalid()||runtimeName.getTextField().getValue().isEmpty()||runtimeName.getTextField().getValue()==null&&
-                port.getTextField().isInvalid()||port.getTextField().getValue().isEmpty()||port.getTextField().getValue()==null&&
+        if(port.getTextField().isInvalid()||port.getTextField().getValue().isEmpty()||port.getTextField().getValue()==null&&
                 host.getTextField().isInvalid()||host.getTextField().getValue().isEmpty()||host.getTextField().getValue()==null){
             testConnexion.setEnabled(false);
         }else {
@@ -91,14 +112,6 @@ public class AddRuntime extends VerticalLayout {
 
     public void setPort(TextFieldPerso port) {
         this.port = port;
-    }
-
-    public TextFieldPerso getRuntimeName() {
-        return runtimeName;
-    }
-
-    public void setRuntimeName(TextFieldPerso runtimeName) {
-        this.runtimeName = runtimeName;
     }
 
     public Button getTestConnexion() {

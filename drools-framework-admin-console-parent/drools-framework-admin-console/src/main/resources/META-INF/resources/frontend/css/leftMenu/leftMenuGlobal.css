@@ -31,6 +31,10 @@
     border-left-width: 0.2vw;
     background-color: whitesmoke;
 }
+.leftMenu-global-button[disabled][disabled] {
+    pointer-events: none;
+    color: var(--lumo-disabled-text-color);
+}
 
 
 .leftMenu-global-action{
@@ -68,6 +72,13 @@
 .leftMenu-global-inforStructure-label{
     color: rgba(0,0,0,0.6);
     font-size: 0.9vw;
+}
+
+.leftMenu-content-action{
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
 }
 
 .leftMenu-global-inforStructure-content-label{}

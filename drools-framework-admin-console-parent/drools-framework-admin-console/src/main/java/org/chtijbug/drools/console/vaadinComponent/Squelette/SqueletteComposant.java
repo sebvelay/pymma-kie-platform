@@ -1,13 +1,19 @@
 package org.chtijbug.drools.console.vaadinComponent.Squelette;
 
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.splitlayout.SplitLayout;
+import org.chtijbug.drools.console.service.UserConnectedService;
+import org.chtijbug.drools.console.service.util.AppContext;
+import org.chtijbug.drools.console.vaadinComponent.componentView.ConsoleDeploy;
 import org.chtijbug.drools.console.vaadinComponent.leftMenu.LeftMenuGlobal;
 import org.chtijbug.drools.console.vaadinComponent.menu.MenuPrincipal;
 import org.chtijbug.drools.console.vaadinComponent.menu.MenuScondaireDeployement;
 import org.chtijbug.drools.console.vaadinComponent.menu.MenuSecondaireAssets;
 import org.chtijbug.drools.console.vaadinComponent.menu.MenuSecondaireInfoUser;
+import org.chtijbug.drools.console.view.DeploymentView;
 
 @StyleSheet("css/accueil.css")
 public class SqueletteComposant extends VerticalLayout {
@@ -26,39 +32,70 @@ public class SqueletteComposant extends VerticalLayout {
 
     private VerticalLayout infoPage;
 
+    private UserConnectedService userConnectedService;
+
+    private ConsoleDeploy consoleDeploy;
+
     public SqueletteComposant(){
-        setClassName("squelette-composant-contentAll");
 
-        menuPrincipal=new MenuPrincipal(this);
-        add(menuPrincipal);
+        userConnectedService= AppContext.getApplicationContext().getBean(UserConnectedService.class);
+
+        if(userConnectedService.getUserConnected()!=null) {
+
+            setClassName("squelette-composant-contentAll");
+
+            menuPrincipal = new MenuPrincipal(this);
+            add(menuPrincipal);
+
+            HorizontalLayout horizontalLayout = new HorizontalLayout();
+            horizontalLayout.setClassName("squelette-component-horizontal");
+            add(horizontalLayout);
+
+            content = new VerticalLayout();
+            content.setClassName("squelette-component-content");
+
+            VerticalLayout tmp=new VerticalLayout();
+            tmp.setClassName("squelette-menu-secondaire");
+            content.add(tmp);
+
+            menuScondaireDeployement = new MenuScondaireDeployement(this);
+            tmp.add(menuScondaireDeployement);
+
+            menuSecondaireInfoUser = new MenuSecondaireInfoUser();
+            tmp.add(menuSecondaireInfoUser);
+
+            menuSecondaireAssets = new MenuSecondaireAssets(this);
+            tmp.add(menuSecondaireAssets);
+
+            infoPage = new VerticalLayout();
+            infoPage.setClassName("squelette-component-infoPage");
+            content.add(infoPage);
 
 
+            consoleDeploy=new ConsoleDeploy();
 
 
-        HorizontalLayout horizontalLayout=new HorizontalLayout();
-        horizontalLayout.setClassName("squelette-component-horizontal");
-        add(horizontalLayout);
+            content.add(consoleDeploy);
 
-        content=new VerticalLayout();
-        content.setClassName("squelette-component-content");
+            leftMenuGlobal = new LeftMenuGlobal();
+            horizontalLayout.add(leftMenuGlobal);
 
-        menuScondaireDeployement=new MenuScondaireDeployement();
-        content.add(menuScondaireDeployement);
+            horizontalLayout.add(content);
+        }
+    }
 
-        menuSecondaireInfoUser=new MenuSecondaireInfoUser();
-        content.add(menuSecondaireInfoUser);
+    public void navigate(VerticalLayout verticalLayout,String pageName,VerticalLayout contentAction){
+        leftMenuGlobal.getInformationStructure().getNomPage().setText(pageName);
 
-        menuSecondaireAssets=new MenuSecondaireAssets();
-        content.add(menuSecondaireAssets);
+        leftMenuGlobal.getContentAction().removeAll();
+        leftMenuGlobal.getContentAction().add(contentAction);
 
-        infoPage=new VerticalLayout();
-        infoPage.setClassName("squelette-component-infoPage");
-        content.add(infoPage);
+        infoPage.removeAll();
+        infoPage.add(verticalLayout);
 
-        leftMenuGlobal=new LeftMenuGlobal();
-        horizontalLayout.add(leftMenuGlobal);
-
-        horizontalLayout.add(content);
+        if(pageName.equals(DeploymentView.pageName)){
+            consoleDeploy.setVisible(true);
+        }
     }
 
     public MenuPrincipal getMenuPrincipal() {
@@ -115,5 +152,21 @@ public class SqueletteComposant extends VerticalLayout {
 
     public void setInfoPage(VerticalLayout infoPage) {
         this.infoPage = infoPage;
+    }
+
+    public UserConnectedService getUserConnectedService() {
+        return userConnectedService;
+    }
+
+    public void setUserConnectedService(UserConnectedService userConnectedService) {
+        this.userConnectedService = userConnectedService;
+    }
+
+    public ConsoleDeploy getConsoleDeploy() {
+        return consoleDeploy;
+    }
+
+    public void setConsoleDeploy(ConsoleDeploy consoleDeploy) {
+        this.consoleDeploy = consoleDeploy;
     }
 }
