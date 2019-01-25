@@ -1,6 +1,7 @@
 package org.chtijbug.drools.console.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vaadin.flow.component.UI;
 import org.apache.commons.codec.binary.Base64;
 import org.chtijbug.drools.console.AddLog;
 import org.chtijbug.drools.console.service.model.UserConnected;
@@ -124,7 +125,7 @@ public class KieRepositoryService {
         return reponseMoteur;
     }
 
-    public JobStatus buildProject(String url, String username, String password, String space, String project, String command, AddLog workOnGoingView) {
+    public JobStatus buildProject(String url, String username, String password, String space, String project, String command, AddLog workOnGoingView, UI ui) {
         String completeurl = url + "/spaces/" + space + "/projects/" + project + "/maven/" + command;
         logger.info("url Maven install : " + completeurl);
         ResponseEntity<JobStatus> response = restTemplateKiewb
@@ -142,7 +143,7 @@ public class KieRepositoryService {
         JobStatus reponseMoteur;
 
         reponseMoteur = response.getBody();
-        workOnGoingView.addRow(reponseMoteur.toString());
+        workOnGoingView.addRow(reponseMoteur.toString(),ui);
         return reponseMoteur;
     }
 
@@ -185,30 +186,5 @@ public class KieRepositoryService {
             clientHttpRequest.getHeaders().add(
                     HttpHeaders.AUTHORIZATION, authHeader);
         };
-    }
-
-    public String waitForJobToBeEnded(String url, String username, String password, String jobID, AddLog workOnGoingView) {
-        String isJobDone = "NO";
-        while ("NO".equals(isJobDone)) {
-            JobStatus jobStatus = this.getStatusJobID(url,
-                    username,
-                    password, jobID);
-            if ("DUPLICATE_RESOURCE".equals(jobStatus.getStatus())
-                    || "SUCCESS".equals(jobStatus.getStatus())) {
-                isJobDone = "YES";
-                workOnGoingView.addRow("JobID=" + jobID + " finished");
-            } else if ("ACCEPTED".equals(jobStatus.getStatus())
-                    || ("APPROVED".equals(jobStatus.getStatus()))) {
-                try {
-                    workOnGoingView.addRow("JobID=" + jobID + " not yet finished");
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } else {
-
-            }
-        }
-        return isJobDone;
     }
 }

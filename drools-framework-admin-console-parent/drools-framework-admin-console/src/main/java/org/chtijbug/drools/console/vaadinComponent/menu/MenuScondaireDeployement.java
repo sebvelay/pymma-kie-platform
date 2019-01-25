@@ -5,36 +5,37 @@ import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import org.chtijbug.drools.console.view.AddRuntime;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
+import org.chtijbug.drools.console.vaadinComponent.componentView.AddRuntime;
+import org.chtijbug.drools.console.vaadinComponent.leftMenu.Action.DeploymentAction;
+import org.chtijbug.drools.console.view.DeploymentView;
 
 @StyleSheet("css/accueil.css")
 public class MenuScondaireDeployement extends HorizontalLayout {
 
     private Button addRuntime;
 
-    private Button projectDeploy;
+    private Button deployment;
 
-    private Button accueilDeployment;
-
-    public MenuScondaireDeployement(){
+    public MenuScondaireDeployement(SqueletteComposant squeletteComposant){
         setVisible(false);
 
         setClassName("menu-secondaire-content");
 
 
+        deployment =new Button("Deployment",VaadinIcon.EJECT.create());
+        deployment.setClassName("menu-secondaire-button");
+        add(deployment);
+        deployment.addClickListener(buttonClickEvent -> {
+            if(!isActive(deployment)) {
+                active(deployment);
+            }
+            DeploymentView deploymentView=new DeploymentView(squeletteComposant);
 
-        accueilDeployment=new Button("Accueil deployement",VaadinIcon.ARCHIVE.create());
-        accueilDeployment.setClassName("menu-secondaire-button");
-        add(accueilDeployment);
-        accueilDeployment.addClickListener(buttonClickEvent -> {
-           getUI().get().navigate("AssetUpdate");
-        });
-
-        projectDeploy=new Button("Deployable project",VaadinIcon.EJECT.create());
-        projectDeploy.setClassName("menu-secondaire-button");
-        add(projectDeploy);
-        projectDeploy.addClickListener(buttonClickEvent -> {
-            getUI().get().navigate("deployment");
+            DeploymentAction deploymentAction=new DeploymentAction(squeletteComposant,deploymentView);
+            deploymentView.setDeploymentAction(deploymentAction);
+            squeletteComposant.navigate(deploymentView,DeploymentView.pageName,deploymentAction);
         });
 
         addRuntime=new Button("add runtime", VaadinIcon.PLUS.create());
@@ -42,11 +43,27 @@ public class MenuScondaireDeployement extends HorizontalLayout {
         add(addRuntime);
 
         Dialog dialog=new Dialog();
-        dialog.add(new AddRuntime(dialog));
+        dialog.add(new AddRuntime(dialog,squeletteComposant));
 
         addRuntime.addClickListener(buttonClickEvent -> {
            dialog.open();
         });
+    }
+
+    private boolean isActive(Button button){
+        return button.getClassNames().contains("active");
+    }
+    private void removeActive(Button button) {
+
+        if(button.getClassNames().contains("active")){
+            button.getClassNames().remove("active");
+        }
+    }
+    private void active(Button button){
+        removeActive(addRuntime);
+        removeActive(deployment);
+
+        button.getClassNames().add("active");
     }
 
     public Button getAddRuntime() {
@@ -57,19 +74,12 @@ public class MenuScondaireDeployement extends HorizontalLayout {
         this.addRuntime = addRuntime;
     }
 
-    public Button getProjectDeploy() {
-        return projectDeploy;
+    public Button getDeployment() {
+        return deployment;
     }
 
-    public void setProjectDeploy(Button projectDeploy) {
-        this.projectDeploy = projectDeploy;
+    public void setDeployment(Button deployment) {
+        this.deployment = deployment;
     }
 
-    public Button getAccueilDeployment() {
-        return accueilDeployment;
-    }
-
-    public void setAccueilDeployment(Button accueilDeployment) {
-        this.accueilDeployment = accueilDeployment;
-    }
 }

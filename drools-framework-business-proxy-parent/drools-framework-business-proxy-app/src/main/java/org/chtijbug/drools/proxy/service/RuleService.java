@@ -5,7 +5,6 @@ import org.apache.commons.io.FileUtils;
 import org.chtijbug.drools.kieserver.extension.KieServerAddOnElement;
 import org.chtijbug.drools.kieserver.extension.KieServerLoggingDefinition;
 import org.chtijbug.drools.logging.SessionExecution;
-import org.chtijbug.drools.proxy.persistence.ContainerRepository;
 import org.chtijbug.kieserver.services.drools.ChtijbugObjectRequest;
 import org.chtijbug.kieserver.services.drools.DroolsChtijbugKieServerExtension;
 import org.chtijbug.kieserver.services.drools.DroolsChtijbugRulesExecutionService;
@@ -18,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;

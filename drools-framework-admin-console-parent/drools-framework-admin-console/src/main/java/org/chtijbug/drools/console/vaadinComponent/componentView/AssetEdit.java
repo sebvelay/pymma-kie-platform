@@ -1,6 +1,7 @@
-package org.chtijbug.drools.console.view;
+package org.chtijbug.drools.console.vaadinComponent.componentView;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.StyleSheet;
@@ -9,12 +10,15 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import org.chtijbug.drools.console.service.KieRepositoryService;
 import org.chtijbug.drools.console.service.UserConnectedService;
 import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
+import org.chtijbug.drools.console.util.VerifyConnectedInterface;
 import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
 import org.drools.workbench.models.datamodel.rule.InterpolationVariable;
 import org.drools.workbench.models.guided.template.backend.RuleTemplateModelXMLPersistenceImpl;
@@ -29,9 +33,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 
-@Route("AssetDetail")
 @StyleSheet("css/accueil.css")
-public class AssetEditView extends SqueletteComposant {
+public class AssetEdit extends VerticalLayout {
 
     private KieRepositoryService kieRepositoryService;
     private KieConfigurationData config;
@@ -47,7 +50,9 @@ public class AssetEditView extends SqueletteComposant {
     private String spaceName;
     private String projectName;
 
-    public AssetEditView() {
+    public AssetEdit() {
+
+        setClassName("assetEdit-content");
 
         this.kieRepositoryService = AppContext.getApplicationContext().getBean(KieRepositoryService.class);
         this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
@@ -60,10 +65,8 @@ public class AssetEditView extends SqueletteComposant {
         String assetContent = kieRepositoryService.getAssetSource(config.getKiewbUrl(), userConnected.getUserName(), userConnected.getUserPassword(), spaceName, projectName, assetToUpdate);
         TemplateModel model = RuleTemplateModelXMLPersistenceImpl.getInstance().unmarshal(assetContent);
 
-
-        VerticalLayout verticalLayout = new VerticalLayout();
         HorizontalLayout actionButtons = new HorizontalLayout();
-        verticalLayout.add(actionButtons);
+        add(actionButtons);
         startUpdate = new Button("Update");
         actionButtons.add(startUpdate);
 
@@ -97,7 +100,7 @@ public class AssetEditView extends SqueletteComposant {
         actionButtons.add(undoUpdate);
         InterpolationVariable[] variablesList = model.getInterpolationVariablesList();
         gridAssetTable = new Grid<>();
-        verticalLayout.add(gridAssetTable);
+        add(gridAssetTable);
         gridAssetTable.setClassName("grid-perso");
         gridAssetTable.setSelectionMode(Grid.SelectionMode.SINGLE);
         Binder<Map<String, Object>> binder = new Binder<>();
@@ -127,10 +130,7 @@ public class AssetEditView extends SqueletteComposant {
         binder.setBean(giveInitRow(model));
         fillTable(model);
         gridAssetTable.setSizeFull();
-        getInfoPage().add(verticalLayout);
-/**
- *
- */
+
     }
 
     private Date toDate(String dateString) {
@@ -233,6 +233,4 @@ public class AssetEditView extends SqueletteComposant {
         gridAssetTable.setItems(rows);
 
     }
-
-
 }

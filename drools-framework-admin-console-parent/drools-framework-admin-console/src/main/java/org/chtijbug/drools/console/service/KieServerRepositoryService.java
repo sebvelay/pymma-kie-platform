@@ -2,20 +2,23 @@ package org.chtijbug.drools.console.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import com.vaadin.flow.component.UI;
 import org.apache.commons.codec.binary.Base64;
 import org.chtijbug.drools.console.AddLog;
+import org.chtijbug.drools.console.service.model.ReturnPerso;
 import org.chtijbug.drools.console.service.model.kie.KieContainerInfo;
 import org.chtijbug.drools.console.service.model.kie.KieServerJobStatus;
 import org.chtijbug.drools.console.service.model.kie.SpaceProject;
 import org.kie.server.api.model.KieContainerResource;
+import org.kie.server.api.model.KieServerInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
@@ -58,7 +61,6 @@ public class KieServerRepositoryService {
         reponseMoteur = response.getBody();
         System.out.println(reponseMoteur);
     }
-
 
     public List<KieContainerInfo> getContainerList(String url, String username, String password) {
         List<KieContainerInfo> results = new ArrayList<>();
@@ -106,9 +108,9 @@ public class KieServerRepositoryService {
         return results;
     }
 
-    public KieServerJobStatus stopContainer(String url, String username, String password, String containerId, AddLog workOnGoingView) {
+    public KieServerJobStatus stopContainer(String url, String username, String password, String containerId, AddLog workOnGoingView, UI ui) {
         KieServerJobStatus results = null;
-        String completeurl = url  + containerId;
+        String completeurl = url  +"/"+ containerId;
         logger.info("url kie server container : " + completeurl);
         ResponseEntity<KieServerJobStatus> response = restTemplateKiewb
                 .execute(completeurl, HttpMethod.DELETE, requestCallback(null, username, password), clientHttpResponse -> {
@@ -124,11 +126,11 @@ public class KieServerRepositoryService {
                 });
         KieServerJobStatus reponseMoteur;
         reponseMoteur = response.getBody();
-        workOnGoingView.addRow(reponseMoteur.toString());
+        workOnGoingView.addRow(reponseMoteur.toString(),ui);
         return reponseMoteur;
     }
 
-    public KieContainerInfo createContainer(String url, String username, String password, String containerId, KieContainerResource request, AddLog workOnGoingView) {
+    public KieContainerInfo createContainer(String url, String username, String password, String containerId, KieContainerResource request, AddLog workOnGoingView,UI ui) {
         String completeurl = url  + "/"+containerId;
         logger.info("url kie server container : " + completeurl);
         ResponseEntity<Map<String, Object>> response = restTemplateKiewb
@@ -150,7 +152,7 @@ public class KieServerRepositoryService {
         Map<String, Object> reponseMoteur;
 
         reponseMoteur = response.getBody();
-        workOnGoingView.addRow(reponseMoteur.toString());
+        workOnGoingView.addRow(reponseMoteur.toString(),ui);
         KieContainerInfo result = new KieContainerInfo();
         if (reponseMoteur.get("result") != null) {
             String containerID = (String) ((Map) ((Map) reponseMoteur.get("result")).get("kie-container")).get("container-id");

@@ -143,6 +143,7 @@ public class MenuPrincipal extends HorizontalLayout {
     private void active(Button button){
         removeActive(infoUser);
         removeActive(deployement);
+        removeActive(assets);
 
         button.getClassNames().add("active");
     }

@@ -16,7 +16,7 @@ public class UserConnectedService {
         return (UserConnected) VaadinSession.getCurrent().getAttribute(USER);
     }
 
-    public void addToSession(UserConnected userConnected) {
+    public void addUserToSession(UserConnected userConnected) {
         VaadinSession.getCurrent().setAttribute(USER, userConnected);
     }
 

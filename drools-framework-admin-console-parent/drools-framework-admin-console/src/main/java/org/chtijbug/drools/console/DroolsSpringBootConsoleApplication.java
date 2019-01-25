@@ -6,15 +6,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.stereotype.Repository;
 
 @Configuration
 @SpringBootApplication
-
-//@ComponentScan({"com.assurfleet.front.courtier.petiteflotte.maj","com.assurfleet.jms.services"})
+@ComponentScan("org.chtijbug.drools.proxy.persistence")
+@EnableMongoRepositories("org.chtijbug.drools.proxy.persistence.repository")
 @PropertySource("classpath:application.properties")
 @ImportResource("classpath:applicationContext.xml")
 public class DroolsSpringBootConsoleApplication extends SpringBootServletInitializer {

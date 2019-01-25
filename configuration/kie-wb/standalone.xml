@@ -617,26 +617,4 @@
             <remote-destination host="localhost" port="25"/>
         </outbound-socket-binding>
     </socket-binding-group>
-    <deployments>
-        <deployment name="kie-wb.war" runtime-name="kie-wb.war">
-            <fs-archive path="/Users/nheron/workspace-chtiJBUG/code-7.5/pymma-jbpm-platform/kie-wb/target/kie-wb.war"/>
-        </deployment>
-        <deployment name="kie-server.war" runtime-name="kie-server.war">
-            <fs-archive
-                    path="/Users/nheron/workspace-chtiJBUG/code-7.5/pymma-jbpm-platform/drools-framework-kie-server-parent/drools-framework-kie-server-webapp/target/kie-server.war"/>
-        </deployment>
-        <deployment name="swimmingpool-web.war" runtime-name="swimmingpool-web.war">
-            <fs-archive
-                    path="/Users/nheron/workspace-chtiJBUG/code-7.5/pymma-jbpm-platform/drools-framework-examples/drools-framework-swimmingpool-web-ui/target/swimmingpool-web.war"/>
-        </deployment>
-        <deployment name="kie#mariadb-1.3.4#" runtime-name="kie#mariadb-1.3.4#">
-            <content sha1="7a491a4fcd6416ca29dd4f35d3625c4205f6ecbd"/>
-        </deployment>
-        <deployment name="kie#mysql-5.1.38#" runtime-name="kie#mysql-5.1.38#">
-            <content sha1="dbbd7cd309ce167ec8367de4e41c63c2c8593cc5"/>
-        </deployment>
-        <deployment name="kie#postgresql-9.4.1207#" runtime-name="kie#postgresql-9.4.1207#">
-            <content sha1="f2ea471fbe4446057991e284a6b4b3263731f319"/>
-        </deployment>
-    </deployments>
 </server>

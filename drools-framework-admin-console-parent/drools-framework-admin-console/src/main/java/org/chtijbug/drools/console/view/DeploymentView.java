@@ -1,20 +1,37 @@
 package org.chtijbug.drools.console.view;
 
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
+import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.function.SerializablePredicate;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import org.chtijbug.drools.console.AddLog;
 import org.chtijbug.drools.console.service.KieRepositoryService;
 import org.chtijbug.drools.console.service.KieServerRepositoryService;
+import org.chtijbug.drools.console.service.ProjectPersistService;
 import org.chtijbug.drools.console.service.UserConnectedService;
 import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.*;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
+import org.chtijbug.drools.console.vaadinComponent.componentView.ConsoleDeploy;
+import org.chtijbug.drools.console.vaadinComponent.leftMenu.Action.DeploymentAction;
+import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
+import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
 import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
 import org.guvnor.rest.client.ProjectResponse;
 import org.kie.server.api.model.KieContainerResource;
@@ -22,151 +39,275 @@ import org.kie.server.api.model.ReleaseId;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
-@Route("deployment")
-public class DeploymentView extends SqueletteComposant implements AddLog {
+@StyleSheet("css/accueil.css")
+public class DeploymentView extends VerticalLayout implements AddLog{
+
+    public static final String pageName="Deployment";
+
+    //GRID composant
+
+    private Grid<ProjectPersist> projectPersistGrid;
+
+    private ListDataProvider<ProjectPersist> dataProvider;
+
+    private ConfigurableFilterDataProvider<ProjectPersist,Void,SerializablePredicate<ProjectPersist>> filterDataProvider;
+
+    private DeploymentAction deploymentAction;
+
+    //TEXTFIELD search
+
+    private TextField nameDeploy;
+
+    private TextField nameProject;
+
+    private TextField groupeId;
+
+    private TextField artifactId;
+
+    private TextField processId;
+
+    private TextField serverName;
+
+    private ComboBox status;
+
+    //CONSTANTE Textfield
+
+    private final String strNameDeploy="Deploy name";
+
+    private final String strNameProject="Project name";
+
+    private final String strGroupeId="Groupe ID";
+
+    private final String strArtefactID="Artefact ID";
+
+    private final String strProcessID="Process ID";
+
+    private final String strServerName="Server Name";
+
+    private final String strStatus="Status";
+
+    //SERVICE
+
+    private ProjectPersistService projectPersistService;
+
+    private SqueletteComposant squeletteComposant;
+
+    public DeploymentView(SqueletteComposant squeletteComposant) {
+
+        this.squeletteComposant=squeletteComposant;
+        projectPersistService=AppContext.getApplicationContext().getBean(ProjectPersistService.class);
+
+        setClassName("deployment-content");
+
+        add(new Label("Project"));
+
+        projectPersistGrid=new Grid<>();
+        projectPersistGrid.setClassName("deployment-grid-perso");
+        projectPersistGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
 
 
-    final private Grid<List<String>> gridLogging = new Grid();
-    final private Button buttonDeployProject = new Button("Deploy project");
-    private KieConfigurationData config;
-    private ComboBox<PlatformProjectResponse> spaceSelection;
-
-    final private TextField projectArtifactIDTextField = new TextField("Project Artifact ID");
-    final private TextField projectGroupIDTextField = new TextField("Project Group ID");
-    final private TextField projectVersionTextField = new TextField("Project Version");
-    final private TextField containerIdTextField = new TextField("Container ID");
-
-    private KieRepositoryService kieRepositoryService;
-
-    private KieServerRepositoryService kieServerRepositoryService;
-    private UserConnectedService userConnectedService;
-    private UserConnected userConnected;
-    private List<String> logs = new ArrayList<>();
-
-    public DeploymentView() {
-
-        this.kieRepositoryService = AppContext.getApplicationContext().getBean(KieRepositoryService.class);
-        this.userConnectedService = AppContext.getApplicationContext().getBean(UserConnectedService.class);
-        this.kieServerRepositoryService = AppContext.getApplicationContext().getBean(KieServerRepositoryService.class);
-
-        this.userConnected = userConnectedService.getUserConnected();
-
-        this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
-        VerticalLayout verticalLayout = new VerticalLayout();
-        Button button = new Button("Refresh");
-        //  button.addStyleName(Runo.BUTTON_SMALL);
-
-        button.addClickListener(event -> {
-            this.refreshCombo();
-            this.refreshList();
+        Grid.Column<ProjectPersist> deployNameCo=projectPersistGrid.addColumn(projectPersist -> projectPersist.getDeploymentName());
+        nameDeploy=new TextField(strNameDeploy);
+        nameDeploy.setValueChangeMode(ValueChangeMode.EAGER);
+        nameDeploy.addValueChangeListener(e -> {
+            refreshtGrid(nameDeploy.getValue(), strNameDeploy);
         });
+        deployNameCo.setHeader(nameDeploy);
 
-        verticalLayout.add(button);
-
-
-        spaceSelection = new ComboBox("Project", userConnected.getProjectResponses());
-        spaceSelection.setItemLabelGenerator(ProjectResponse::getName);
-        spaceSelection.addValueChangeListener(valueChangeEvent -> {
-            PlatformProjectResponse response =  spaceSelection.getValue();
-            projectArtifactIDTextField.setValue(response.getArtifactId());
-            projectGroupIDTextField.setValue(response.getGroupId());
-            projectVersionTextField.setValue(response.getVersion());
-            refreshList();
+        Grid.Column<ProjectPersist> nameProjectCo=projectPersistGrid.addColumn(projectPersist -> projectPersist.getProjectName());
+        nameProject=new TextField(strNameProject);
+        nameProject.setValueChangeMode(ValueChangeMode.EAGER);
+        nameProject.addValueChangeListener(e -> {
+            refreshtGrid(nameProject.getValue(), strNameProject);
         });
+        nameProjectCo.setHeader(nameProject);
+
+        projectPersistGrid.addColumn(projectPersist -> projectPersist.getMainClass()).setHeader("ClassName")
+                .setComparator((projectPersist,t1) -> projectPersist.getMainClass().compareTo(t1.getMainClass()));
+
+        Grid.Column<ProjectPersist> groupIdCo=projectPersistGrid.addColumn(projectPersist -> projectPersist.getGroupID());
+        groupeId=new TextField(strGroupeId);
+        groupeId.setValueChangeMode(ValueChangeMode.EAGER);
+        groupeId.addValueChangeListener(e -> {
+            refreshtGrid(groupeId.getValue(), strGroupeId);
+        });
+        groupIdCo.setHeader(groupeId);
+
+        Grid.Column<ProjectPersist> artifactIDCO=projectPersistGrid.addColumn(projectPersist -> projectPersist.getArtifactID());
+        artifactId=new TextField(strArtefactID);
+        artifactId.setValueChangeMode(ValueChangeMode.EAGER);
+        artifactId.addValueChangeListener(e -> {
+            refreshtGrid(artifactId.getValue(), strArtefactID);
+        });
+        artifactIDCO.setHeader(artifactId);
+
+        Grid.Column<ProjectPersist> processIDco=projectPersistGrid.addColumn(projectPersist -> projectPersist.getProcessID());
+        processId=new TextField(strProcessID);
+        processId.setValueChangeMode(ValueChangeMode.EAGER);
+        processId.addValueChangeListener(e -> {
+            refreshtGrid(processId.getValue(), strProcessID);
+        });
+        processIDco.setHeader(processId);
 
 
-        verticalLayout.add(spaceSelection);
-
-        projectArtifactIDTextField.setEnabled(false);
-        projectGroupIDTextField.setEnabled(false);
-        projectVersionTextField.setEnabled(false);
-        containerIdTextField.setEnabled(false);
-        verticalLayout.add(projectArtifactIDTextField);
-        verticalLayout.add(projectGroupIDTextField);
-        verticalLayout.add(projectVersionTextField);
-        verticalLayout.add(containerIdTextField);
-
-        buttonDeployProject.setEnabled(false);
-        verticalLayout.add(buttonDeployProject);
-        // buttonDeployProject.addStyleName(Runo.BUTTON_SMALL);
+        Grid.Column<ProjectPersist> serverNameCo=projectPersistGrid.addColumn(projectPersist -> projectPersist.getServerName());
+        serverName=new TextField(strServerName);
+        serverName.setValueChangeMode(ValueChangeMode.EAGER);
+        serverName.addValueChangeListener(e -> {
+            refreshtGrid(serverName.getValue(), strServerName);
+        });
+        serverNameCo.setHeader(serverName);
 
 
-        buttonDeployProject.addClickListener(event -> {
+        projectPersistGrid.addColumn(projectPersist -> projectPersist.getProjectVersion()).setHeader("Version")
+                .setComparator((projectPersist,t1) -> projectPersist.getProjectVersion().compareTo(t1.getProjectVersion()));
 
-            ProjectResponse response = (ProjectResponse) spaceSelection.getValue();
 
-            JobStatus result = kieRepositoryService.buildProject(config.getKiewbUrl(), userConnected.getUserName(),
-                    userConnected.getUserPassword(), response.getSpaceName(), response.getName(), "compile", this);
-            kieRepositoryService.waitForJobToBeEnded(config.getKiewbUrl(), userConnected.getUserName(),
-                    userConnected.getUserPassword(), result.getJobId(), this);
+        Grid.Column<ProjectPersist> statusCo=projectPersistGrid.addColumn(projectPersist -> projectPersist.getStatus());
+        status=new ComboBox(strProcessID);
+        status.setClassName("deployment-combobox");
 
-            result = kieRepositoryService.buildProject(config.getKiewbUrl(), userConnected.getUserName(),
-                    userConnected.getUserPassword(), response.getSpaceName(), response.getName(), "install", this);
+        ArrayList<String> tmp=new ArrayList<>();
+        tmp.add(ProjectPersist.DEFINI);
+        tmp.add(ProjectPersist.Deployable);
+        tmp.add(ProjectPersist.ADEFINIR);
+        tmp.add(" ");
+        status.setItems(tmp);
+        status.addValueChangeListener(e -> {
+            refreshtGrid(status.getValue()!=null?status.getValue().toString():" ", strStatus);
+        });
+        statusCo.setHeader(status);
 
-            kieRepositoryService.waitForJobToBeEnded(config.getKiewbUrl(), userConnected.getUserName(),
-                    userConnected.getUserPassword(), result.getJobId(), this);
-            if (containerIdTextField.getValue() != null && containerIdTextField.getValue().length() > 0) {
-                KieServerJobStatus jobresult = kieServerRepositoryService.stopContainer(config.getKieserverUrl(), config.getKieserverUserName(), config.getKieserverPassword(), containerIdTextField.getValue(), this);
-                if (jobresult != null
-                        && "SUCCESS".equals(jobresult.getType())) {
-                }
+        add(projectPersistGrid);
 
+        setDataProvider();
+
+        projectPersistGrid.addSelectionListener(selectionEvent -> {
+
+            if(selectionEvent.getFirstSelectedItem()!=null&&selectionEvent.getFirstSelectedItem().isPresent()) {
+                majAction(selectionEvent.getFirstSelectedItem().get());
+            }else {
+                getDeploymentAction().getAssociateKieServer().setEnabled(false);
+                getDeploymentAction().getDefinirProject().setEnabled(false);
+                getDeploymentAction().getDeployer().setEnabled(false);
             }
-            KieContainerResource newContainer = new KieContainerResource();
-            newContainer.setContainerId(containerIdTextField.getValue());
-            newContainer.setReleaseId(new ReleaseId());
-            newContainer.getReleaseId().setArtifactId(projectArtifactIDTextField.getValue());
-            newContainer.getReleaseId().setGroupId(projectGroupIDTextField.getValue());
-            newContainer.getReleaseId().setVersion(projectVersionTextField.getValue());
-            KieContainerInfo createdContainer = kieServerRepositoryService.createContainer(config.getKieserverUrl(), config.getKieserverUserName(), config.getKieserverPassword(), projectArtifactIDTextField.getValue(), newContainer, this);
-            containerIdTextField.setValue(createdContainer.getContainerId());
-            refreshList();
-
-
         });
-        buttonDeployProject.setEnabled(false);
-        gridLogging.setSizeFull();
-
-        gridLogging.setColumnReorderingAllowed(false);
-
-
-        // gridLogging.addColumn("Message", new com.vaadin.ui.renderers.TextRenderer()).setCaption("Message");
-
-
-        verticalLayout.add(gridLogging);
-        getInfoPage().add(verticalLayout);
-
+        //add(new ConsoleDeploy());
     }
 
-    public void refreshCombo() {
-        spaceSelection.setItems(userConnected.getProjectResponses());
+    private void refreshtGrid(String value,String type){
 
+        filterDataProvider.setFilter(filterGrid(value.toUpperCase(),type));
+        projectPersistGrid.getDataProvider().refreshAll();
     }
+    private SerializablePredicate<ProjectPersist> filterGrid(String value, String type){
+        SerializablePredicate<ProjectPersist> columnPredicate = null;
 
-    private void refreshList() {
-        buttonDeployProject.setEnabled(true);
-        KieConfigurationData config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
-        List<KieContainerInfo> listcontainers = kieServerRepositoryService.getContainerList(config.getKieserverUrl(), config.getKieserverUserName(), config.getKieserverPassword());
-        containerIdTextField.setValue("");
-        for (KieContainerInfo kieContainerInfo : listcontainers) {
-            if (kieContainerInfo.getArtifactId() != null
-                    && kieContainerInfo.getArtifactId().equals(projectArtifactIDTextField.getValue())
-                    && kieContainerInfo.getArtifactId().equals(projectArtifactIDTextField.getValue())
-                    && kieContainerInfo.getArtifactId().equals(projectArtifactIDTextField.getValue())) {
-                containerIdTextField.setValue(kieContainerInfo.getContainerId());
+        if(value.equals("")||value.equals(" ")||type.equals(" ")){
+            columnPredicate = asset -> (true);
+        }else {
+            if (type.equals(strArtefactID)) {
+                columnPredicate = asset -> (
+                        asset.getArtifactID()!=null&&asset.getArtifactID().toUpperCase().contains(value.toUpperCase()));
+            }else if(type.equals(strGroupeId)){
+                columnPredicate = asset -> (asset.getGroupID()!=null&&asset.getGroupID().toUpperCase().contains(value.toUpperCase()));
             }
+            else if(type.equals(strNameDeploy)){
+                columnPredicate = asset -> (asset.getDeploymentName()!=null&&asset.getDeploymentName().toUpperCase().contains(value.toUpperCase()));
+            } else if(type.equals(strNameProject)){
+                columnPredicate = asset -> (asset.getProjectName()!=null&&asset.getProjectName().toUpperCase().contains(value.toUpperCase()));
+            }else if(type.equals(strProcessID)){
+                columnPredicate = asset -> (asset.getProcessID()!=null&&asset.getProcessID().toUpperCase().contains(value.toUpperCase()));
+            }else if(type.equals(strStatus)){
+                columnPredicate = asset -> (asset.getStatus()!=null&&asset.getStatus().toUpperCase().equals(value.toUpperCase()));
+            }else if(type.equals(strServerName)){
+                columnPredicate = asset -> (asset.getServerName()!=null&&asset.getServerName().toUpperCase().equals(value.toUpperCase()));
+            }
+        }
+        return columnPredicate;
+    }
+    public void setDataProvider(){
+
+        Set<ProjectPersist> projectPersists = projectPersistService.getProjectsSession();
+        if(projectPersists!=null) {
+            dataProvider = new ListDataProvider<>(projectPersists);
+
+            filterDataProvider = dataProvider.withConfigurableFilter();
+
+
+            projectPersistGrid.setDataProvider(filterDataProvider);
+
+            reinitFilter();
 
         }
-        System.out.println("coucou");
+    }
+    public void reinitFilter(){
+
+        artifactId.setValue("");
+        groupeId.setValue("");
+        processId.setValue("");
+        nameProject.setValue("");
+        nameDeploy.setValue("");
+    }
+    public void majAction(ProjectPersist projectPersist){
+        if(projectPersist.getStatus().equals(ProjectPersist.DEFINI)){
+
+            getDeploymentAction().getAssociateKieServer().setEnabled(true);
+            getDeploymentAction().getDefinirProject().setEnabled(false);
+            getDeploymentAction().getDeployer().setEnabled(false);
+
+        }else if(projectPersist.getStatus().equals(ProjectPersist.ADEFINIR)){
+
+            getDeploymentAction().getAssociateKieServer().setEnabled(false);
+            getDeploymentAction().getDefinirProject().setEnabled(true);
+            getDeploymentAction().getDeployer().setEnabled(false);
+        }else if(projectPersist.getStatus().equals(ProjectPersist.Deployable)){
+
+            getDeploymentAction().getAssociateKieServer().setEnabled(false);
+            getDeploymentAction().getDefinirProject().setEnabled(false);
+            getDeploymentAction().getDeployer().setEnabled(true);
+
+        }
+    }
+    @Override
+    public void addRow(String textToAdd,UI ui) {
+
+        getUI().get().access(()->{
+
+            HorizontalLayout horizontalLayout=new HorizontalLayout();
+            horizontalLayout.setClassName("console-row");
+            Label date=new Label(new Date()+" : ");
+            date.setClassName("console-date");
+            horizontalLayout.add(date);
+            horizontalLayout.add(new Label(textToAdd));
+            squeletteComposant.getConsoleDeploy().getLogContent().add(horizontalLayout);
+            //getUI().get().push();
+        });
+        ui.getSession().lock();
+        try {
+            ui.push();
+        }finally {
+            ui.getSession().unlock();
+        }
+
+    }
+    public Grid<ProjectPersist> getProjectPersistGrid() {
+        return projectPersistGrid;
     }
 
-    public void addRow(String textToAdd) {
-        logs.add(textToAdd);
-        gridLogging.setItems(logs);
-
+    public void setProjectPersistGrid(Grid<ProjectPersist> projectPersistGrid) {
+        this.projectPersistGrid = projectPersistGrid;
     }
 
+    public DeploymentAction getDeploymentAction() {
+        return deploymentAction;
+    }
 
+    public void setDeploymentAction(DeploymentAction deploymentAction) {
+        this.deploymentAction = deploymentAction;
+    }
 }
