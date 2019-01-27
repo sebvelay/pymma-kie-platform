@@ -6,7 +6,6 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import org.chtijbug.drools.console.service.ProjectPersistService;
 import org.chtijbug.drools.console.service.UserConnectedService;
@@ -72,7 +71,11 @@ public class DefineProject extends VerticalLayout {
         mainClass.getComboBox().setRequired(true);
         mainClass.getComboBox().addValueChangeListener(textFieldStringComponentValueChangeEvent -> {
             verify();
-            projectPersist.setMainClass(mainClass.getComboBox().getValue().toString());
+            String mainClassName=(String)mainClass.getComboBox().getValue();
+            if (mainClassName.indexOf("=")!= -1){
+                mainClassName = mainClassName.substring(mainClassName.indexOf("=")+1);
+            }
+             projectPersist.setMainClass(mainClassName);
         });
 
         add(mainClass);

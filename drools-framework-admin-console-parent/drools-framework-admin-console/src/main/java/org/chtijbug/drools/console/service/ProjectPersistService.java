@@ -2,7 +2,6 @@ package org.chtijbug.drools.console.service;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinSession;
-import org.apache.tomcat.util.threads.TaskThread;
 import org.chtijbug.drools.console.AddLog;
 import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.JobStatus;
@@ -14,14 +13,11 @@ import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
 import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
 import org.chtijbug.drools.proxy.persistence.repository.ProjectRepository;
 import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
-import org.guvnor.rest.client.ProjectResponse;
 import org.kie.server.api.model.KieContainerResource;
 import org.kie.server.api.model.ReleaseId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -157,7 +153,7 @@ public class ProjectPersistService {
                 newContainer.getReleaseId().setArtifactId(projectPersist.getArtifactID());
                 newContainer.getReleaseId().setGroupId(projectPersist.getGroupID());
                 newContainer.getReleaseId().setVersion(projectPersist.getProjectVersion());
-                KieContainerInfo createdContainer = kieServerRepositoryService.createContainer(config.getKieserverUrl(), config.getKieserverUserName(), config.getKieserverPassword(), projectPersist.getArtifactID(), newContainer, workOnGoingView,ui);
+                KieContainerInfo createdContainer = kieServerRepositoryService.createContainerWithBusinessInterface(config.getKieserverUrl(), config.getKieserverUserName(), config.getKieserverPassword(), projectPersist, newContainer, workOnGoingView,ui);
 
 
             }

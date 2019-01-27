@@ -2,8 +2,6 @@ package org.chtijbug.drools.console.view;
 
 
 import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.grid.Grid;
@@ -13,34 +11,17 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.SerializablePredicate;
-import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.Route;
 import org.chtijbug.drools.console.AddLog;
-import org.chtijbug.drools.console.service.KieRepositoryService;
-import org.chtijbug.drools.console.service.KieServerRepositoryService;
 import org.chtijbug.drools.console.service.ProjectPersistService;
-import org.chtijbug.drools.console.service.UserConnectedService;
-import org.chtijbug.drools.console.service.model.UserConnected;
-import org.chtijbug.drools.console.service.model.kie.*;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
-import org.chtijbug.drools.console.vaadinComponent.componentView.ConsoleDeploy;
 import org.chtijbug.drools.console.vaadinComponent.leftMenu.Action.DeploymentAction;
 import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
-import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
-import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
-import org.guvnor.rest.client.ProjectResponse;
-import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.ReleaseId;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 @StyleSheet("css/accueil.css")
@@ -287,12 +268,15 @@ public class DeploymentView extends VerticalLayout implements AddLog{
             squeletteComposant.getConsoleDeploy().getLogContent().add(horizontalLayout);
             //getUI().get().push();
         });
+        /**
         ui.getSession().lock();
         try {
             ui.push();
         }finally {
             ui.getSession().unlock();
         }
+         **/
+        System.out.println(textToAdd);
 
     }
     public Grid<ProjectPersist> getProjectPersistGrid() {

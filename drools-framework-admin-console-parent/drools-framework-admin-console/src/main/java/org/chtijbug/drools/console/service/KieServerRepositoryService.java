@@ -2,23 +2,22 @@ package org.chtijbug.drools.console.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import com.vaadin.flow.component.UI;
 import org.apache.commons.codec.binary.Base64;
 import org.chtijbug.drools.console.AddLog;
-import org.chtijbug.drools.console.service.model.ReturnPerso;
 import org.chtijbug.drools.console.service.model.kie.KieContainerInfo;
 import org.chtijbug.drools.console.service.model.kie.KieServerJobStatus;
 import org.chtijbug.drools.console.service.model.kie.SpaceProject;
+import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
 import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.KieServerInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RequestCallback;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
@@ -135,6 +134,37 @@ public class KieServerRepositoryService {
         logger.info("url kie server container : " + completeurl);
         ResponseEntity<Map<String, Object>> response = restTemplateKiewb
                 .execute(completeurl, HttpMethod.PUT, requestCallback(request, username, password), clientHttpResponse -> {
+                    Map<String, Object> extractedResponse = null;
+                    if (clientHttpResponse.getBody() != null) {
+                        Scanner s = new Scanner(clientHttpResponse.getBody()).useDelimiter("\\A");
+                        String result = s.hasNext() ? s.next() : "";
+                        Map<String, Object> map = mapper.readValue(
+                                result,
+                                new TypeReference<Map<String, Object>>() {
+                                });
+                        Map<String, Object> values = mapper.readValue(result, Map.class);
+                        extractedResponse = values;
+                    }
+                    ResponseEntity<Map<String, Object>> extractedValue = new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
+                    return extractedValue;
+                });
+        Map<String, Object> reponseMoteur;
+
+        reponseMoteur = response.getBody();
+        workOnGoingView.addRow(reponseMoteur.toString(),ui);
+        KieContainerInfo result = new KieContainerInfo();
+        if (reponseMoteur.get("result") != null) {
+            String containerID = (String) ((Map) ((Map) reponseMoteur.get("result")).get("kie-container")).get("container-id");
+            result.setContainerId(containerID);
+        }
+        return result;
+    }
+
+    public KieContainerInfo createContainerWithBusinessInterface(String url, String username, String password, ProjectPersist projectPersist, KieContainerResource request, AddLog workOnGoingView, UI ui) {
+        String completeurl = url  + "/business/"+projectPersist.getContainerID()+"/"+projectPersist.getMainClass()+"/"+projectPersist.getProcessID();
+        logger.info("url kie server business container : " + completeurl);
+        ResponseEntity<Map<String, Object>> response = restTemplateKiewb
+                .execute(completeurl, HttpMethod.POST, requestCallback(request, username, password), clientHttpResponse -> {
                     Map<String, Object> extractedResponse = null;
                     if (clientHttpResponse.getBody() != null) {
                         Scanner s = new Scanner(clientHttpResponse.getBody()).useDelimiter("\\A");
