@@ -9,7 +9,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.shared.communication.PushMode;
 import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
 
-@Push(PushMode.MANUAL)
+@Push(PushMode.AUTOMATIC)
 @StyleSheet("css/accueil.css")
 @Route("accueil")
 public class AccueilView extends SqueletteComposant implements BeforeEnterObserver {

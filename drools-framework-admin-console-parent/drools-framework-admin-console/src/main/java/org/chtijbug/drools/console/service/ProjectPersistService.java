@@ -9,6 +9,7 @@ import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.model.kie.KieContainerInfo;
 import org.chtijbug.drools.console.service.model.kie.KieServerJobStatus;
 import org.chtijbug.drools.console.service.util.AppContext;
+import org.chtijbug.drools.proxy.persistence.json.KeyProject;
 import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
 import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
 import org.chtijbug.drools.proxy.persistence.repository.ProjectRepository;
@@ -18,6 +19,7 @@ import org.kie.server.api.model.ReleaseId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,32 +56,41 @@ public class ProjectPersistService {
 
         for(PlatformProjectResponse platformProjectResponse:platformProjectResponses) {
 
-            ProjectPersist projectPersist = projectRepository.findByProjectName(platformProjectResponse.getSpaceName() + "-" + platformProjectResponse.getName());
+            ProjectPersist projectPersist = projectRepository.findByProjectName(new KeyProject(platformProjectResponse.getSpaceName(),platformProjectResponse.getName()));
 
             if (projectPersist == null) {
                 projectPersist = platformProjectResponseToProjectPersist(platformProjectResponse);
 
                 projectRepository.save(projectPersist);
-                addProjectToSession(projectPersist);
+                addProjectToSession(projectPersist,true);
 
             }else {
-                addProjectToSession(projectPersist);
+                addProjectToSession(projectPersist,false);
             }
         }
     }
 
-    public Set<ProjectPersist> getProjectsSession() {
-        return (Set<ProjectPersist>) VaadinSession.getCurrent().getAttribute(PROJECT);
+    public HashMap<String,ProjectPersist> getProjectsSession() {
+        return (HashMap<String, ProjectPersist>) VaadinSession.getCurrent().getAttribute(PROJECT);
     }
 
-    public void addProjectToSession(ProjectPersist projectPersist) {
+    public void addProjectToSession(ProjectPersist projectPersist,boolean isModifiable) {
 
-        Set<ProjectPersist> projectPersists=getProjectsSession();
+        HashMap<String,ProjectPersist> projectPersists=getProjectsSession();
 
         if(projectPersists==null){
-            projectPersists=new HashSet<>();
+            projectPersists=new HashMap<>();
         }
-        projectPersists.add(projectPersist);
+
+        if(isModifiable){
+            projectPersists.put(projectPersist.getProjectName().toString(),projectPersist);
+        }else {
+
+            ProjectPersist tmp=projectPersists.get(projectPersist.getProjectName().toString());
+            if(tmp==null){
+                projectPersists.put(projectPersist.getProjectName().toString(),projectPersist);
+            }
+        }
 
         VaadinSession.getCurrent().setAttribute(PROJECT, projectPersists);
     }
@@ -95,7 +106,7 @@ public class ProjectPersistService {
             projectPersist.setStatus(ProjectPersist.Deployable);
             projectPersist.setContainerID(projectPersist.getDeploymentName()+"-"+projectPersist.getProjectName());
             projectRepository.save(projectPersist);
-            addProjectToSession(projectPersist);
+            addProjectToSession(projectPersist,true);
 
             return true;
         }
@@ -115,12 +126,10 @@ public class ProjectPersistService {
         ProjectPersist projectPersist=new ProjectPersist();
         projectPersist.setArtifactID(platformProjectResponse.getArtifactId());
         projectPersist.setGroupID(platformProjectResponse.getGroupId());
-        projectPersist.setProjectName(platformProjectResponse.getSpaceName()+"-"+platformProjectResponse.getName());
+        projectPersist.setProjectName(new KeyProject(platformProjectResponse.getSpaceName(),platformProjectResponse.getName()));
         projectPersist.setProjectVersion(platformProjectResponse.getVersion());
         projectPersist.setStatus(ProjectPersist.ADEFINIR);
         projectPersist.setClassNameList(platformProjectResponse.getJavaClasses());
-        projectPersist.setSpaceName(platformProjectResponse.getSpaceName());
-        projectPersist.setOldName(platformProjectResponse.getName());
         return projectPersist;
     }
 
@@ -132,12 +141,12 @@ public class ProjectPersistService {
             public void run() {
 
                 JobStatus result = kieRepositoryService.buildProject(config.getKiewbUrl(), userConnected.getUserName(),
-                        userConnected.getUserPassword(), projectPersist.getSpaceName(), projectPersist.getOldName(), "compile", workOnGoingView,ui);
+                        userConnected.getUserPassword(), projectPersist.getProjectName().getSpaceName(), projectPersist.getProjectName().getName(), "compile", workOnGoingView,ui);
 
                 executeWrite(url,username,password,workOnGoingView,result.getJobId(),ui);
 
                 result = kieRepositoryService.buildProject(config.getKiewbUrl(), userConnected.getUserName(),
-                        userConnected.getUserPassword(), projectPersist.getSpaceName(), projectPersist.getOldName(), "install", workOnGoingView,ui);
+                        userConnected.getUserPassword(), projectPersist.getProjectName().getSpaceName(), projectPersist.getProjectName().getName(), "install", workOnGoingView,ui);
 
                 executeWrite(url,username,password,workOnGoingView,result.getJobId(),ui);
 

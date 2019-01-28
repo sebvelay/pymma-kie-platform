@@ -5,34 +5,33 @@ import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
 import org.chtijbug.drools.console.vaadinComponent.componentView.AddRuntime;
 import org.chtijbug.drools.console.vaadinComponent.leftMenu.Action.DeploymentAction;
+import org.chtijbug.drools.console.vaadinComponent.leftMenu.Action.RuntimesAction;
 import org.chtijbug.drools.console.view.DeploymentView;
+import org.chtijbug.drools.console.view.RuntimesView;
 
 @StyleSheet("css/accueil.css")
-public class MenuScondaireDeployement extends HorizontalLayout {
+public class MenuSecondaireRuntime extends HorizontalLayout {
 
-    private Button deployment;
+    private Button gestionRuntime;
 
-    public MenuScondaireDeployement(SqueletteComposant squeletteComposant){
+    public MenuSecondaireRuntime(SqueletteComposant squeletteComposant){
         setVisible(false);
 
         setClassName("menu-secondaire-content");
 
 
-        deployment =new Button("Deployment",VaadinIcon.EJECT.create());
-        deployment.setClassName("menu-secondaire-button");
-        add(deployment);
-        deployment.addClickListener(buttonClickEvent -> {
-            if(!isActive(deployment)) {
-                active(deployment);
+        gestionRuntime =new Button("Gestion", VaadinIcon.OUTBOX.create());
+        gestionRuntime.setClassName("menu-secondaire-button");
+        add(gestionRuntime);
+        gestionRuntime.addClickListener(buttonClickEvent -> {
+            if(!isActive(gestionRuntime)) {
+                active(gestionRuntime);
             }
-            DeploymentView deploymentView=new DeploymentView(squeletteComposant);
-
-            DeploymentAction deploymentAction=new DeploymentAction(squeletteComposant,deploymentView);
-            deploymentView.setDeploymentAction(deploymentAction);
+            RuntimesView deploymentView=new RuntimesView();
+            RuntimesAction deploymentAction=new RuntimesAction(squeletteComposant);
             squeletteComposant.navigate(deploymentView,DeploymentView.pageName,deploymentAction);
         });
     }
@@ -47,17 +46,16 @@ public class MenuScondaireDeployement extends HorizontalLayout {
         }
     }
     private void active(Button button){
-        removeActive(deployment);
+        removeActive(gestionRuntime);
 
         button.getClassNames().add("active");
     }
 
-    public Button getDeployment() {
-        return deployment;
+    public Button getGestionRuntime() {
+        return gestionRuntime;
     }
 
-    public void setDeployment(Button deployment) {
-        this.deployment = deployment;
+    public void setGestionRuntime(Button gestionRuntime) {
+        this.gestionRuntime = gestionRuntime;
     }
-
 }

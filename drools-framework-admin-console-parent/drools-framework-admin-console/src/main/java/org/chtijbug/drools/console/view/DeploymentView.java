@@ -13,15 +13,18 @@ import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.SerializablePredicate;
+import com.vaadin.flow.shared.communication.PushMode;
 import org.chtijbug.drools.console.AddLog;
 import org.chtijbug.drools.console.service.ProjectPersistService;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
 import org.chtijbug.drools.console.vaadinComponent.leftMenu.Action.DeploymentAction;
+import org.chtijbug.drools.proxy.persistence.json.KeyProject;
 import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Set;
 
 @StyleSheet("css/accueil.css")
@@ -200,7 +203,7 @@ public class DeploymentView extends VerticalLayout implements AddLog{
             else if(type.equals(strNameDeploy)){
                 columnPredicate = asset -> (asset.getDeploymentName()!=null&&asset.getDeploymentName().toUpperCase().contains(value.toUpperCase()));
             } else if(type.equals(strNameProject)){
-                columnPredicate = asset -> (asset.getProjectName()!=null&&asset.getProjectName().toUpperCase().contains(value.toUpperCase()));
+                columnPredicate = asset -> (asset.getProjectName()!=null&&asset.getProjectName().toString().toUpperCase().contains(value.toUpperCase()));
             }else if(type.equals(strProcessID)){
                 columnPredicate = asset -> (asset.getProcessID()!=null&&asset.getProcessID().toUpperCase().contains(value.toUpperCase()));
             }else if(type.equals(strStatus)){
@@ -213,9 +216,9 @@ public class DeploymentView extends VerticalLayout implements AddLog{
     }
     public void setDataProvider(){
 
-        Set<ProjectPersist> projectPersists = projectPersistService.getProjectsSession();
+        HashMap<String,ProjectPersist> projectPersists = projectPersistService.getProjectsSession();
         if(projectPersists!=null) {
-            dataProvider = new ListDataProvider<>(projectPersists);
+            dataProvider = new ListDataProvider<>(projectPersists.values());
 
             filterDataProvider = dataProvider.withConfigurableFilter();
 
@@ -257,7 +260,7 @@ public class DeploymentView extends VerticalLayout implements AddLog{
     @Override
     public void addRow(String textToAdd,UI ui) {
 
-        getUI().get().access(()->{
+        ui.access(()->{
 
             HorizontalLayout horizontalLayout=new HorizontalLayout();
             horizontalLayout.setClassName("console-row");
@@ -265,19 +268,22 @@ public class DeploymentView extends VerticalLayout implements AddLog{
             date.setClassName("console-date");
             horizontalLayout.add(date);
             horizontalLayout.add(new Label(textToAdd));
+            squeletteComposant.getConsoleDeploy().getLogContent().getElement().getNode().markAsDirty();
             squeletteComposant.getConsoleDeploy().getLogContent().add(horizontalLayout);
-            //getUI().get().push();
         });
-        /**
+
         ui.getSession().lock();
         try {
+            ui.getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
             ui.push();
+
+        }catch (Exception e){
+            e.printStackTrace();
+            ui.getSession().unlock();
+
         }finally {
             ui.getSession().unlock();
         }
-         **/
-        System.out.println(textToAdd);
-
     }
     public Grid<ProjectPersist> getProjectPersistGrid() {
         return projectPersistGrid;
