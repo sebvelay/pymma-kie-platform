@@ -1,6 +1,7 @@
 package org.chtijbug.drools.proxy.persistence.model;
 
 import org.bson.types.ObjectId;
+import org.chtijbug.drools.proxy.persistence.json.KeyProject;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,18 +18,12 @@ public class ProjectPersist implements Serializable {
 
     public static final String Deployable="Déployable";
 
-    @Id
-    private String id=new ObjectId().toString();
-
     @Indexed
     private String deploymentName;
 
+    @Id
     @Indexed
-    private String projectName;
-
-    private String spaceName;
-
-    private String oldName;
+    private KeyProject projectName;
 
     private String mainClass;
 
@@ -50,14 +45,6 @@ public class ProjectPersist implements Serializable {
 
     public ProjectPersist(){}
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getDeploymentName() {
         return deploymentName;
     }
@@ -66,11 +53,11 @@ public class ProjectPersist implements Serializable {
         this.deploymentName = deploymentName;
     }
 
-    public String getProjectName() {
+    public KeyProject getProjectName() {
         return projectName;
     }
 
-    public void setProjectName(String projectName) {
+    public void setProjectName(KeyProject projectName) {
         this.projectName = projectName;
     }
 
@@ -102,28 +89,12 @@ public class ProjectPersist implements Serializable {
         return processID;
     }
 
-    public String getSpaceName() {
-        return spaceName;
-    }
-
-    public void setSpaceName(String spaceName) {
-        this.spaceName = spaceName;
-    }
-
-    public String getOldName() {
-        return oldName;
-    }
-
     public String getContainerID() {
         return containerID;
     }
 
     public void setContainerID(String containerID) {
         this.containerID = containerID;
-    }
-
-    public void setOldName(String oldName) {
-        this.oldName = oldName;
     }
 
     public void setProcessID(String processID) {

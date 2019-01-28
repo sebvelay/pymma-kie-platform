@@ -9,10 +9,7 @@ import org.chtijbug.drools.console.service.UserConnectedService;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.console.vaadinComponent.componentView.ConsoleDeploy;
 import org.chtijbug.drools.console.vaadinComponent.leftMenu.LeftMenuGlobal;
-import org.chtijbug.drools.console.vaadinComponent.menu.MenuPrincipal;
-import org.chtijbug.drools.console.vaadinComponent.menu.MenuScondaireDeployement;
-import org.chtijbug.drools.console.vaadinComponent.menu.MenuSecondaireAssets;
-import org.chtijbug.drools.console.vaadinComponent.menu.MenuSecondaireInfoUser;
+import org.chtijbug.drools.console.vaadinComponent.menu.*;
 import org.chtijbug.drools.console.view.DeploymentView;
 
 @StyleSheet("css/accueil.css")
@@ -27,6 +24,8 @@ public class SqueletteComposant extends VerticalLayout {
     private MenuSecondaireInfoUser menuSecondaireInfoUser;
 
     private MenuSecondaireAssets menuSecondaireAssets;
+
+    private MenuSecondaireRuntime menuSecondaireRuntime;
 
     private VerticalLayout content;
 
@@ -66,6 +65,9 @@ public class SqueletteComposant extends VerticalLayout {
 
             menuSecondaireAssets = new MenuSecondaireAssets(this);
             tmp.add(menuSecondaireAssets);
+
+            menuSecondaireRuntime=new MenuSecondaireRuntime(this);
+            tmp.add(menuSecondaireRuntime);
 
             infoPage = new VerticalLayout();
             infoPage.setClassName("squelette-component-infoPage");
@@ -116,6 +118,14 @@ public class SqueletteComposant extends VerticalLayout {
 
     public void setMenuSecondaireAssets(MenuSecondaireAssets menuSecondaireAssets) {
         this.menuSecondaireAssets = menuSecondaireAssets;
+    }
+
+    public MenuSecondaireRuntime getMenuSecondaireRuntime() {
+        return menuSecondaireRuntime;
+    }
+
+    public void setMenuSecondaireRuntime(MenuSecondaireRuntime menuSecondaireRuntime) {
+        this.menuSecondaireRuntime = menuSecondaireRuntime;
     }
 
     public void setLeftMenuGlobal(LeftMenuGlobal leftMenuGlobal) {
