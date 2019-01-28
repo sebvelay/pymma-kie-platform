@@ -268,14 +268,14 @@ public class DeploymentView extends VerticalLayout implements AddLog{
             squeletteComposant.getConsoleDeploy().getLogContent().add(horizontalLayout);
             //getUI().get().push();
         });
-        /**
+
         ui.getSession().lock();
         try {
             ui.push();
         }finally {
             ui.getSession().unlock();
         }
-         **/
+
         System.out.println(textToAdd);
 
     }
