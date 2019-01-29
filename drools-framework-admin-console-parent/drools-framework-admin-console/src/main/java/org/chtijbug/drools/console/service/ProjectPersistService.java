@@ -41,7 +41,7 @@ public class ProjectPersistService {
     @Autowired
     private KieServerRepositoryService kieServerRepositoryService;
 
-    private String isJobDone = "NO";
+
 
 
     public ProjectPersistService(){
@@ -124,7 +124,7 @@ public class ProjectPersistService {
         return projectPersist;
     }
 
-    public String waitForJobToBeEnded(String url, String username, String password,ProjectPersist projectPersist, AddLog workOnGoingView, UI ui) {
+    public void waitForJobToBeEnded(String url, String username, String password,ProjectPersist projectPersist, AddLog workOnGoingView, UI ui) {
 
         UserConnected userConnected=userConnectedService.getUserConnected();
 
@@ -160,10 +160,10 @@ public class ProjectPersistService {
         };
         thread.start();
 
-
-        return isJobDone;
     }
     private void executeWrite(String url, String username, String password,AddLog workOnGoingView,String jobID,UI ui){
+
+       String isJobDone = "NO";
         while ("NO".equals(isJobDone)) {
             JobStatus jobStatus = kieRepositoryService.getStatusJobID(url,
                     username,

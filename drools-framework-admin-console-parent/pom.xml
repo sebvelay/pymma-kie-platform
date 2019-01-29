@@ -13,6 +13,5 @@
 
     <modules>
         <module>drools-framework-admin-console</module>
-        <module>drools-framework-artefact-ui</module>
     </modules>
 </project>

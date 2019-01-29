@@ -30,8 +30,7 @@ public class SftpServerService {
     private String server = "0.0.0.0";
     private Integer port = -1;
     private String login = "kieserver";
-    private String password = "kieserver1!";
-    ;
+    private String password = "kieserver1";
     private String sftpDir = System.getProperty("org.chtijbug.server.tracedir");
 
 

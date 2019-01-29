@@ -83,6 +83,8 @@ public class MessageHandlerResolver {
                 }
             }
         }
+
+        sessionContext.getRuleflowGroups().clear();
         return sessionContext;
     }
 
