@@ -95,7 +95,7 @@ public class DefineProject extends VerticalLayout {
         valider.setClassName("login-application-connexion");
         valider.addClickListener(buttonClickEvent -> {
             projectPersist.setStatus(ProjectPersist.DEFINI);
-            projectPersistService.addProjectToSession(projectPersist);
+            projectPersistService.addProjectToSession(projectPersist,true);
             projectPersistService.getProjectRepository().save(projectPersist);
             deploymentView.setDataProvider();
             dialog.close();
