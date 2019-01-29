@@ -43,6 +43,11 @@
             <version>2.9.7</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.pymmasoftware.jbpm</groupId>
+            <artifactId>drools-framework-runtime-entity</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

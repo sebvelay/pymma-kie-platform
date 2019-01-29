@@ -26,7 +26,7 @@ import org.chtijbug.drools.runtimeevent.AbstractMemoryEventHandlerStrategy;
 
 
 public class DeleteFactEventStrategy implements AbstractMemoryEventHandlerStrategy {
-    ;
+
 
     @Override
     public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext) {

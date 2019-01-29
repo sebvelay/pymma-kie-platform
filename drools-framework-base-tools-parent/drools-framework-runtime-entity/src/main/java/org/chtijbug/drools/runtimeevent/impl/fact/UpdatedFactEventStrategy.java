@@ -38,12 +38,14 @@ public class UpdatedFactEventStrategy implements AbstractMemoryEventHandlerStrat
         factOldValue.setRealFact(updatedFactHistoryEvent.getObjectOldValue().getRealObject());
         factOldValue.setModificationDate(updatedFactHistoryEvent.getDateEvent());
         factOldValue.setFactType(FactType.UPDATED_OLDVALUE);
+        factOldValue.setEventid(updatedFactHistoryEvent.getEventID());
         Fact factNewValue = new Fact();
         factNewValue.setFullClassName(updatedFactHistoryEvent.getObjectNewValue().getFullClassName());
         factNewValue.setObjectVersion(updatedFactHistoryEvent.getObjectNewValue().getObjectVersion());
         factNewValue.setRealFact(updatedFactHistoryEvent.getObjectNewValue().getRealObject());
         factNewValue.setModificationDate(updatedFactHistoryEvent.getDateEvent());
         factNewValue.setFactType(FactType.UPDATED_NEWVALUE);
+        factNewValue.setEventid(updatedFactHistoryEvent.getEventID());
         RuleExecution existingInSessionRuleExecution = null;
         if (updatedFactHistoryEvent.getRuleName() == null) {  // updated from a session
             SessionExecution sessionExecution = sessionContext.getSessionExecution();

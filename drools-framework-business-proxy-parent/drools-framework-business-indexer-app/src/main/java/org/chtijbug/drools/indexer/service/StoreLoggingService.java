@@ -1,14 +1,18 @@
 package org.chtijbug.drools.indexer.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.chtijbug.drools.SessionContext;
+import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionAction;
 import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionPersistence;
+import org.chtijbug.drools.indexer.persistence.model.EventType;
+import org.chtijbug.drools.indexer.persistence.repository.BusinessTransactionActionRepository;
 import org.chtijbug.drools.indexer.persistence.repository.BusinessTransactionPersistenceRepository;
-import org.chtijbug.drools.logging.SessionExecution;
+import org.chtijbug.drools.logging.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.UUID;
+import java.util.*;
 
 @Service("storeService")
 public class StoreLoggingService {
@@ -16,8 +20,10 @@ public class StoreLoggingService {
     ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
-    private BusinessTransactionPersistenceRepository repository;
+    private BusinessTransactionPersistenceRepository transactionRepository;
 
+    @Autowired
+    private BusinessTransactionActionRepository actionRepository;
 
     public void store(String fileName, String fileContent) {
         if (fileName!= null) {
@@ -40,16 +46,116 @@ public class StoreLoggingService {
             item.setSecond(second);
             item.setMillis(millis);
             item.setTransactionId(id);
+            item.setId(UUID.randomUUID().toString());
+            long ii=1;
             try {
-                SessionExecution object = mapper.readValue(fileContent,SessionExecution.class);
+                SessionContext sessionContext = mapper.readValue(fileContent,SessionContext.class);
+                item.setContainerId(sessionContext.getContainerId());
+                item.setGroupID(sessionContext.getGroupID());
+                item.setArtefactID(sessionContext.getArtefactID());
+                item.setVersion(sessionContext.getVersion());
 
-                item.setContent(object);
+                item.setServerName(sessionContext.getServerName());
+                Map<Long, BusinessTransactionAction> actions = new HashMap<>();
+                SessionExecution sessionExecution = sessionContext.getSessionExecution();
+                BusinessTransactionAction businessTransactionoutput=null;
+                for (Fact fact : sessionExecution.getFacts()){
+                    BusinessTransactionAction businessTransactionAction = new BusinessTransactionAction();
+                    businessTransactionAction.setId(UUID.randomUUID().toString());
+                    businessTransactionAction.setBusinessTransactionId(item.getId());
+                    if (fact.getFactType().equals(FactType.INPUTDATA)){
+                        businessTransactionAction.setEventType(EventType.INPUT);
+                        businessTransactionAction.setInputData(fact);
+                        businessTransactionAction.setEventNumber(0);
+                        actions.put(businessTransactionAction.getEventNumber(),businessTransactionAction);
+                    }else  if (fact.getFactType().equals(FactType.OUTPUTDATA)){
+                        businessTransactionAction.setEventType(EventType.OUPUT);
+                        businessTransactionAction.setOutputData(fact);
+                        businessTransactionoutput=businessTransactionAction;
+
+                    }else if (fact.getFactType().equals(FactType.INSERTED)){
+                        businessTransactionAction.setEventType(EventType.INSERTFACT);
+                        businessTransactionAction.setFact(fact);
+                        businessTransactionAction.setEventNumber(ii++);
+                        actions.put(businessTransactionAction.getEventNumber(),businessTransactionAction);
+                    } else if (fact.getFactType().equals(FactType.UPDATED_NEWVALUE)){
+                        businessTransactionAction.setEventType(EventType.UPDATEFACTNEWVALUE);
+                        businessTransactionAction.setFact(fact);
+                        businessTransactionAction.setEventNumber(ii++);
+                        actions.put(businessTransactionAction.getEventNumber(),businessTransactionAction);
+                    }else if (fact.getFactType().equals(FactType.UPDATED_OLDVALUE)){
+                        businessTransactionAction.setEventType(EventType.UPDATEFACTOLDVALUE);
+                        businessTransactionAction.setFact(fact);
+                        businessTransactionAction.setEventNumber(ii++);
+                        actions.put(businessTransactionAction.getEventNumber(),businessTransactionAction);
+                    }else  if (fact.getFactType().equals(FactType.DELETED)){
+                        businessTransactionAction.setEventType(EventType.RETRACTFACT);
+                        businessTransactionAction.setFact(fact);
+                        businessTransactionAction.setEventNumber(ii++);
+                        actions.put(businessTransactionAction.getEventNumber(),businessTransactionAction);
+                    }
+                }
+                for (ProcessExecution processExecution : sessionExecution.getProcessExecutions()){
+                    BusinessTransactionAction businessTransactionActionStart = new BusinessTransactionAction();
+
+                    businessTransactionActionStart.setEventType(EventType.STARTPROCESS);
+                    businessTransactionActionStart.setProcessID(processExecution.getProcessId());
+                    businessTransactionActionStart.setBusinessTransactionId(item.getId());
+                    businessTransactionActionStart.setEventNumber(ii++);
+                    actions.put(businessTransactionActionStart.getEventNumber(),businessTransactionActionStart);
+                    for (RuleflowGroup rfg : processExecution.getRuleflowGroups()){
+                        BusinessTransactionAction businessTransactionActionStartRFG = new BusinessTransactionAction();
+
+                        businessTransactionActionStartRFG.setBusinessTransactionId(item.getId());
+                        businessTransactionActionStartRFG.setEventType(EventType.STARTRULEFLOWGROUP);
+                        businessTransactionActionStartRFG.setRuleflowGroupName(rfg.getRuleflowGroup());
+                        businessTransactionActionStartRFG.setEventNumber(ii++);
+                        actions.put(businessTransactionActionStartRFG.getEventNumber(),businessTransactionActionStartRFG);
+                        for (RuleExecution ruleExecution : rfg.getRuleExecutionList()){
+                            BusinessTransactionAction businessTransactionActionRule = new BusinessTransactionAction();
+
+                            businessTransactionActionRule.setEventType(EventType.RULE);
+                            businessTransactionActionRule.setRuleflowGroupName(rfg.getRuleflowGroup());
+                            businessTransactionActionRule.setRuleExecution(ruleExecution);
+                            businessTransactionActionRule.setBusinessTransactionId(item.getId());
+                            businessTransactionActionRule.setProcessID(processExecution.getProcessId());
+                            businessTransactionActionRule.setEventNumber(ii++);
+                            actions.put(businessTransactionActionRule.getEventNumber(),businessTransactionActionRule);
+                        }
+                        BusinessTransactionAction businessTransactionActionSTOPRFG = new BusinessTransactionAction();
+
+                        businessTransactionActionSTOPRFG.setEventType(EventType.STOPTRULEFLOWGROUP);
+                        businessTransactionActionSTOPRFG.setRuleflowGroupName(rfg.getRuleflowGroup());
+                        businessTransactionActionSTOPRFG.setBusinessTransactionId(item.getId());
+                        businessTransactionActionSTOPRFG.setEventNumber(ii++);
+                        actions.put(businessTransactionActionSTOPRFG.getEventNumber(),businessTransactionActionSTOPRFG);
+                    }
+                    BusinessTransactionAction businessTransactionActionEnd = new BusinessTransactionAction();
+                    businessTransactionActionEnd.setEventType(EventType.STOPPROCESS);
+                    businessTransactionActionEnd.setProcessID(processExecution.getProcessId());
+                    businessTransactionActionEnd.setBusinessTransactionId(item.getId());
+                    businessTransactionActionEnd.setEventNumber(ii++);
+                    actions.put(businessTransactionActionEnd.getEventNumber(),businessTransactionActionEnd);
+                }
+                if (businessTransactionoutput!= null) {
+                    businessTransactionoutput.setEventNumber(ii++);
+                    actions.put(businessTransactionoutput.getEventNumber(), businessTransactionoutput);
+                }
+                List<Long> keys = new ArrayList<Long>(actions.keySet());
+                Collections.sort(keys);
+                List<BusinessTransactionAction> sortedList= new LinkedList<>();
+                for (Long i : keys){
+                    sortedList.add(actions.get(i));
+                }
+                transactionRepository.save(item);
+                actionRepository.saveAll(sortedList);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            item.setContent(fileContent);
-            item.setId(UUID.randomUUID().toString());
-            repository.save(item);
+
+            //item.setContent(fileContent);
+
+        //    repository.save(item);
          }
 
         System.out.println("coucou");

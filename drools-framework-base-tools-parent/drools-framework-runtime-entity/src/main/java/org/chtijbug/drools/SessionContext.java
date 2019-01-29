@@ -3,6 +3,7 @@ package org.chtijbug.drools;
 import org.chtijbug.drools.logging.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,6 +23,20 @@ public class SessionContext {
     private FireAllRulesExecution fireAllRulesExecution;
 
     private Fact fact;
+
+    private String groupID;
+
+    private String artefactID;
+
+    private String version;
+
+    private String containerId;
+
+    private String serverName;
+
+    private Date startTime;
+
+    private Date stopTime;
 
     public SessionExecution getSessionExecution() {
         return sessionExecution;
@@ -83,15 +98,72 @@ public class SessionContext {
         this.fireAllRulesExecution = fireAllRulesExecution;
     }
 
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getStopTime() {
+        return stopTime;
+    }
+
+    public void setStopTime(Date stopTime) {
+        this.stopTime = stopTime;
+    }
+
+    public String getGroupID() {
+        return groupID;
+    }
+
+    public void setGroupID(String groupID) {
+        this.groupID = groupID;
+    }
+
+    public String getArtefactID() {
+        return artefactID;
+    }
+
+    public void setArtefactID(String artefactID) {
+        this.artefactID = artefactID;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getContainerId() {
+        return containerId;
+    }
+
+    public void setContainerId(String containerId) {
+        this.containerId = containerId;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
 
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("SessionContext{");
-        sb.append("sessionExecution=").append(sessionExecution);
-        sb.append(", processExecution=").append(processExecution);
-        sb.append(", ruleExecution=").append(ruleExecution);
-        sb.append(", fireAllRulesExecution=").append(fireAllRulesExecution);
-        sb.append(", fact=").append(fact);
+        sb.append("groupID='").append(groupID).append('\'');
+        sb.append(", artefactID='").append(artefactID).append('\'');
+        sb.append(", version='").append(version).append('\'');
+        sb.append(", containerId='").append(containerId).append('\'');
+        sb.append(", serverName='").append(serverName).append('\'');
+        sb.append(", startTime=").append(startTime);
+        sb.append(", stopTime=").append(stopTime);
         sb.append('}');
         return sb.toString();
     }

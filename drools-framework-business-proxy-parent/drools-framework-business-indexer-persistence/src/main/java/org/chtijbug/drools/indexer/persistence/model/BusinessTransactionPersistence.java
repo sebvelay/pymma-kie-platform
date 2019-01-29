@@ -4,25 +4,39 @@ package org.chtijbug.drools.indexer.persistence.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 
-@Document(indexName = "droolshistory", type = "loggingDrools")
+@Document(indexName = "droolstransaction", type = "droolsTransaction")
 public class BusinessTransactionPersistence {
-
 
     @Id
     private String id;
 
-
     private String transactionId;
 
-    private Integer year ;
-    private Integer month ;
-    private Integer day ;
-    private Integer hour ;
+    private Integer year;
+
+    private Integer month;
+
+    private Integer day;
+
+    private Integer hour;
+
     private Integer minute;
-    private Integer second ;
-    private Integer millis ;
-  //  @Field( type = FieldType.Object)
-    private Object content;
+
+    private Integer second;
+
+    private Integer millis;
+
+    private String groupID;
+
+    private String artefactID;
+
+    private String version;
+
+    private String containerId;
+
+    private String serverName;
+
+
 
     public String getId() {
         return id;
@@ -96,11 +110,45 @@ public class BusinessTransactionPersistence {
         this.millis = millis;
     }
 
-    public Object getContent() {
-        return content;
+    public String getGroupID() {
+        return groupID;
     }
 
-    public void setContent(Object content) {
-        this.content = content;
+    public void setGroupID(String groupID) {
+        this.groupID = groupID;
     }
+
+    public String getArtefactID() {
+        return artefactID;
+    }
+
+    public void setArtefactID(String artefactID) {
+        this.artefactID = artefactID;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    public String getContainerId() {
+        return containerId;
+    }
+
+    public void setContainerId(String containerId) {
+        this.containerId = containerId;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+
 }

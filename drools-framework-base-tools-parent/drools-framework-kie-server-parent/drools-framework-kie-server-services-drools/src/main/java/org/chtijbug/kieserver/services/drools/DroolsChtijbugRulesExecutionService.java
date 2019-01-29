@@ -31,6 +31,7 @@ import org.kie.server.services.api.KieServerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -116,6 +117,7 @@ public class DroolsChtijbugRulesExecutionService {
 
             RuleBasePackage ruleBasePackage = this.ruleBasePackages.get(kci.getResource().getContainerId());
             if (ruleBasePackage != null) {
+                Date startTime = new Date();
                 ChtijbugHistoryListener chtijbugHistoryListener = new ChtijbugHistoryListener();
                 RuleBaseSession session = ruleBasePackage.createRuleBaseSession(sessionMaxNumberRulesToExecute, chtijbugHistoryListener, sessionName);
                 if (kieServerAddOnElement != null) {
@@ -129,11 +131,23 @@ public class DroolsChtijbugRulesExecutionService {
 
                 }
                 result = session.fireAllRulesAndStartProcess(chtijbugObjectRequest.getObjectRequest(), processID);
+                session.dispose();
+                Date stopTime = new Date();
                 SessionContext sessionContext = this.messageHandlerResolver.getSessionFromHistoryEvent(chtijbugHistoryListener.getHistoryEventLinkedList());
+                sessionContext.setGroupID(kci.getResource().getReleaseId().getGroupId());
+                sessionContext.setArtefactID(kci.getResource().getReleaseId().getArtifactId());
+                sessionContext.setVersion(kci.getResource().getReleaseId().getVersion());
+                sessionContext.setContainerId(kci.getContainerId());
+                String serverName = System.getProperty("org.kie.server.id");
+                if (serverName!= null){
+                    sessionContext.setServerName(serverName);
+                }
+                sessionContext.setStartTime(startTime);
+                sessionContext.setStopTime(stopTime);
                 chtijbugObjectRequest.setSessionLogging(sessionContext);
                 chtijbugObjectRequest.setObjectRequest(result);
                 logger.debug("Returning OK response with content '{}'", chtijbugObjectRequest.getObjectRequest());
-                session.dispose();
+
             }
             return chtijbugObjectRequest;
 

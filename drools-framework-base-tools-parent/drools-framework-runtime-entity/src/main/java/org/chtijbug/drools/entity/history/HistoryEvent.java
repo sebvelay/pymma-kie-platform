@@ -35,7 +35,7 @@ public class HistoryEvent implements Serializable {
     private Long ruleBaseID;
     private Long sessionId;
     private DroolsChtijbugException droolsChtijbugException;
-    private ArrayList<KnowledgeResource> knowledgeResources = new ArrayList<>();
+    private ArrayList<KnowledgeResource> knowledgeResources = new ArrayList<KnowledgeResource>();
 
     /**
      * Mandatory for GWT Serialization

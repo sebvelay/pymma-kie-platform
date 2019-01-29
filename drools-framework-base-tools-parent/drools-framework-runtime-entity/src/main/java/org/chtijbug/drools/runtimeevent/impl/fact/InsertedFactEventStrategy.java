@@ -36,6 +36,7 @@ public class InsertedFactEventStrategy implements AbstractMemoryEventHandlerStra
         fact.setRealFact(insertedFactHistoryEvent.getInsertedObject().getRealObject());
         fact.setModificationDate(insertedFactHistoryEvent.getDateEvent());
         fact.setFactType(FactType.INSERTED);
+        fact.setEventid(insertedFactHistoryEvent.getEventID());
         RuleExecution existingInSessionRuleExecution = null;
         if (insertedFactHistoryEvent.getRuleName() == null) {  // inserted from a session
             SessionExecution sessionExecution = sessionContext.getSessionExecution();

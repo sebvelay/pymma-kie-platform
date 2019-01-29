@@ -35,7 +35,7 @@ public class KnowledgeSessionFireAllRulesAndStartProcessEventStrategy implements
             if (sessionFireAllRulesAndStartProcess.getInputObject() != null) {
                 DroolsFactObject inputObject = sessionFireAllRulesAndStartProcess.getInputObject();
                 Fact inputFact = new Fact();
-                inputFact.setEventid(sessionFireAllRulesAndStartProcess.getEventID());
+                inputFact.setEventid(sessionContext.getSessionExecution().getStartEventID());
                 inputFact.setFactType(FactType.INPUTDATA);
                 inputFact.setFullClassName(inputObject.getFullClassName());
                 inputFact.setRealFact(inputObject.getRealObject());
@@ -46,7 +46,7 @@ public class KnowledgeSessionFireAllRulesAndStartProcessEventStrategy implements
             if (sessionFireAllRulesAndStartProcess.getOutputObject() != null) {
                 DroolsFactObject outputObject = sessionFireAllRulesAndStartProcess.getOutputObject();
                 Fact outputFact = new Fact();
-                outputFact.setEventid(sessionFireAllRulesAndStartProcess.getEventID());
+                outputFact.setEventid(sessionContext.getSessionExecution().getStopEventID());
                 outputFact.setFactType(FactType.OUTPUTDATA);
                 outputFact.setFullClassName(outputObject.getFullClassName());
                 outputFact.setRealFact(outputObject.getRealObject());

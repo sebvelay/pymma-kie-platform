@@ -72,7 +72,6 @@ public class RuleService {
          * remove facts from logging to avoid infinite loop when marshalling to json and size of logging
          */
         SessionExecution sessionExecution = chtijbutObjectResponse.getSessionLogging().getSessionExecution();
-        sessionExecution.getFacts().clear();
         if (kieServerAddOnElement != null) {
 
             for (KieServerLoggingDefinition kieServerLoggingDefinition : kieServerAddOnElement.getKieServerLoggingDefinitions()) {
