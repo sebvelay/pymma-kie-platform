@@ -32,6 +32,8 @@ public class MenuPrincipal extends HorizontalLayout {
 
     private Button hamburger;
 
+    private Button logging;
+
     //METIER
 
     private UserConnectedService userConnectedService;
@@ -83,11 +85,15 @@ public class MenuPrincipal extends HorizontalLayout {
                 squeletteComposant.getMenuSecondaireInfoUser().setVisible(false);
                 squeletteComposant.getMenuSecondaireAssets().setVisible(false);
                 squeletteComposant.getMenuSecondaireRuntime().setVisible(false);
+                squeletteComposant.getMenuSecondaireLogging().setVisible(false);
+
             }else {
                 removeActive(deployement);
                 squeletteComposant.getMenuScondaireDeployement().setVisible(false);
                 squeletteComposant.getMenuSecondaireInfoUser().setVisible(false);
                 squeletteComposant.getMenuSecondaireAssets().setVisible(false);
+                squeletteComposant.getMenuSecondaireLogging().setVisible(false);
+
                 squeletteComposant.getMenuSecondaireRuntime().setVisible(false);
             }
         });
@@ -102,12 +108,16 @@ public class MenuPrincipal extends HorizontalLayout {
                 squeletteComposant.getMenuScondaireDeployement().setVisible(false);
                 squeletteComposant.getMenuSecondaireInfoUser().setVisible(false);
                 squeletteComposant.getMenuSecondaireAssets().setVisible(true);
+                squeletteComposant.getMenuSecondaireLogging().setVisible(false);
+
                 squeletteComposant.getMenuSecondaireRuntime().setVisible(false);
 
             }else {
                 removeActive(assets);
                 squeletteComposant.getMenuScondaireDeployement().setVisible(false);
                 squeletteComposant.getMenuSecondaireInfoUser().setVisible(false);
+                squeletteComposant.getMenuSecondaireLogging().setVisible(false);
+
                 squeletteComposant.getMenuSecondaireAssets().setVisible(false);
                 squeletteComposant.getMenuSecondaireRuntime().setVisible(false);
             }
@@ -123,6 +133,8 @@ public class MenuPrincipal extends HorizontalLayout {
                 squeletteComposant.getMenuScondaireDeployement().setVisible(false);
                 squeletteComposant.getMenuSecondaireInfoUser().setVisible(false);
                 squeletteComposant.getMenuSecondaireAssets().setVisible(false);
+                squeletteComposant.getMenuSecondaireLogging().setVisible(false);
+
                 squeletteComposant.getMenuSecondaireRuntime().setVisible(true);
             }else {
                 removeActive(runtimes);
@@ -130,6 +142,32 @@ public class MenuPrincipal extends HorizontalLayout {
                 squeletteComposant.getMenuSecondaireInfoUser().setVisible(false);
                 squeletteComposant.getMenuSecondaireAssets().setVisible(false);
                 squeletteComposant.getMenuSecondaireRuntime().setVisible(false);
+                squeletteComposant.getMenuSecondaireLogging().setVisible(false);
+
+            }
+        });
+
+        logging=new Button("Logging");
+        logging.setClassName("menu-principal-button");
+        add(logging);
+        logging.addClickListener(buttonClickEvent -> {
+
+            if(!isActive(logging)) {
+                active(logging);
+                squeletteComposant.getMenuScondaireDeployement().setVisible(false);
+                squeletteComposant.getMenuSecondaireInfoUser().setVisible(false);
+                squeletteComposant.getMenuSecondaireAssets().setVisible(false);
+                squeletteComposant.getMenuSecondaireRuntime().setVisible(false);
+                squeletteComposant.getMenuSecondaireLogging().setVisible(true);
+
+            }else {
+                removeActive(logging);
+                squeletteComposant.getMenuScondaireDeployement().setVisible(false);
+                squeletteComposant.getMenuSecondaireInfoUser().setVisible(false);
+                squeletteComposant.getMenuSecondaireAssets().setVisible(false);
+                squeletteComposant.getMenuSecondaireRuntime().setVisible(false);
+                squeletteComposant.getMenuSecondaireLogging().setVisible(false);
+
             }
         });
 
@@ -144,7 +182,7 @@ public class MenuPrincipal extends HorizontalLayout {
                 squeletteComposant.getMenuSecondaireInfoUser().setVisible(true);
                 squeletteComposant.getMenuSecondaireAssets().setVisible(false);
                 squeletteComposant.getMenuSecondaireRuntime().setVisible(false);
-
+                squeletteComposant.getMenuSecondaireLogging().setVisible(false);
 
             }else {
                 removeActive(infoUser);
@@ -152,6 +190,7 @@ public class MenuPrincipal extends HorizontalLayout {
                 squeletteComposant.getMenuSecondaireInfoUser().setVisible(false);
                 squeletteComposant.getMenuSecondaireAssets().setVisible(false);
                 squeletteComposant.getMenuSecondaireRuntime().setVisible(false);
+                squeletteComposant.getMenuSecondaireLogging().setVisible(false);
 
 
             }
@@ -174,6 +213,7 @@ public class MenuPrincipal extends HorizontalLayout {
         removeActive(deployement);
         removeActive(assets);
         removeActive(runtimes);
+        removeActive(logging);
 
         button.getClassNames().add("active");
     }

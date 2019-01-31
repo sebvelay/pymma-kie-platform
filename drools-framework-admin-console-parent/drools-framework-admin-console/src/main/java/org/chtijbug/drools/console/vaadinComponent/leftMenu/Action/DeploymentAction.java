@@ -6,6 +6,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.chtijbug.drools.console.service.ProjectPersistService;
 import org.chtijbug.drools.console.service.util.AppContext;
+import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.DialogPerso;
 import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
 import org.chtijbug.drools.console.vaadinComponent.componentView.AssociateProjectKie;
 import org.chtijbug.drools.console.vaadinComponent.componentView.DefineProject;
@@ -39,7 +40,7 @@ public class DeploymentAction extends VerticalLayout {
             ProjectPersist projectPersist=deploymentView.getProjectPersistGrid().getSelectedItems().stream().findFirst().get();
 
             if(projectPersist!=null) {
-                Dialog dialog = new Dialog();
+                DialogPerso dialog = new DialogPerso();
                 dialog.add(new DefineProject(deploymentView,dialog,projectPersist));
                 dialog.open();
             }
@@ -55,7 +56,7 @@ public class DeploymentAction extends VerticalLayout {
             ProjectPersist projectPersist=deploymentView.getProjectPersistGrid().getSelectedItems().stream().findFirst().get();
 
             if(projectPersist!=null) {
-                Dialog dialog = new Dialog();
+                DialogPerso dialog = new DialogPerso();
                 dialog.add(new AssociateProjectKie(deploymentView,dialog,projectPersist));
                 dialog.open();
             }
