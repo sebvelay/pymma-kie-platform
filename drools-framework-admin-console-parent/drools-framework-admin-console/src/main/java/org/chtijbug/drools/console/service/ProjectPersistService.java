@@ -42,8 +42,6 @@ public class ProjectPersistService {
     private KieServerRepositoryService kieServerRepositoryService;
 
 
-
-
     public ProjectPersistService(){
         this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
 

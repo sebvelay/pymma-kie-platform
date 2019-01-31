@@ -27,6 +27,8 @@ public class SqueletteComposant extends VerticalLayout {
 
     private MenuSecondaireRuntime menuSecondaireRuntime;
 
+    private MenuSecondaireLogging menuSecondaireLogging;
+
     private VerticalLayout content;
 
     private VerticalLayout infoPage;
@@ -68,6 +70,9 @@ public class SqueletteComposant extends VerticalLayout {
 
             menuSecondaireRuntime=new MenuSecondaireRuntime(this);
             tmp.add(menuSecondaireRuntime);
+
+            menuSecondaireLogging=new MenuSecondaireLogging(this);
+            tmp.add(menuSecondaireLogging);
 
             infoPage = new VerticalLayout();
             infoPage.setClassName("squelette-component-infoPage");
@@ -170,6 +175,14 @@ public class SqueletteComposant extends VerticalLayout {
 
     public void setUserConnectedService(UserConnectedService userConnectedService) {
         this.userConnectedService = userConnectedService;
+    }
+
+    public MenuSecondaireLogging getMenuSecondaireLogging() {
+        return menuSecondaireLogging;
+    }
+
+    public void setMenuSecondaireLogging(MenuSecondaireLogging menuSecondaireLogging) {
+        this.menuSecondaireLogging = menuSecondaireLogging;
     }
 
     public ConsoleDeploy getConsoleDeploy() {

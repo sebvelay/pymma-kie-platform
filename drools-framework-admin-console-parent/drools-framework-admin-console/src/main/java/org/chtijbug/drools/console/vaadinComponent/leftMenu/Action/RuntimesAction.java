@@ -4,6 +4,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.DialogPerso;
 import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
 import org.chtijbug.drools.console.vaadinComponent.componentView.AddRuntime;
 
@@ -21,7 +22,7 @@ public class RuntimesAction extends VerticalLayout {
         addRuntime.setClassName("leftMenu-global-button");
         add(addRuntime);
 
-        Dialog dialog=new Dialog();
+        DialogPerso dialog=new DialogPerso();
         dialog.add(new AddRuntime(dialog,squeletteComposant));
 
         addRuntime.addClickListener(buttonClickEvent -> {
