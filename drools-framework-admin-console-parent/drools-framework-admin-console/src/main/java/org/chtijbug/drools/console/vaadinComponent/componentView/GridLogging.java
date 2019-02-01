@@ -15,13 +15,11 @@ import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionPersistence;
 import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
 import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
+import org.springframework.data.domain.PageRequest;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class GridLogging extends Grid<BusinessTransactionPersistence> {
-
-    private TextField transactionId;
 
     private TextField groupeId;
 
@@ -33,19 +31,15 @@ public class GridLogging extends Grid<BusinessTransactionPersistence> {
 
     private TextField serverName;
 
+    private String strGroupeId ="GroupeId";
 
+    private String strArtefactId ="ArtefactId";
 
-    private String strTransactionId ="transactiondId";
+    private String strVersion ="Version";
 
-    private String strGroupeId ="groupeId";
+    private String strContainerId ="ContainerId";
 
-    private String strArtefactId ="artefactId";
-
-    private String strVersion ="version";
-
-    private String strContainerId ="containerId";
-
-    private String strServerName ="serverName";
+    private String strServerName ="ServerName";
 
     private ListDataProvider<BusinessTransactionPersistence> dataProvider;
     private ConfigurableFilterDataProvider<BusinessTransactionPersistence,Void,SerializablePredicate<BusinessTransactionPersistence>> filterDataProvider;
@@ -56,7 +50,7 @@ public class GridLogging extends Grid<BusinessTransactionPersistence> {
 
         indexerService = AppContext.getApplicationContext().getBean(IndexerService.class);
 
-        setClassName("deployment-grid-perso");
+        setClassName("log-grid-perso");
         setSelectionMode(Grid.SelectionMode.SINGLE);
 
 
@@ -68,13 +62,7 @@ public class GridLogging extends Grid<BusinessTransactionPersistence> {
         })).setHeader("Date");
 
 
-        Grid.Column<BusinessTransactionPersistence> transactionIdC=addColumn(runtimePersist -> runtimePersist.getTransactionId());
-        this.transactionId =new TextField(strTransactionId);
-        this.transactionId.setValueChangeMode(ValueChangeMode.EAGER);
-        this.transactionId.addValueChangeListener(e -> {
-            refreshtGrid(this.transactionId.getValue(), strTransactionId);
-        });
-        transactionIdC.setHeader(this.transactionId);
+        Grid.Column<BusinessTransactionPersistence> transactionIdC=addColumn(runtimePersist -> runtimePersist.getTransactionId()).setHeader("TransactionId");
 
         Grid.Column<BusinessTransactionPersistence> groupIdC=addColumn(runtimePersist -> runtimePersist.getGroupID());
         groupeId =new TextField(strGroupeId);
@@ -116,7 +104,7 @@ public class GridLogging extends Grid<BusinessTransactionPersistence> {
         });
         serverNameC.setHeader(serverName);
 
-        setDataProvider();
+        setDataProvider(indexerService.getBusinessTransactionPersistenceRepository().findAll(new PageRequest(0,100)).getContent());
     }
     private void refreshtGrid(String value,String type){
 
@@ -131,10 +119,7 @@ public class GridLogging extends Grid<BusinessTransactionPersistence> {
             if (type.equals(strGroupeId)) {
                 columnPredicate = runtimePersist -> (runtimePersist.getGroupID()!=null&&runtimePersist.getGroupID().toUpperCase().contains(value));
 
-            } else if (type.equals(strTransactionId)) {
-                columnPredicate = runtimePersist -> (runtimePersist.getTransactionId()!=null&&runtimePersist.getTransactionId().toUpperCase().contains(value));
-
-            } else if (type.equals(strArtefactId)) {
+            }else if (type.equals(strArtefactId)) {
                 columnPredicate = runtimePersist -> (runtimePersist.getArtefactID()!=null&&runtimePersist.getArtefactID().toUpperCase().contains(value));
             }else if (type.equals(strServerName)) {
                 columnPredicate = runtimePersist -> (runtimePersist.getServerName()!=null&&runtimePersist.getServerName().toUpperCase().contains(value));
@@ -147,12 +132,25 @@ public class GridLogging extends Grid<BusinessTransactionPersistence> {
         return columnPredicate;
     }
 
-    public void setDataProvider(){
+    public void setDataProvider(List<BusinessTransactionPersistence> b){
 
-        List<BusinessTransactionPersistence> businessTransactionPersistences = new ArrayList<>();
-        indexerService.getBusinessTransactionPersistenceRepository().findAll().forEach(businessTransactionPersistences::add);
 
-        if(businessTransactionPersistences!=null) {
+        List<BusinessTransactionPersistence> businessTransactionPersistences=null;
+
+        if(b!=null) {
+
+            businessTransactionPersistences=new ArrayList<>(b);
+
+            Collections.sort(businessTransactionPersistences, new Comparator<BusinessTransactionPersistence>() {
+                @Override
+                public int compare(BusinessTransactionPersistence businessTransactionPersistence, BusinessTransactionPersistence t1) {
+
+                    return indexerService.toDate(businessTransactionPersistence.getYear(), businessTransactionPersistence.getMonth(), businessTransactionPersistence.getDay(), businessTransactionPersistence.getHour(), businessTransactionPersistence.getMinute(), businessTransactionPersistence.getMillis()).compareTo(
+                            indexerService.toDate(t1.getYear(), t1.getMonth(), t1.getDay(), t1.getHour(), t1.getMinute(), t1.getMillis()));
+                }
+            });
+
+
             dataProvider = new ListDataProvider<>(businessTransactionPersistences);
 
             filterDataProvider = dataProvider.withConfigurableFilter();
@@ -165,7 +163,6 @@ public class GridLogging extends Grid<BusinessTransactionPersistence> {
     public void reinitFilter(){
         groupeId.setValue("");
         artefactId.setValue("");
-        transactionId.setValue("");
         version.setValue("");
         containerId.setValue("");
         serverName.setValue("");

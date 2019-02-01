@@ -12,9 +12,9 @@ import com.vaadin.flow.function.SerializablePredicate;
 import org.chtijbug.drools.console.service.IndexerService;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionAction;
-import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionPersistence;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GridActionLogging extends Grid<BusinessTransactionAction> {
@@ -73,8 +73,7 @@ public class GridActionLogging extends Grid<BusinessTransactionAction> {
         });
         enventTypeC.setHeader(this.eventType);
 
-        Grid.Column<BusinessTransactionAction> positionC=addColumn(runtimePersist -> runtimePersist.getEventNumber())
-                .setSortable(true);
+        Grid.Column<BusinessTransactionAction> positionC=addColumn(runtimePersist -> runtimePersist.getEventNumber());
 
         positionExecution =new TextField(strPositionExecution);
         positionExecution.setValueChangeMode(ValueChangeMode.EAGER);
@@ -129,7 +128,7 @@ public class GridActionLogging extends Grid<BusinessTransactionAction> {
 
     public void setDataProvider(String id){
 
-        List<BusinessTransactionAction> businessTransactionPersistences = indexerService.getBusinessTransactionActionRepository().findByBusinessTransactionId(id);
+        List<BusinessTransactionAction> businessTransactionPersistences = indexerService.getBusinessTransactionActionRepository().findAllByBusinessTransactionId(id,new Sort(new Sort.Order(Sort.Direction.ASC,"eventNumber")),new PageRequest(0,50));
 
         if(businessTransactionPersistences!=null) {
             dataProvider = new ListDataProvider<>(businessTransactionPersistences);

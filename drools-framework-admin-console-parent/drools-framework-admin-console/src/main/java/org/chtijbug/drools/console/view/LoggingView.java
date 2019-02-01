@@ -12,13 +12,17 @@ public class LoggingView extends VerticalLayout {
 
     public static final String pageName="Logging";
 
+    private Label title;
+
     private GridLogging gridLogging;
 
     private ActionLogging actionLogging;
 
     public LoggingView(){
 
-        add(new Label("Logging"));
+        title=new Label("Logging : ");
+
+        add(title);
 
         gridLogging=new GridLogging();
 
@@ -53,5 +57,13 @@ public class LoggingView extends VerticalLayout {
 
     public void setActionLogging(ActionLogging actionLogging) {
         this.actionLogging = actionLogging;
+    }
+
+    public Label getTitle() {
+        return title;
+    }
+
+    public void setTitle(Label title) {
+        this.title = title;
     }
 }
