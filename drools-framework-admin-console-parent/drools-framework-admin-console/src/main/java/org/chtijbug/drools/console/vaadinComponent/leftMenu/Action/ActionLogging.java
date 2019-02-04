@@ -17,6 +17,7 @@ import org.chtijbug.drools.console.vaadinComponent.componentView.AddRuntime;
 import org.chtijbug.drools.console.vaadinComponent.componentView.DefineProject;
 import org.chtijbug.drools.console.vaadinComponent.componentView.GridActionLogging;
 import org.chtijbug.drools.console.vaadinComponent.componentView.GridLogging;
+import org.chtijbug.drools.console.view.ActionLoggingView;
 import org.chtijbug.drools.console.view.LoggingView;
 import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionPersistence;
 import org.springframework.data.domain.PageRequest;
@@ -75,8 +76,8 @@ public class ActionLogging extends VerticalLayout {
 
             if(b!=null) {
                 DialogPerso dialog = new DialogPerso();
-                dialog.add(new Label("Transaction Id : "+b.getTransactionId()));
-                dialog.add(new GridActionLogging(b.getId()));
+
+                dialog.add(new ActionLoggingView(b,dialog));
                 dialog.open();
             }
 
