@@ -9,17 +9,35 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 @StyleSheet("css/composantperso/dialog.css")
 public class DialogPerso extends Dialog {
 
+    private HorizontalLayout bar;
+
+    private Button close;
+
     public DialogPerso(){
-        HorizontalLayout bar = new HorizontalLayout();
-        Button close = new Button();
+        bar = new HorizontalLayout();
+        close = new Button();
         close.setIcon(VaadinIcon.CLOSE.create());
         close.addClassName("DialogClose");
         bar.addClassName("DialogBar");
         bar.add(close);
         add(bar);
-        setCloseOnEsc(false);
-        setCloseOnOutsideClick(false);
 
         close.addClickListener(buttonClickEvent -> close());
+    }
+
+    public HorizontalLayout getBar() {
+        return bar;
+    }
+
+    public void setBar(HorizontalLayout bar) {
+        this.bar = bar;
+    }
+
+    public Button getClose() {
+        return close;
+    }
+
+    public void setClose(Button close) {
+        this.close = close;
     }
 }

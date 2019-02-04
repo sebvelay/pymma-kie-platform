@@ -1,6 +1,7 @@
 package org.chtijbug.drools.console.view;
 
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.dependency.HtmlImport;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -11,6 +12,7 @@ import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
 
 @Push(PushMode.AUTOMATIC)
 @StyleSheet("css/accueil.css")
+@HtmlImport("frontend://styles/shared-styles.html")
 @Route("accueil")
 public class AccueilView extends SqueletteComposant implements BeforeEnterObserver {
 

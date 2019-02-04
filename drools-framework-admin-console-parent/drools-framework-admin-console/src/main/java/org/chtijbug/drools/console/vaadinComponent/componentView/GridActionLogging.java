@@ -1,7 +1,9 @@
 package org.chtijbug.drools.console.vaadinComponent.componentView;
 
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
@@ -15,6 +17,7 @@ import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionAction;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class GridActionLogging extends Grid<BusinessTransactionAction> {
@@ -27,6 +30,8 @@ public class GridActionLogging extends Grid<BusinessTransactionAction> {
 
     private TextField packageName;
 
+    private TextField ruleFlowGroup;
+
 
 
     private String strEventType ="EventType";
@@ -37,6 +42,7 @@ public class GridActionLogging extends Grid<BusinessTransactionAction> {
 
     private String strPackageName ="Package";
 
+    private String strRuleFlowGroup="RuleFlouwGroup";
 
     private ListDataProvider<BusinessTransactionAction> dataProvider;
     private ConfigurableFilterDataProvider<BusinessTransactionAction,Void,SerializablePredicate<BusinessTransactionAction>> filterDataProvider;
@@ -53,16 +59,23 @@ public class GridActionLogging extends Grid<BusinessTransactionAction> {
 
         addColumn(new ComponentRenderer<>(runtimePersist -> {
 
-            VerticalLayout verticalLayout=new VerticalLayout();
-
+            SimpleDateFormat simpleDateFormat=new SimpleDateFormat(  "yyyy-MM-dd HH:mm:ss");
+            Label label=new Label();
             if(runtimePersist.getRuleExecution()!=null) {
-                Label label = new Label("Starting ->" + runtimePersist.getRuleExecution().getStartDate());
-                verticalLayout.add(label);
-                Label label2 = new Label("Ending ->" + runtimePersist.getRuleExecution().getEndDate());
-                verticalLayout.add(label2);
+                label.setText(simpleDateFormat.format(runtimePersist.getRuleExecution().getStartDate()));
             }
-            return verticalLayout;
-        })).setHeader("Date");
+            return label;
+        })).setHeader("Début");
+
+        addColumn(new ComponentRenderer<>(runtimePersist -> {
+
+            SimpleDateFormat simpleDateFormat=new SimpleDateFormat(  "yyyy-MM-dd HH:mm:ss");
+            Label label=new Label();
+            if(runtimePersist.getRuleExecution()!=null) {
+                label.setText(simpleDateFormat.format(runtimePersist.getRuleExecution().getEndDate()));
+            }
+            return label;
+        })).setHeader("Fin");
 
 
         Grid.Column<BusinessTransactionAction> enventTypeC=addColumn(runtimePersist -> runtimePersist.getEventType());
@@ -81,6 +94,7 @@ public class GridActionLogging extends Grid<BusinessTransactionAction> {
             refreshtGrid(positionExecution.getValue(), strPositionExecution);
         });
         positionC.setHeader(positionExecution);
+        positionC.setWidth("3%");
 
         Grid.Column<BusinessTransactionAction> ruleNameC=addColumn(runtimePersist -> runtimePersist.getRuleExecution()!=null?runtimePersist.getRuleExecution().getRuleName():"");
         ruleName =new TextField(strRuleName);
@@ -97,6 +111,34 @@ public class GridActionLogging extends Grid<BusinessTransactionAction> {
             refreshtGrid(packageName.getValue(), strPackageName);
         });
         versionC.setHeader(packageName);
+
+        Grid.Column<BusinessTransactionAction> ruleflowC=addColumn(runtimePersist -> runtimePersist.getRuleflowGroupName()!=null?runtimePersist.getRuleflowGroupName():"");
+        ruleFlowGroup =new TextField(strRuleFlowGroup);
+        ruleFlowGroup.setValueChangeMode(ValueChangeMode.EAGER);
+        ruleFlowGroup.addValueChangeListener(e -> {
+            refreshtGrid(ruleFlowGroup.getValue(), strRuleFlowGroup);
+        });
+        ruleflowC.setHeader(ruleFlowGroup);
+
+        addColumn(new ComponentRenderer<>(runtimePersist -> {
+
+            Checkbox label=new Checkbox();
+            label.setValue(false);
+
+            if(runtimePersist.getInputData()!=null&&runtimePersist.getInputData().getRealFact()!=null){
+                label.setValue(true);
+            }
+            if(runtimePersist.getFact()!=null&&runtimePersist.getFact().getRealFact()!=null){
+                label.setValue(true);
+            }
+            if(runtimePersist.getRuleExecution()!=null&&runtimePersist.getRuleExecution().getThenFacts()!=null&&runtimePersist.getRuleExecution().getThenFacts().size()>0){
+                label.setValue(true);
+            }
+            if(runtimePersist.getRuleExecution()!=null&&runtimePersist.getRuleExecution().getWhenFacts()!=null&&runtimePersist.getRuleExecution().getWhenFacts().size()>0){
+                label.setValue(true);
+            }
+            return label;
+        })).setHeader("Data?");
 
         setDataProvider(idRequest);
     }
@@ -122,6 +164,10 @@ public class GridActionLogging extends Grid<BusinessTransactionAction> {
             else if (type.equals(strPackageName)) {
                 columnPredicate = runtimePersist -> (runtimePersist.getRuleExecution()!=null&&runtimePersist.getRuleExecution().getPackageName()!=null&&runtimePersist.getRuleExecution().getPackageName().toUpperCase().contains(value));
             }
+            else if (type.equals(strRuleFlowGroup)) {
+                columnPredicate = runtimePersist -> (runtimePersist.getRuleflowGroupName()!=null&&runtimePersist.getRuleflowGroupName().toUpperCase().contains(value));
+            }
+
         }
         return columnPredicate;
     }
@@ -145,6 +191,7 @@ public class GridActionLogging extends Grid<BusinessTransactionAction> {
         ruleName.setValue("");
         eventType.setValue("");
         packageName.setValue("");
+        ruleFlowGroup.setValue("");
     }
 
 }
