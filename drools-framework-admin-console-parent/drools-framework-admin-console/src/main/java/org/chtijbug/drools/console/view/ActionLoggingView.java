@@ -116,6 +116,7 @@ public class ActionLoggingView extends VerticalLayout {
                 verticalLayout.setClassName("content-action-logging");
 
                 TextArea textArea=new TextArea(b.getInputData().getFactType().name());
+                textArea.setReadOnly(true);
                 textArea.setClassName("content-log");
                 textArea.setValue(
                         b.getInputData().getRealFact().toString().replaceAll(",",",\n")
@@ -147,6 +148,7 @@ public class ActionLoggingView extends VerticalLayout {
                 verticalLayout.setClassName("content-action-logging");
 
                 TextArea textArea=new TextArea(b.getFact().getFactType().name());
+                textArea.setReadOnly(true);
                 textArea.setClassName("content-log");
                 textArea.setValue(
                         b.getFact().getRealFact().toString().replaceAll(",",",\n")
@@ -180,6 +182,7 @@ public class ActionLoggingView extends VerticalLayout {
                     if(fact!=null&&fact.getRealFact()!=null){
 
                         TextArea textArea=new TextArea(fact.getFactType().name());
+                        textArea.setReadOnly(true);
                         textArea.setClassName("content-log");
                         textArea.setValue(
                                 fact.getRealFact().toString().replaceAll(",",",\n")
@@ -212,6 +215,7 @@ public class ActionLoggingView extends VerticalLayout {
                     if(fact!=null&&fact.getRealFact()!=null){
 
                         TextArea textArea=new TextArea(fact.getFactType().name());
+                        textArea.setReadOnly(true);
                         textArea.setClassName("content-log");
                         textArea.setValue(
                                 fact.getRealFact().toString().replaceAll(",",",\n")

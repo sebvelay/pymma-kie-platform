@@ -12,8 +12,8 @@
     <artifactId>drools-framework-admin-console</artifactId>
 
     <properties>
-        <vaadin.version>12.0.2</vaadin.version>
-        <spring-boot.version>2.1.0.RELEASE</spring-boot.version>
+        <vaadin.version>12.0.5</vaadin.version>
+        <spring-boot.version>2.1.2.RELEASE</spring-boot.version>
         <spring-version>5.1.2.RELEASE</spring-version>
         <webapp.directory>src/main/webapp</webapp.directory>
         <jbpm.version>7.15.0.Final</jbpm.version>
@@ -57,6 +57,19 @@
 
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>4.0.1</version>
+        </dependency>
         <dependency>
             <groupId>org.kie.server</groupId>
             <artifactId>kie-server-api</artifactId>
@@ -95,7 +108,16 @@
         </dependency>
         <dependency>
             <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-upload-flow</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
             <artifactId>vaadin-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.vaadin.olli</groupId>
+            <artifactId>file-download-wrapper</artifactId>
+            <version>1.1.0</version>
         </dependency>
 
 

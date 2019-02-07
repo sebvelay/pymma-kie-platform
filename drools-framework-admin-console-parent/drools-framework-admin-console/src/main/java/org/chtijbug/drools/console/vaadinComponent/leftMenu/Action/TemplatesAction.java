@@ -1,9 +1,12 @@
 package org.chtijbug.drools.console.vaadinComponent.leftMenu.Action;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.ComboBoxPerso;
 import org.chtijbug.drools.console.view.TemplateView;
+import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
 
 public class TemplatesAction extends VerticalLayout {
 
@@ -13,16 +16,28 @@ public class TemplatesAction extends VerticalLayout {
 
     private Button edit;
 
+    private ComboBoxPerso<PlatformProjectResponse> spaceSelection;
+
     public TemplatesAction(TemplateView templateView){
 
         setClassName("leftMenu-global-action");
+
+
+        spaceSelection = new ComboBoxPerso<>("Project",VaadinIcon.SEARCH.create());
+        spaceSelection.getComboBox().setItems(templateView.getUserConnectedService().getUserConnected().getProjectResponses());
+        spaceSelection.getComboBox().setItemLabelGenerator(PlatformProjectResponse::getName);
+        spaceSelection.getComboBox().addValueChangeListener(valueChangeEvent -> {
+            templateView.setDataProvider(spaceSelection.getComboBox());
+        });
+        add(spaceSelection);
+
 
         refresh =new Button("Refresh", VaadinIcon.ROTATE_LEFT.create());
         refresh.setClassName("leftMenu-global-button");
         add(refresh);
         refresh.addClickListener(buttonClickEvent -> {
             active(refresh);
-            templateView.refreshList();
+            templateView.refreshList(spaceSelection.getComboBox());
         });
 
         duplicate =new Button("Duplicate",VaadinIcon.TOOLS.create());
@@ -40,7 +55,7 @@ public class TemplatesAction extends VerticalLayout {
         add(edit);
         edit.addClickListener(buttonClickEvent -> {
             active(edit);
-            templateView.edit();
+            templateView.edit(spaceSelection.getComboBox());
         });
     }
     private boolean isActive(Button button){
@@ -58,7 +73,6 @@ public class TemplatesAction extends VerticalLayout {
         removeActive(edit);
         button.getClassNames().add("active");
     }
-
     public Button getRefresh() {
         return refresh;
     }

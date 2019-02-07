@@ -123,6 +123,7 @@ public class GridActionLogging extends Grid<BusinessTransactionAction> {
         addColumn(new ComponentRenderer<>(runtimePersist -> {
 
             Checkbox label=new Checkbox();
+            label.setEnabled(false);
             label.setValue(false);
 
             if(runtimePersist.getInputData()!=null&&runtimePersist.getInputData().getRealFact()!=null){
