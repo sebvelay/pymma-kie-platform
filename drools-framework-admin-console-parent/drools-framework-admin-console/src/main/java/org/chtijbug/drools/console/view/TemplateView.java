@@ -15,6 +15,7 @@ import org.chtijbug.drools.console.service.UserConnectedService;
 import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
+import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.DialogPerso;
 import org.chtijbug.drools.console.vaadinComponent.componentView.AssetEdit;
 import org.chtijbug.drools.console.vaadinComponent.leftMenu.Action.TemplatesAction;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
@@ -37,8 +38,6 @@ public class TemplateView extends VerticalLayout {
 
     private ListDataProvider<Asset> dataProvider;
 
-    private ComboBox<PlatformProjectResponse> spaceSelection;
-
     private Grid<Asset> assetListGrid;
 
     private TextField searchTemplate;
@@ -58,14 +57,6 @@ public class TemplateView extends VerticalLayout {
         this.userConnectedService = AppContext.getApplicationContext().getBean(UserConnectedService.class);
         this.userConnected = userConnectedService.getUserConnected();
         this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
-
-        spaceSelection = new ComboBox("Project", userConnected.getProjectResponses());
-        spaceSelection.setItemLabelGenerator(PlatformProjectResponse::getName);
-        spaceSelection.addValueChangeListener(valueChangeEvent -> {
-            setDataProvider();
-        });
-
-        add(spaceSelection);
 
         assetListGrid = new Grid();
         assetListGrid.setClassName("templates-grid-perso");
@@ -89,8 +80,8 @@ public class TemplateView extends VerticalLayout {
         });
     }
 
-    public void setDataProvider(){
-        PlatformProjectResponse response = (PlatformProjectResponse) spaceSelection.getValue();
+    public void setDataProvider(ComboBox<PlatformProjectResponse> spaceSelection){
+        PlatformProjectResponse response = spaceSelection.getValue();
         List<Asset> tmp = kieRepositoryService.getListAssets(config.getKiewbUrl(), userConnected.getUserName(), userConnected.getUserPassword(), response.getSpaceName(), response.getName());
         List<Asset> result = new ArrayList<>();
         for (Asset asset : tmp) {
@@ -105,10 +96,10 @@ public class TemplateView extends VerticalLayout {
         reinitFilter();
     }
 
-    public void refreshList() {
+    public void refreshList(ComboBox<PlatformProjectResponse> spaceSelection) {
         spaceSelection.setItems(userConnected.getProjectResponses());
     }
-    public void edit(){
+    public void edit(ComboBox<PlatformProjectResponse> spaceSelection){
         Set<Asset> selectedElements = assetListGrid.getSelectedItems();
         if (selectedElements.toArray().length > 0) {
             String assetName = selectedElements.stream().findFirst().get().getTitle();
@@ -117,9 +108,9 @@ public class TemplateView extends VerticalLayout {
                 userConnectedService.addAssetToSession(assetName);
                 userConnectedService.addProjectToSession(response.getName());
                 userConnectedService.addSpaceToSession(response.getSpaceName());
-                Dialog dialog=new Dialog();
+                DialogPerso dialog=new DialogPerso();
 
-                dialog.add(new AssetEdit());
+                dialog.add(new EditTemplateView(dialog,assetName));
                 dialog.open();
             }
         }
@@ -140,6 +131,15 @@ public class TemplateView extends VerticalLayout {
         }
         return columnPredicate;
     }
+
+    public UserConnectedService getUserConnectedService() {
+        return userConnectedService;
+    }
+
+    public void setUserConnectedService(UserConnectedService userConnectedService) {
+        this.userConnectedService = userConnectedService;
+    }
+
     public void duplicate(){}
 
     public void reinitFilter(){

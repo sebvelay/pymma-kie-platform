@@ -9,20 +9,18 @@ import org.chtijbug.drools.console.service.model.kie.JobStatus;
 import org.chtijbug.guvnor.server.jaxrs.api.UserLoginInformation;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
 import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
+import org.drools.workbench.models.guided.template.backend.RuleTemplateModelXMLPersistenceImpl;
+import org.drools.workbench.models.guided.template.shared.TemplateModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 @Service
 public class KieRepositoryService {
@@ -35,8 +33,57 @@ public class KieRepositoryService {
 
     private ObjectMapper mapper = new ObjectMapper();
 
+    private String pojoToStringMethod(String assetContent,List<HashMap<String,Object>> objects){
 
-    public String getAssetSource(String url, String username, String password, String spaceName, String projectName, String assetName) {
+        TemplateModel model = RuleTemplateModelXMLPersistenceImpl.getInstance().unmarshal(assetContent);
+        int i=0;
+        model.clearRows();
+        for(HashMap<String,Object> t:objects){
+
+            List<String> row=new ArrayList<>();
+            for (Map.Entry<String,Object> entry:t.entrySet()){
+               row.add(String.valueOf(entry.getValue()));
+            }
+            model.addRow(i,row.toArray(new String[row.size()]));
+            i++;
+        }
+
+
+        return RuleTemplateModelXMLPersistenceImpl.getInstance().marshal(model);
+    }
+
+    public void updateAssetSource(String url, String username, String password, String spaceName, String projectName, String assetName,List<HashMap<String,Object>> objects) {
+
+        String assetContent = getAssetSource(url,
+                username,
+                password,
+                spaceName,
+                projectName,
+                assetName);
+
+
+        String completeurl = url + "/chtijbug/" + spaceName + "/" + projectName + "/assets/" + assetName + "/source";
+
+        String content=pojoToStringMethod(assetContent,objects);
+        logger.info("url moteur reco : " + completeurl);
+
+        ResponseEntity response = restTemplateKiewb
+                .execute(completeurl, HttpMethod.POST, requestCallback(content, username, password), clientHttpResponse -> {
+                    String extractedResponse = null;
+                    if (clientHttpResponse.getBody() != null) {
+                        Scanner s = new Scanner(clientHttpResponse.getBody()).useDelimiter("\\A");
+                        String result = s.hasNext() ? s.next() : "";
+                        extractedResponse = result;
+                    }
+                    ResponseEntity extractedValue = new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
+                    return extractedValue;
+                });
+
+      // restTemplateKiewb.exchange(completeurl, HttpMethod.POST, requestCallBack(content, username, password), void.class);
+        System.out.println("");
+    }
+
+        public String getAssetSource(String url, String username, String password, String spaceName, String projectName, String assetName) {
         String completeurl = url + "/chtijbug/" + spaceName + "/" + projectName + "/assets/" + assetName + "/source";
         logger.info("url moteur reco : " + completeurl);
         ResponseEntity<String> response = restTemplateKiewb
@@ -169,6 +216,23 @@ public class KieRepositoryService {
         return reponseMoteur;
     }
 
+    private HttpEntity requestCallBack(final Object content, String username, String password){
+        HttpHeaders httpHeaders=new HttpHeaders();
+        httpHeaders.add(
+                HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        httpHeaders.add(
+                HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        String auth = username + ":" + password;
+        byte[] encodedAuth = Base64.encodeBase64(
+                auth.getBytes(Charset.forName("UTF-8")));
+        String authHeader = "Basic " + new String(encodedAuth);
+        httpHeaders.add(
+                HttpHeaders.AUTHORIZATION, authHeader);
+        HttpEntity httpEntity=new HttpEntity(content,httpHeaders);
+
+
+        return httpEntity;
+    }
 
     private RequestCallback requestCallback(final Object content, String username, String password) {
         return clientHttpRequest -> {

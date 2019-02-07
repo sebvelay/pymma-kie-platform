@@ -400,14 +400,12 @@ public class PackageResource {
         return null;
     }
 
-    @PUT
+    @POST
     @Path("{organizationalUnitName}/{projectName}/asset/{assetName}/source")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
-    @Produces({MediaType.WILDCARD})
     public void updateAssetSource(
             @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName, @PathParam("assetName") String assetName, String content) {
         updateAssetContent(organizationalUnitName, projectName, assetName, content);
-
     }
 
     private void updateAssetContent(String organizationalUnitName, String projectName, String assetName, String content) {

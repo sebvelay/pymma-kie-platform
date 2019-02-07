@@ -10,3 +10,36 @@
         </style>
     </template>
 </dom-module>
+
+<dom-module id="other" theme-for="vaadin-upload">
+    <template>
+        <style>
+            [part="upload-button"]{
+                color:rgb(0,0,0,0.4)!important;
+            }
+        </style>
+    </template>
+</dom-module>
+
+
+<dom-module id="my-file-download" theme-for="file-download-wrapper">
+    <template>
+        <style>
+            :host {
+                --my-color-exceptionnel:rgb(0,0,0,0.4);
+
+            }
+        </style>
+    </template>
+</dom-module>
+
+<dom-module id="button-link" theme-for="vaadin-button">
+    <template>
+        <style>
+            :host(.menu-button-asset-edit){
+                color:var(--my-color-exceptionnel, rgb(0,0,0,0.4));
+            }
+        </style>
+    </template>
+</dom-module>
+
