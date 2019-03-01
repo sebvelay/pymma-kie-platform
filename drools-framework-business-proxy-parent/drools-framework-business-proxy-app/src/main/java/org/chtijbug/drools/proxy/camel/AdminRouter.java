@@ -2,18 +2,12 @@ package org.chtijbug.drools.proxy.camel;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
-import org.apache.camel.model.rest.RestParamType;
 import org.chtijbug.drools.proxy.service.KieServiceCommon;
-import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.KieContainerResourceList;
 import org.kie.server.api.model.KieServerInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-
-import static org.apache.camel.model.rest.RestParamType.body;
-import static org.apache.camel.model.rest.RestParamType.path;
 
 @Component
 public class AdminRouter extends RouteBuilder {
@@ -47,7 +41,7 @@ public class AdminRouter extends RouteBuilder {
                 .get("/").description("Retrieves KIE Server information - id, name, location, capabilities, messages").outType(KieServerInfo.class)
                 .responseMessage().code(200).message("Server Info successfully returned").endResponseMessage()
                 .to("bean:kieService?method=getInfo()");
-
+/**
         rest("/server/containers").description("Retrieves containers deployed to this server, optionally filtered by group, artifact, version or status")
                 .produces("application/json")
                 .consumes("application/json")
@@ -90,63 +84,6 @@ public class AdminRouter extends RouteBuilder {
                  .param().name("body").type(body).description("KIE Container resource to be deployed as KieContainerResourcee").endParam()
                 .responseMessage().code(200).message("Container successfully created").endResponseMessage()
                 .to("bean:kieService?method=createContainerWithRestBusinessService(${header.id},${body},${header.className},${header.processID})");
-    }
+    **/
+ }
 }
-/**
-
-
-
-
-
-    @ApiOperation(value="Retrieves server state - configuration that the server is currently running with",
-            response=ServiceResponse.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 500, message = "Unexpected error") })
-    @GET
-    @Path("state")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response getServerState(@Context HttpHeaders headers) {
-        return createCorrectVariant(server.getServerState(), headers);
-    }
-
-
-
-    @ApiOperation(value="Readiness check for KIE Server that indicates that server is fully booted and ready to accept requests",
-            response=Void.class, code=200)
-    @ApiResponses(value = { @ApiResponse(code = 503, message = "Service not yet available") })
-    @GET
-    @Path("readycheck")
-    @Produces({MediaType.TEXT_PLAIN})
-    public Response readycheck(@Context HttpHeaders headers) {
-        if (server.isKieServerReady()) {
-            return Response.status(Response.Status.OK).build();
-        }
-        return serviceUnavailable();
-    }
-
-    @ApiOperation(value="Liveness check for KIE Server that validates both kie server and all extensions, optionally produces report",
-            response=Message.class, code=200, responseContainer="List")
-    @ApiResponses(value = { @ApiResponse(code = 503, message = "If any of the checks failed") })
-    @GET
-    @Path("healthcheck")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Response healthcheck(@Context HttpHeaders headers,
-                                @ApiParam(value = "optional report flag to return detailed report of the check, defaults to false", required = false) @QueryParam("report")  @DefaultValue("false") boolean report) {
-        List<Message> healthMessages = server.healthCheck(report);
-
-        boolean anyfailures = healthMessages.stream().anyMatch(msg -> msg.getSeverity().equals(Severity.ERROR));
-        if (anyfailures) {
-            if (report) {
-                return createCorrectVariant(healthMessages, headers, Response.Status.SERVICE_UNAVAILABLE);
-            }
-
-            return serviceUnavailable();
-        }
-        if (report) {
-            return createCorrectVariant(healthMessages, headers, Response.Status.OK);
-        }
-        return Response.status(Response.Status.OK).build();
-    }
-
-}
-
- **/
