@@ -1,22 +1,14 @@
 package org.chtijbug.drools.console.vaadinComponent.leftMenu.Action;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import org.chtijbug.drools.console.service.IndexerService;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.DialogPerso;
 import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.TextFieldPerso;
-import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
-import org.chtijbug.drools.console.vaadinComponent.componentView.AddRuntime;
-import org.chtijbug.drools.console.vaadinComponent.componentView.DefineProject;
-import org.chtijbug.drools.console.vaadinComponent.componentView.GridActionLogging;
-import org.chtijbug.drools.console.vaadinComponent.componentView.GridLogging;
 import org.chtijbug.drools.console.view.ActionLoggingView;
 import org.chtijbug.drools.console.view.LoggingView;
 import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionPersistence;

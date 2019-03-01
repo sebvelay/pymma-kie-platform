@@ -18,12 +18,13 @@ package org.chtijbug.drools.proxy.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.CamelContext;
 import org.chtijbug.drools.proxy.camel.DroolsRouter;
-import org.chtijbug.drools.proxy.persistence.repository.ContainerRepository;
 import org.chtijbug.drools.proxy.persistence.model.ContainerPojoPersist;
+import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
+import org.chtijbug.drools.proxy.persistence.repository.ContainerRepository;
+import org.chtijbug.drools.proxy.persistence.repository.RuntimeRepository;
 import org.chtijbug.kieserver.services.drools.DroolsChtijbugKieServerExtension;
 import org.chtijbug.kieserver.services.drools.DroolsChtijbugRulesExecutionService;
 import org.kie.server.api.model.*;
-import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
@@ -33,12 +34,15 @@ import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -60,8 +64,12 @@ public class KieServiceCommon {
     @Inject
     private ContainerRepository containerRepository;
 
+    @Inject
+    private RuntimeRepository runtimeRepository;
     @Autowired
     CamelContext camelContext;
+    @Value("${server.port}")
+    private int serverPort;
 
     public KieServiceCommon() {
         // for now, if no server impl is passed as parameter, create one
@@ -86,43 +94,67 @@ public class KieServiceCommon {
 
     @PostConstruct
     private void initCamelBusinessRoutes() {
+        String serverName = System.getProperty("org.kie.server.id");
+        String sftpPort=System.getProperty("org.chtijbug.server.sftpPort");
+        List<RuntimePersist> itIsMes = runtimeRepository.findByServerName(serverName);
+        if (itIsMes.size()==0){
+            ServiceResponse<KieServerInfo> result = server.getInfo();
+            String version = result.getResult().getVersion();
+            String hostName="localhost";
+            try {
+                InetAddress inetAddress = InetAddress.getLocalHost();
+                hostName=inetAddress.getHostName();
+            } catch (UnknownHostException e) {
+                logger.info("initCamelBusinessRoutes.getLocalHost", e);
+            }
+//org.chtijbug.server.sftpPort
+            RuntimePersist runtimePersist = new RuntimePersist(serverName,version,"http://"+hostName+":"+serverPort,String.valueOf(serverPort),sftpPort);
+            runtimeRepository.save(runtimePersist);
+        }
         try {
-            String serverName = System.getProperty("org.kie.server.id");
+
             List<ContainerPojoPersist> containers = containerRepository.findByServerName(serverName);
             for (ContainerPojoPersist container : containers) {
-                ClassLoader localClassLoader = null;
-                String containerId = container.getContainerId();
-                KieContainerInstanceImpl kieContainerInstance = registry.getContainer(containerId);
-                if (kieContainerInstance != null) {
-                    try {
-                        localClassLoader = Thread.currentThread()
-                                .getContextClassLoader();
-                    } catch (ClassCastException e) {
-                        logger.info("GenericResource.runSession", e);
-                    }
-                    try {
-                        Set<Class<?>> classes = kieContainerInstance.getExtraClasses();
-                        String className = container.getClassName();
-                        Class foundClass = this.getClassFromName(classes, className);
-                        ClassLoader classLoader = foundClass.getClassLoader();
-                        Class<?> theClass = classLoader.loadClass(className);
-                        camelContext.setApplicationContextClassLoader(classLoader);
-                        Thread.currentThread().setContextClassLoader(classLoader);
-                        String projectName = container.getProjectName();
-                        String processId = container.getProcessID();
-                        DroolsRouter droolsRouter = new DroolsRouter(camelContext, theClass, projectName, kieContainerInstance, processId);
-                        camelContext.addRoutes(droolsRouter);
-                    } finally {
-                        if (localClassLoader != null) {
-                            Thread.currentThread().setContextClassLoader(localClassLoader);
-                        }
-                    }
-                }
+                this.initCamelBusinessRoute(container);
             }
         } catch (Exception e) {
-            logger.info("CreationContainer", e);
+            logger.info("initCamelBusinessRoutes", e);
+        }
+
+    }
+
+    public void initCamelBusinessRoute(ContainerPojoPersist container) throws Exception {
+        ClassLoader localClassLoader = null;
+        String containerId = container.getContainerId();
+        KieContainerInstanceImpl kieContainerInstance = registry.getContainer(containerId);
+        if (kieContainerInstance != null) {
+            try {
+                localClassLoader = Thread.currentThread()
+                        .getContextClassLoader();
+            } catch (ClassCastException e) {
+                logger.info("GenericResource.runSession", e);
+            }
+            try {
+                Set<Class<?>> classes = kieContainerInstance.getExtraClasses();
+                String className = container.getClassName();
+                Class foundClass = this.getClassFromName(classes, className);
+                ClassLoader classLoader = foundClass.getClassLoader();
+                Class<?> theClass = classLoader.loadClass(className);
+                camelContext.setApplicationContextClassLoader(classLoader);
+                Thread.currentThread().setContextClassLoader(classLoader);
+                String projectName = container.getContainerId();
+                String processId = container.getProcessID();
+                DroolsRouter droolsRouter = new DroolsRouter(camelContext, theClass, projectName, kieContainerInstance, processId);
+                camelContext.addRoutes(droolsRouter);
+            } finally {
+                if (localClassLoader != null) {
+                    Thread.currentThread().setContextClassLoader(localClassLoader);
+                }
+            }
         }
     }
+
+
 
     public KieServerImpl getServer() {
         return server;
@@ -150,7 +182,25 @@ public class KieServiceCommon {
         return result.getResult();
     }
 
+    public void updateConfig() throws Exception {
+        String serverName = System.getProperty("org.kie.server.id");
+        List<ContainerPojoPersist>  containers= containerRepository.findByServerNameAndStatus(serverName, ContainerPojoPersist.STATUS.TODEPLOY.toString());
+        for (ContainerPojoPersist element:containers){
+            //this.disposeContainer(element.getContainerId());
 
+            KieContainerResource newContainer = new KieContainerResource();
+            newContainer.setContainerId(element.getContainerId());
+            newContainer.setReleaseId(new ReleaseId());
+            newContainer.getReleaseId().setArtifactId(element.getArtifactId());
+            newContainer.getReleaseId().setGroupId(element.getGroupId());
+            newContainer.getReleaseId().setVersion(element.getVersion());
+            this.createContainer(element.getContainerId(),newContainer);
+            this.initCamelBusinessRoute(element);
+            element.setStatus(ContainerPojoPersist.STATUS.UP.toString());
+            containerRepository.save(element);
+        }
+
+    }
     public KieContainerResource createContainerWithRestBusinessService(String id, KieContainerResource container, String className, String processID) {
 
 
@@ -167,39 +217,27 @@ public class KieServiceCommon {
                 logger.info("GenericResource.runSession", e);
             }
             try {
-                KieContainerInstance kci = registry.getContainer(id);
-                Set<Class<?>> classes = kci.getExtraClasses();
+                String serverName = System.getProperty("org.kie.server.id");
+                ContainerPojoPersist containerPojoPersist = containerRepository.findByServerNameAndContainerId(serverName, id);
+                if (containerPojoPersist == null) {
+                    containerPojoPersist = new ContainerPojoPersist();
+                    containerPojoPersist.setId(UUID.randomUUID().toString());
+                    containerPojoPersist.setContainerId(id);
+                    containerPojoPersist.setClassName(className);
+                    containerPojoPersist.setProjectName(id);
+                    containerPojoPersist.setServerName(serverName);
+                    containerPojoPersist.setProcessID(processID);
 
-                Class foundClass = this.getClassFromName(classes, className);
-                if (foundClass != null) {
-                    ClassLoader classLoader = foundClass.getClassLoader();
-                    Class<?> theClass = classLoader.loadClass(className);
-                    Thread.currentThread().setContextClassLoader(classLoader);
-                    camelContext.setApplicationContextClassLoader(classLoader);
-                    DroolsRouter droolsRouter = new DroolsRouter(camelContext, theClass, id, kci, processID);
-                    camelContext.addRoutes(droolsRouter);
-                    String serverName = System.getProperty("org.kie.server.id");
-                    ContainerPojoPersist containerPojoPersist = containerRepository.findByServerNameAndContainerId(serverName, id);
-                    if (containerPojoPersist == null) {
-                        containerPojoPersist = new ContainerPojoPersist();
-                        containerPojoPersist.setId(UUID.randomUUID().toString());
-                        containerPojoPersist.setContainerId(id);
-                        containerPojoPersist.setClassName(className);
-                        containerPojoPersist.setProjectName(id);
-                        containerPojoPersist.setServerName(serverName);
-                        containerPojoPersist.setProcessID(processID);
-                        containerRepository.save(containerPojoPersist);
-                    } else {
-                        containerPojoPersist.setContainerId(id);
-                        containerPojoPersist.setClassName(className);
-                        containerPojoPersist.setProjectName(id);
-                        containerPojoPersist.setProcessID(processID);
-                        containerPojoPersist.setServerName(serverName);
-                        containerRepository.save(containerPojoPersist);
-                    }
+                } else {
+                    containerPojoPersist.setContainerId(id);
+                    containerPojoPersist.setClassName(className);
+                    containerPojoPersist.setProjectName(id);
+                    containerPojoPersist.setProcessID(processID);
+                    containerPojoPersist.setServerName(serverName);
 
                 }
-
+                this.initCamelBusinessRoute(containerPojoPersist);
+                containerRepository.save(containerPojoPersist);
 
             } catch (ClassNotFoundException e) {
                 logger.error("createContainerWithRestBusinessService", e);

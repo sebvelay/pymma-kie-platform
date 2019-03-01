@@ -13,7 +13,6 @@ import org.drools.workbench.models.guided.template.backend.RuleTemplateModelXMLP
 import org.drools.workbench.models.guided.template.shared.TemplateModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RequestCallback;

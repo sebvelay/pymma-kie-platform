@@ -6,16 +6,15 @@ import org.chtijbug.drools.console.AddLog;
 import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.JobStatus;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
-import org.chtijbug.drools.console.service.model.kie.KieContainerInfo;
-import org.chtijbug.drools.console.service.model.kie.KieServerJobStatus;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.proxy.persistence.json.KeyProject;
+import org.chtijbug.drools.proxy.persistence.model.ContainerPojoPersist;
 import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
 import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
+import org.chtijbug.drools.proxy.persistence.repository.ContainerRepository;
 import org.chtijbug.drools.proxy.persistence.repository.ProjectRepository;
+import org.chtijbug.drools.proxy.persistence.repository.RuntimeRepository;
 import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
-import org.kie.server.api.model.KieContainerResource;
-import org.kie.server.api.model.ReleaseId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,9 +37,12 @@ public class ProjectPersistService {
     @Autowired
     private UserConnectedService userConnectedService;
 
-    @Autowired
-    private KieServerRepositoryService kieServerRepositoryService;
 
+    @Autowired
+    private ContainerRepository containerRepository;
+
+    @Autowired
+    private RuntimeRepository runtimeRepository;
 
     public ProjectPersistService(){
         this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
@@ -145,21 +147,44 @@ public class ProjectPersistService {
                         userConnected.getUserPassword(), projectPersist.getProjectName().getSpaceName(), projectPersist.getProjectName().getName(), "install", workOnGoingView,ui);
 
                 executeWrite(url,username,password,workOnGoingView,result.getJobId(),ui);
-
+/**
                 if (projectPersist.getContainerID() != null) {
                     KieServerJobStatus jobresult = kieServerRepositoryService.stopContainer(config.getKieserverUrl(), config.getKieserverUserName(), config.getKieserverPassword(), projectPersist.getContainerID(), workOnGoingView,ui);
                     if (jobresult != null
                             && "SUCCESS".equals(jobresult.getType())) {
                     }
                 }
-                KieContainerResource newContainer = new KieContainerResource();
-                newContainer.setContainerId(projectPersist.getContainerID());
-                newContainer.setReleaseId(new ReleaseId());
-                newContainer.getReleaseId().setArtifactId(projectPersist.getArtifactID());
-                newContainer.getReleaseId().setGroupId(projectPersist.getGroupID());
-                newContainer.getReleaseId().setVersion(projectPersist.getProjectVersion());
-                KieContainerInfo createdContainer = kieServerRepositoryService.createContainerWithBusinessInterface(config.getKieserverUrl(), config.getKieserverUserName(), config.getKieserverPassword(), projectPersist, newContainer, workOnGoingView,ui);
+ **/
+             //   ContainerPojoPersist toto = containerRepository.findByServerNameAndContainerId(projectPersist.getContainerID());
+                List<RuntimePersist> kieservers = runtimeRepository.findByServerName(projectPersist.getServerName());
+                if (kieservers.size()==1) {
+                    ContainerPojoPersist existingContainer = containerRepository.findByServerNameAndContainerId(projectPersist.getServerName(),projectPersist.getContainerID());
+                    if (existingContainer==null) {
+                        ContainerPojoPersist newContainer = new ContainerPojoPersist();
+                        newContainer.setStatus(ContainerPojoPersist.STATUS.TODEPLOY.toString());
+                        newContainer.setClassName(projectPersist.getMainClass());
+                        newContainer.setProcessID(projectPersist.getProcessID());
+                        newContainer.setContainerId(projectPersist.getContainerID());
+                        newContainer.setServerName(projectPersist.getServerName());
+                        newContainer.setGroupId(projectPersist.getGroupID());
+                        newContainer.setArtifactId(projectPersist.getArtifactID());
+                        newContainer.setVersion(projectPersist.getProjectVersion());
+                        containerRepository.save(newContainer);
+                    }else{
+                        existingContainer.setStatus(ContainerPojoPersist.STATUS.TODEPLOY.toString());
+                        containerRepository.save(existingContainer);
+                    }
 
+/**
+                    KieContainerResource newContainer = new KieContainerResource();
+                    newContainer.setContainerId(projectPersist.getContainerID());
+                    newContainer.setReleaseId(new ReleaseId());
+                    newContainer.getReleaseId().setArtifactId(projectPersist.getArtifactID());
+                    newContainer.getReleaseId().setGroupId(projectPersist.getGroupID());
+                    newContainer.getReleaseId().setVersion(projectPersist.getProjectVersion());
+                    KieContainerInfo createdContainer = kieServerRepositoryService.createContainerWithBusinessInterface(config.getKieserverUrl(), config.getKieserverUserName(), config.getKieserverPassword(), projectPersist, newContainer, workOnGoingView, ui);
+   **/
+                }
 
             }
         };

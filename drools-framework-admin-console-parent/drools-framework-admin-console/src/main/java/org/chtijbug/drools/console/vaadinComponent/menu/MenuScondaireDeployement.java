@@ -2,12 +2,9 @@ package org.chtijbug.drools.console.vaadinComponent.menu;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.StyleSheet;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
-import org.chtijbug.drools.console.vaadinComponent.componentView.AddRuntime;
 import org.chtijbug.drools.console.vaadinComponent.leftMenu.Action.DeploymentAction;
 import org.chtijbug.drools.console.view.DeploymentView;
 

@@ -6,7 +6,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 public class ContainerPojoPersist {
-
+    public enum STATUS {
+        UP,
+        DOWN,
+        TODEPLOY
+    }
     @Id
     private String id;
 
@@ -21,6 +25,14 @@ public class ContainerPojoPersist {
     private String processID;
 
     private String projectName;
+
+    private String status;
+
+    private String groupId;
+
+    private String artifactId;
+
+    private String version;
 
     public String getId() {
         return id;
@@ -70,6 +82,38 @@ public class ContainerPojoPersist {
         this.processID = processID;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public String getArtifactId() {
+        return artifactId;
+    }
+
+    public void setArtifactId(String artifactId) {
+        this.artifactId = artifactId;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("ContainerPojoPersist{");
@@ -79,6 +123,10 @@ public class ContainerPojoPersist {
         sb.append(", serverName='").append(serverName).append('\'');
         sb.append(", processID='").append(processID).append('\'');
         sb.append(", projectName='").append(projectName).append('\'');
+        sb.append(", status=").append(status);
+        sb.append(", groupId='").append(groupId).append('\'');
+        sb.append(", artifactId='").append(artifactId).append('\'');
+        sb.append(", version='").append(version).append('\'');
         sb.append('}');
         return sb.toString();
     }

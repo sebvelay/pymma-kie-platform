@@ -401,7 +401,7 @@ public class PackageResource {
     }
 
     @POST
-    @Path("{organizationalUnitName}/{projectName}/asset/{assetName}/source")
+    @Path("{organizationalUnitName}/{projectName}/asset/{assetName:.+}}/source")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
     public void updateAssetSource(
             @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName, @PathParam("assetName") String assetName, String content) {

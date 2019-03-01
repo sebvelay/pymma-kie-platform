@@ -19,7 +19,7 @@ import org.springframework.web.client.RestTemplate;
 public class RuntimeService {
 
 
-    private static Logger logger = LoggerFactory.getLogger(KieServerRepositoryService.class);
+    private static Logger logger = LoggerFactory.getLogger(RuntimeService.class);
 
     @Autowired
     private RuntimeRepository runtimeRepository;

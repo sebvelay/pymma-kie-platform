@@ -18,10 +18,16 @@ public class RuntimePersist {
 
     private String hostname;
 
-    public RuntimePersist(String serverName, String version, String hostname) {
+    private String serverPort;
+
+    private String sftpPort;
+
+    public RuntimePersist(String serverName, String version, String hostname,String serverPort,String sftpPort) {
         this.serverName = serverName;
         this.version = version;
         this.hostname = hostname;
+        this.serverPort = serverPort;
+        this.sftpPort = sftpPort;
     }
 
     public String getId() {
@@ -54,5 +60,21 @@ public class RuntimePersist {
 
     public void setHostname(String hostname) {
         this.hostname = hostname;
+    }
+
+    public String getSftpPort() {
+        return sftpPort;
+    }
+
+    public void setSftpPort(String sftpPort) {
+        this.sftpPort = sftpPort;
+    }
+
+    public String getServerPort() {
+        return serverPort;
+    }
+
+    public void setServerPort(String serverPort) {
+        this.serverPort = serverPort;
     }
 }
