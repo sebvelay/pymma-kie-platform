@@ -11,7 +11,7 @@
 
   <artifactId>kie-wb</artifactId>
 
-  <packaging>pom</packaging>
+  <packaging>war</packaging>
     <name>Pymma platform workbench</name>
     <description>Pymma Plarform Kie-wb</description>
   <dependencies>
@@ -141,5 +141,145 @@
 
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>docker-build</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>0.21.0</version>
+
+            <configuration>
+              <!--registry>192.168.1.184:12500</registry-->
+              <dockerHost>${docker.Host}</dockerHost>
+
+              <!--  this is for Mac and Amazon Linux -->
+              <!--dockerHost>unix:///var/run/docker.sock</dockerHost-->
+
+              <verbose>true</verbose>
+              <images>
+                <image>
+                  <name>kie-wb</name>
+                  <build>
+                    <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+
+                    <!--copies Jar to the maven directory (uses Assembly system)-->
+                    <assembly>
+                      <descriptorRef>artifact</descriptorRef>
+                    </assembly>
+                    <tags>
+                      <tag>latest</tag>
+                    </tags>
+
+                  </build>
+
+                  <run>
+                    <extraHosts>
+                      <host>mongodb:192.168.1.102</host>
+                      <host>declasin:192.168.1.184</host>
+                    </extraHosts>
+                    <ports>
+                      <port>8080:8080</port>
+                    </ports>
+                  </run>
+                </image>
+              </images>
+            </configuration>
+
+            <executions>
+
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>build</goal>
+                </goals>
+              </execution>
+
+
+            </executions>
+
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>docker-deploy</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>0.21.0</version>
+
+            <configuration>
+              <!--registry>192.168.1.184:12500</registry-->
+              <dockerHost>${docker.Host}</dockerHost>
+
+              <!--  this is for Mac and Amazon Linux -->
+              <!--dockerHost>unix:///var/run/docker.sock</dockerHost-->
+
+              <verbose>true</verbose>
+              <images>
+                <image>
+                  <name>kie-wb</name>
+                  <build>
+                    <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+
+                    <!--copies Jar to the maven directory (uses Assembly system)-->
+                    <assembly>
+                      <mode>dir</mode>
+                      <name>maven/</name>
+                      <inline xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+                        <id>middleware-rest</id>
+                        <files>
+                          <file>
+                            <source>${project.build.directory}/kie-wb.war</source>
+                            <outputDirectory>./</outputDirectory>
+                            <destName>kie-wb.war</destName>
+                          </file>
+                         </files>
+                      </inline>
+                    </assembly>
+                    <tags>
+                      <tag>latest</tag>
+                    </tags>
+
+                  </build>
+
+                  <run>
+                    <extraHosts>
+                      <host>mongodb:192.168.1.102</host>
+                      <host>declasin:192.168.1.184</host>
+                    </extraHosts>
+                    <ports>
+                      <port>8080:8080</port>
+                    </ports>
+                  </run>
+                </image>
+              </images>
+            </configuration>
+
+            <executions>
+
+
+              <execution>
+                <id>mydeploy</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>push</goal>
+                </goals>
+              </execution>
+
+            </executions>
+
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+
 
 </project>
