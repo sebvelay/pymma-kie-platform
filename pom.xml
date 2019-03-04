@@ -24,7 +24,30 @@
         <spring.version>4.3.16.RELEASE</spring.version>
         <version.thorntail>2.2.1.Final</version.thorntail>
     </properties>
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <env>dev</env>
+                <docker.Host>unix:///var/run/docker.sock</docker.Host>
+            </properties>
+        </profile>
+        <profile>
+            <id>docker-pymma</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <env>docker</env>
+                <docker.Host>http://192.168.1.184:2376</docker.Host>
+            </properties>
+        </profile>
 
+
+    </profiles>
 
     <build>
         <plugins>

@@ -24,8 +24,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DroolsBusinessProxyServer {
 
 
-
-
     /**
      * Main method to start the application.
      */

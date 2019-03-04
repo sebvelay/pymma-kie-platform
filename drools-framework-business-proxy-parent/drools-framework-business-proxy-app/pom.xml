@@ -31,8 +31,6 @@
     <name>Chtijbug :: Business Proxy :: app</name>
 
 
-
-
     <!-- Spring-Boot and Camel BOM -->
     <dependencyManagement>
         <dependencies>

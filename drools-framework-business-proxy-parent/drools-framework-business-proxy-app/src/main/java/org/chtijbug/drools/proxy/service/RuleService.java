@@ -27,17 +27,12 @@ import java.util.Set;
 @Service("ruleService")
 public class RuleService {
 
+    private static final Logger logger = LoggerFactory.getLogger(RuleService.class);
     private DroolsChtijbugRulesExecutionService droolsChtijbugRulesExecutionService = null;
-
     private DroolsChtijbugKieServerExtension droolsChtijbugKieServerExtension;
-
     private KieServerRegistry registry;
     private ObjectMapper mapper = new ObjectMapper();
-
     private KieServerImpl server;
-
-    private static final Logger logger = LoggerFactory.getLogger(RuleService.class);
-
 
 
     public RuleService() {
@@ -57,7 +52,7 @@ public class RuleService {
         }
     }
 
-    public Object runSessionObject(String transactionID,String id, String processID, Object input) throws IOException {
+    public Object runSessionObject(String transactionID, String id, String processID, Object input) throws IOException {
         KieContainerInstance kci = registry.getContainer(id);
         ChtijbugObjectRequest chtijbugObjectRequest = new ChtijbugObjectRequest();
         chtijbugObjectRequest.setObjectRequest(input);
@@ -85,11 +80,11 @@ public class RuleService {
             if (jsonInString == null) {
                 jsonInString = mapper.writeValueAsString(chtijbutObjectResponse.getSessionLogging());
             }
-            String fileUUID=null;
-            if (transactionID==null){
-                fileUUID="noTransactionID";
-            }else{
-                fileUUID=transactionID;
+            String fileUUID = null;
+            if (transactionID == null) {
+                fileUUID = "noTransactionID";
+            } else {
+                fileUUID = transactionID;
             }
             LocalDateTime now = LocalDateTime.now();
             int year = now.getYear();
@@ -99,15 +94,14 @@ public class RuleService {
             int minute = now.getMinute();
             int second = now.getSecond();
             int millis = now.get(ChronoField.MILLI_OF_SECOND);
-            String fileName=year+"-"+month+"-"+day+"-"+hour+"-"+minute+"-"+second+"-"+millis+"-"+fileUUID.replaceAll("-","")+".json";
-            File traceFile = new File(fileTemp + "/" +fileName);
+            String fileName = year + "-" + month + "-" + day + "-" + hour + "-" + minute + "-" + second + "-" + millis + "-" + fileUUID.replaceAll("-", "") + ".json";
+            File traceFile = new File(fileTemp + "/" + fileName);
             FileUtils.writeByteArrayToFile(traceFile, jsonInString.getBytes());
         }
 
         Object response = chtijbutObjectResponse.getObjectRequest();
         return response;
     }
-
 
 
     private Class getClassFromName(Set<Class<?>> classes, String name) {

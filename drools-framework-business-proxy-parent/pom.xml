@@ -22,5 +22,6 @@
         <module>drools-framewwork-business-proxy-persistence</module>
         <module>drools-framework-business-indexer-app</module>
         <module>drools-framework-business-indexer-persistence</module>
+        <module>drools-framework-business-reverse-proxx</module>
     </modules>
 </project>
