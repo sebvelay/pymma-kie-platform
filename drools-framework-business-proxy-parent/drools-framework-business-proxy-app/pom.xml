@@ -230,5 +230,131 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>docker-build</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.21.0</version>
 
+                        <configuration>
+                            <!--registry>192.168.1.184:12500</registry-->
+                            <dockerHost>${docker.Host}</dockerHost>
+
+                            <!--  this is for Mac and Amazon Linux -->
+                            <!--dockerHost>unix:///var/run/docker.sock</dockerHost-->
+
+                            <verbose>true</verbose>
+                            <images>
+                                <image>
+                                    <name>runtime-proxy</name>
+                                    <build>
+                                        <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+
+                                        <!--copies Jar to the maven directory (uses Assembly system)-->
+                                        <assembly>
+                                            <descriptorRef>artifact</descriptorRef>
+                                        </assembly>
+                                        <tags>
+                                            <tag>latest</tag>
+                                        </tags>
+
+                                    </build>
+
+                                    <run>
+                                        <extraHosts>
+                                            <host>mongodb:172.17.0.1</host>
+                                            <host>kie-wb:172.17.0.1</host>
+                                        </extraHosts>
+                                        <ports>
+                                            <port>8200:8200</port>
+                                            <port>9080:9080</port>
+                                        </ports>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+
+                        <executions>
+
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+
+
+                        </executions>
+
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>docker-deploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.21.0</version>
+
+                        <configuration>
+                            <!--registry>192.168.1.184:12500</registry-->
+                            <dockerHost>${docker.Host}</dockerHost>
+
+                            <!--  this is for Mac and Amazon Linux -->
+                            <!--dockerHost>unix:///var/run/docker.sock</dockerHost-->
+
+                            <verbose>true</verbose>
+                            <images>
+                                <image>
+                                    <name>runtime-proxy</name>
+                                    <build>
+                                        <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+
+                                        <!--copies Jar to the maven directory (uses Assembly system)-->
+                                        <assembly>
+                                            <descriptorRef>artifact</descriptorRef>
+                                        </assembly>
+                                        <tags>
+                                            <tag>latest</tag>
+                                        </tags>
+
+                                    </build>
+
+                                    <run>
+                                        <extraHosts>
+                                            <host>mongodb:192.168.1.100</host>
+                                        </extraHosts>
+                                        <ports>
+                                            <port>8080:8080</port>
+                                        </ports>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+
+                        <executions>
+
+
+                            <execution>
+                                <id>mydeploy</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>push</goal>
+                                </goals>
+                            </execution>
+
+                        </executions>
+
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

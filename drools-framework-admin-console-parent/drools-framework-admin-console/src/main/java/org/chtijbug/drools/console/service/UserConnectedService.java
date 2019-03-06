@@ -11,6 +11,8 @@ public class UserConnectedService {
     public static String ASSET = "2";
     public static String SPACE = "3";
     public static String PROJECT = "4";
+    public static String CURRENTPROJECT = "5";
+
 
     public UserConnected getUserConnected() {
         return (UserConnected) VaadinSession.getCurrent().getAttribute(USER);
@@ -41,10 +43,10 @@ public class UserConnectedService {
     }
 
     public void addProjectToSession(String projectName) {
-        VaadinSession.getCurrent().setAttribute(PROJECT, projectName);
+        VaadinSession.getCurrent().setAttribute(CURRENTPROJECT, projectName);
     }
 
     public String getProject() {
-        return (String) VaadinSession.getCurrent().getAttribute(PROJECT);
+        return (String) VaadinSession.getCurrent().getAttribute(CURRENTPROJECT);
     }
 }

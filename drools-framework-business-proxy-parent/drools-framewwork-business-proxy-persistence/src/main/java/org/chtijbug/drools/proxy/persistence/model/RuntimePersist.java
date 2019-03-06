@@ -7,7 +7,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 public class RuntimePersist {
-
+    public enum STATUS {
+        UP,
+        DOWN
+    }
     @Id
     private String id=new ObjectId().toString();
 
@@ -20,14 +23,25 @@ public class RuntimePersist {
 
     private String serverPort;
 
+    private String sftpHost;
+
     private String sftpPort;
 
-    public RuntimePersist(String serverName, String version, String hostname,String serverPort,String sftpPort) {
+    private String status;
+
+    public RuntimePersist(String serverName, String version, String hostname,String serverPort,String sftpPort,String sftpHost,String status) {
         this.serverName = serverName;
         this.version = version;
         this.hostname = hostname;
         this.serverPort = serverPort;
         this.sftpPort = sftpPort;
+        this.sftpHost = sftpHost;
+        this.status=status;
+    }
+
+    public RuntimePersist duplicate(){
+        RuntimePersist duplicate = new RuntimePersist(serverName,version,hostname,serverPort,sftpPort,sftpHost,status);
+        return duplicate;
     }
 
     public String getId() {
@@ -76,5 +90,21 @@ public class RuntimePersist {
 
     public void setServerPort(String serverPort) {
         this.serverPort = serverPort;
+    }
+
+    public String getSftpHost() {
+        return sftpHost;
+    }
+
+    public void setSftpHost(String sftpHost) {
+        this.sftpHost = sftpHost;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

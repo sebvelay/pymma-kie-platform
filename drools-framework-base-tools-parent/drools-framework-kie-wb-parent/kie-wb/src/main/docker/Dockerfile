@@ -19,7 +19,7 @@ ENV KIE_SERVER_PROFILE standalone-full
 ENV CHTIJBUG_VERSION 2.0.10
 # Do NOT use demo neither examples by default in this image (no internet connection required).
 ENV KIE_DEMO false
-ENV JAVA_OPTS -Xms256m -Xmx2512m
+ENV JAVA_OPTS -Xms256m -Xmx4512m
 
 
 
@@ -33,10 +33,6 @@ ADD maven/kie-wb.war  /opt/jboss/wildfly/standalone/deployments/$KIE_CONTEXT_PAT
 #touch $JBOSS_HOME/standalone/deployments/$KIE_CONTEXT_PATH.war.dodeploy &&  \
 # rm -rf $HOME/$KIE_CONTEXT_PATH.war
 
-####### MVN REPO ############
-# https://bugzilla.redhat.com/show_bug.cgi?id=1263738
-RUN mkdir -p $HOME/.m2/repository/org/guvnor/guvnor-asset-mgmt-project/$KIE_VERSION && \
-curl -o $HOME/.m2/repository/org/guvnor/guvnor-asset-mgmt-project/$KIE_VERSION/guvnor-asset-mgmt-project-$KIE_VERSION.jar $KIE_REPOSITORY/org/guvnor/guvnor-asset-mgmt-project/$KIE_VERSION/guvnor-asset-mgmt-project-$KIE_VERSION.jar
 
 ####### SCRIPTS ############
 USER root
@@ -66,20 +62,32 @@ chown jboss:jboss $JBOSS_HOME/standalone/configuration/application-roles.propert
 
 # Switchback to jboss user
 USER root
-RUN yum install -y git
+#RUN yum install -y git
 RUN mkdir /home/db
 RUN mkdir /home/lucene
 RUN mkdir /home/niodir
 RUN mkdir /home/kie-example
+RUN mkdir /m2_kiewb
+ADD settings.xml /m2_kiewb/settings.xml
+RUN mkdir /m2_kiewb/repository
+####### MVN REPO ############
+# https://bugzilla.redhat.com/show_bug.cgi?id=1263738
+RUN mkdir -p /m2_kiewb/repository/org/guvnor/guvnor-asset-mgmt-project/$KIE_VERSION && \
+curl -o /m2_kiewb/repository/org/guvnor/guvnor-asset-mgmt-project/$KIE_VERSION/guvnor-asset-mgmt-project-$KIE_VERSION.jar $KIE_REPOSITORY/org/guvnor/guvnor-asset-mgmt-project/$KIE_VERSION/guvnor-asset-mgmt-project-$KIE_VERSION.jar
+
 RUN chown jboss:jboss /home/db
 RUN chown jboss:jboss /home/lucene
 RUN chown jboss:jboss /home/niodir
 RUN chown jboss:jboss /home/kie-example
+RUN chown jboss:jboss /m2_kiewb
+RUN chown -R jboss:jboss /m2_kiewb/repository
+
 #RUN cd /home/kie-example && git clone https://github.com/chtiJBUG/onboarding-nautic-project.git
 #RUN cd /home/kie-example && git clone https://github.com/chtiJBUG/onboarding-carinsurance-project.git
 #RUN cd /home/kie-example && git clone https://github.com/chtiJBUG/onboarding-loyalty-project.git
 ####### EXPOSE INTERNAL JBPM GIT PORT ############
 EXPOSE 8001
+EXPOSE 8080
 
 ####### RUNNING DROOLS-WB ############
 VOLUME /home/db

@@ -14,6 +14,7 @@ import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
 import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
 import com.vaadin.flow.component.html.Label;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GridRuntime extends Grid<RuntimePersist> {
@@ -24,6 +25,7 @@ public class GridRuntime extends Grid<RuntimePersist> {
 
     private TextField version;
 
+    private TextField status;
 
     private String strRuntimeName="Runtime Name";
 
@@ -31,6 +33,7 @@ public class GridRuntime extends Grid<RuntimePersist> {
 
     private String strVersion="Version";
 
+    private String strStatus="State";
 
     private ProjectPersistService projectPersistService;
     private RuntimeService runtimeService;
@@ -38,14 +41,30 @@ public class GridRuntime extends Grid<RuntimePersist> {
     private ListDataProvider<RuntimePersist> dataProvider;
     private ConfigurableFilterDataProvider<RuntimePersist,Void,SerializablePredicate<RuntimePersist>> filterDataProvider;
 
+    private ProjectPersist projectPersist;
 
-    public GridRuntime(){
+    public GridRuntime(ProjectPersist projectPersist){
+        this.projectPersist = projectPersist;
+        init();
+//dataProvider.get
+        for (RuntimePersist runtimePersist : dataProvider.getItems()){
+            if (projectPersist.getServerNames().contains(runtimePersist.getServerName())){
+                getSelectionModel().select(runtimePersist);
+            }
+        }
 
+    }
+
+    public GridRuntime() {
+        init();
+
+    }
+    private void init(){
         projectPersistService = AppContext.getApplicationContext().getBean(ProjectPersistService.class);
         runtimeService= AppContext.getApplicationContext().getBean(RuntimeService.class);
 
         setClassName("deployment-grid-perso");
-        setSelectionMode(Grid.SelectionMode.SINGLE);
+        setSelectionMode(Grid.SelectionMode.MULTI);
 
         Grid.Column<RuntimePersist> runtimeNameCo=addColumn(runtimePersist -> runtimePersist.getServerName());
         runtimeName=new TextField(strRuntimeName);
@@ -70,11 +89,18 @@ public class GridRuntime extends Grid<RuntimePersist> {
             refreshtGrid(version.getValue(), strVersion);
         });
         versionCo.setHeader(version);
-
+        Grid.Column<RuntimePersist> statusCo=addColumn(runtimePersist -> runtimePersist.getStatus());
+        status=new TextField(strStatus);
+        status.setValueChangeMode(ValueChangeMode.EAGER);
+        status.addValueChangeListener(e -> {
+            refreshtGrid(status.getValue(), strVersion);
+        });
+        statusCo.setHeader(status);
 
         addColumn(new ComponentRenderer<>(runtimePersist -> {
-
-            List<ProjectPersist> projectPersists=projectPersistService.getProjectRepository().findByServerName(runtimePersist.getServerName());
+            List<String> serverList = new ArrayList<>();
+            serverList.add(runtimePersist.getServerName());
+            List<ProjectPersist> projectPersists=projectPersistService.getProjectRepository().findByServerNamesIn(serverList);
 
             Label label=new Label(projectPersists!=null?projectPersists.size()+"":"0");
 

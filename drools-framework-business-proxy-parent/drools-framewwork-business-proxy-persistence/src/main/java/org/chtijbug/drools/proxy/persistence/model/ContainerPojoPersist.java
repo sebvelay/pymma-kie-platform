@@ -9,7 +9,8 @@ public class ContainerPojoPersist {
     public enum STATUS {
         UP,
         DOWN,
-        TODEPLOY
+        TODEPLOY,
+        TODELETE
     }
     @Id
     private String id;

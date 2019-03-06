@@ -66,6 +66,14 @@
     <orderEntry type="library" name="Maven: org.apache.camel:camel-spring-boot:2.23.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.camel:camel-spring:2.23.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.camel:camel-core-starter:2.23.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.camel:camel-quartz2:2.23.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.camel:camel-core:2.23.0" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
+    <orderEntry type="library" name="Maven: org.quartz-scheduler:quartz:2.3.0" level="project" />
+    <orderEntry type="library" name="Maven: com.mchange:mchange-commons-java:0.2.11" level="project" />
+    <orderEntry type="library" name="Maven: com.mchange:c3p0:0.9.5.2" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-core:2.3.0" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-impl:2.3.0" level="project" />
     <orderEntry type="module" module-name="drools-framework-business-indexer-persistence" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-data-elasticsearch:2.1.0.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.data:spring-data-elasticsearch:3.1.2.RELEASE" level="project" />
@@ -122,14 +130,16 @@
     <orderEntry type="library" name="Maven: io.netty:netty-handler:4.1.29.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-resolver:4.1.29.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-transport:4.1.29.Final" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.25" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.9.0" level="project" />
+    <orderEntry type="module" module-name="drools-framewwork-business-proxy-persistence" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-data-mongodb:2.1.0.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.mongodb:mongodb-driver:3.8.2" level="project" />
+    <orderEntry type="library" name="Maven: org.mongodb:bson:3.8.2" level="project" />
+    <orderEntry type="library" name="Maven: org.mongodb:mongodb-driver-core:3.8.2" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.data:spring-data-mongodb:2.1.2.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.apache.camel:camel-ftp:2.23.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.camel:camel-core:2.23.0" level="project" />
     <orderEntry type="library" name="Maven: com.jcraft:jsch:0.1.54" level="project" />
     <orderEntry type="library" name="Maven: commons-net:commons-net:3.6" level="project" />
-    <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-core:2.3.0" level="project" />
-    <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-impl:2.3.0" level="project" />
     <orderEntry type="module" module-name="drools-framework-runtime-entity" />
     <orderEntry type="module" module-name="drools-framework-common" />
     <orderEntry type="library" name="Maven: junit:junit:4.12" level="project" />

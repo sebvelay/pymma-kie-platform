@@ -10,8 +10,8 @@ import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.console.view.DeploymentView;
 import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
 import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
-import org.chtijbug.drools.proxy.persistence.repository.ProjectRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AssociateProjectKie extends VerticalLayout {
@@ -26,39 +26,40 @@ public class AssociateProjectKie extends VerticalLayout {
 
     private ProjectPersistService projectPersistService;
 
-    public AssociateProjectKie(DeploymentView deploymentView,Dialog dialog, ProjectPersist projectPersist){
+    public AssociateProjectKie(DeploymentView deploymentView, Dialog dialog, ProjectPersist projectPersist) {
 
-        projectPersistService= AppContext.getApplicationContext().getBean(ProjectPersistService.class);
+        projectPersistService = AppContext.getApplicationContext().getBean(ProjectPersistService.class);
 
         setClassName("creation-runtime-content");
 
-        label=new Label("Define your project : "+projectPersist.getProjectName());
+        label = new Label("Define the runtime(s) for the project : " + projectPersist.getProjectName());
         label.setClassName("creation-runtime-title");
         add(label);
 
-        label2=new Label("this step is essential before you can associate your project with a workbench");
+        label2 = new Label("This step is essential to be able to execute the rules defined in the project");
         label2.setClassName("creation-runtime-title2");
         add(label2);
 
-        gridRuntime=new GridRuntime();
+        gridRuntime = new GridRuntime(projectPersist);
         add(gridRuntime);
 
-        associer=new Button("Associer");
+        associer = new Button("Link and Save");
         associer.setEnabled(false);
         associer.setClassName("login-application-connexion");
         add(associer);
         associer.addClickListener(buttonClickEvent -> {
+            List<RuntimePersist> lstToSave = new ArrayList<>();
+            for (RuntimePersist runtimePersist : gridRuntime.getSelectedItems()) {
+                lstToSave.add(runtimePersist);
+            }
+            if (lstToSave.size()>0) {
 
-            RuntimePersist runtimePersist=gridRuntime.getSelectedItems().stream().findFirst().get();
+                boolean tmp = projectPersistService.associate(projectPersist,lstToSave);
 
-            if(runtimePersist!=null) {
-
-                boolean tmp = projectPersistService.associate(projectPersist,runtimePersist);
-
-                if(tmp==true){
+                if (tmp == true) {
                     deploymentView.setDataProvider();
                     dialog.close();
-                }else {
+                } else {
                     associer.setEnabled(false);
                     Notification.show("There is already a project of this name on this runtime");
                 }
@@ -66,10 +67,10 @@ public class AssociateProjectKie extends VerticalLayout {
         });
 
         gridRuntime.addSelectionListener(selectionEvent -> {
-            if(selectionEvent.getFirstSelectedItem()!=null&&selectionEvent.getFirstSelectedItem().isPresent()) {
+            if (selectionEvent.getFirstSelectedItem() != null && selectionEvent.getFirstSelectedItem().isPresent()) {
 
                 associer.setEnabled(true);
-            }else {
+            } else {
                 associer.setEnabled(false);
             }
         });

@@ -1,15 +1,28 @@
 package org.chtijbug.drools.indexer.route;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-@Component
+
 public class IndexerRoute extends RouteBuilder {
-    @Value("${kieserver.login}")
+
     private String login;
-    @Value("${kieserver.password}")
+
     private String password;
+
+    private String host;
+
+    private String port;
+
+    private String id;
+
+    public IndexerRoute(String id,String login, String password, String host, String port) {
+        this.login = login;
+        this.password = password;
+        this.host = host;
+        this.port = port;
+        this.id=id;
+    }
+
 
 
     @Override
@@ -17,8 +30,8 @@ public class IndexerRoute extends RouteBuilder {
         System.out.println("coucou");
 
         //from("sftp://foo@myserver?password=secret&ftpClient.dataTimeout=30000").to("bean:foo");
-        String url="sftp://"+login+"@localhost:9080?password="+password+"&move=.done";
-        from(url).to("bean:storeService?method=store(${header.CamelFileName},${body})");
+        String url="sftp://"+login+"@"+host+":"+port+"?password="+password+"&move=.done";
+        from(url).routeId(id).to("bean:storeService?method=store(${header.CamelFileName},${body})");
 
     }
 }

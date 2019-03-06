@@ -27,6 +27,7 @@ public class DroolsRouter extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         rest("/" + containerId).description(containerId + " Rest service")
+
                 .consumes("application/json")
                 .produces("application/json")
 
@@ -34,6 +35,7 @@ public class DroolsRouter extends RouteBuilder {
                 //  .param().name("containerId").type(path).description("Container  ID where the rule artefact id deployed").dataType("integer").endParam()
                 .param().name("body").type(body).description("The Data drools should work on").endParam()
                 .responseMessage().code(200).message("Data drools worked on").endResponseMessage()
+
                 .to("bean:ruleService?method=runSessionObject(${header.transactionId}," + this.containerId + "," + this.processID + ",${body})");
     }
 }

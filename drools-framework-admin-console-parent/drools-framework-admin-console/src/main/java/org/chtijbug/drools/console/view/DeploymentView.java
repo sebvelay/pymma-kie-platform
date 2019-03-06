@@ -19,91 +19,70 @@ import org.chtijbug.drools.console.service.ProjectPersistService;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
 import org.chtijbug.drools.console.vaadinComponent.leftMenu.Action.DeploymentAction;
-import org.chtijbug.drools.proxy.persistence.json.KeyProject;
 import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Set;
 
 @StyleSheet("css/accueil.css")
-public class DeploymentView extends VerticalLayout implements AddLog{
+public class DeploymentView extends VerticalLayout implements AddLog {
 
-    public static final String pageName="Deployment";
+    public static final String pageName = "Deployment";
 
     //GRID composant
-
-    private Grid<ProjectPersist> projectPersistGrid;
-
-    private ListDataProvider<ProjectPersist> dataProvider;
-
-    private ConfigurableFilterDataProvider<ProjectPersist,Void,SerializablePredicate<ProjectPersist>> filterDataProvider;
-
-    private DeploymentAction deploymentAction;
+    private final String strNameDeploy = "Deploy name";
+    private final String strNameProject = "Project name";
+    private final String strGroupeId = "Groupe ID";
+    private final String strArtefactID = "Artefact ID";
 
     //TEXTFIELD search
-
-    private TextField nameDeploy;
-
-    private TextField nameProject;
-
-    private TextField groupeId;
-
-    private TextField artifactId;
-
-    private TextField processId;
-
-    private TextField serverName;
-
-    private ComboBox status;
+    private final String strProcessID = "Process ID";
+    private final String strServerName = "Server Name";
+    private final String strStatus = "Status";
+    private Grid<ProjectPersist> projectPersistGrid;
+    private ListDataProvider<ProjectPersist> dataProvider;
+    private ConfigurableFilterDataProvider<ProjectPersist, Void, SerializablePredicate<ProjectPersist>> filterDataProvider;
+    private DeploymentAction deploymentAction;
 
     //CONSTANTE Textfield
-
-    private final String strNameDeploy="Deploy name";
-
-    private final String strNameProject="Project name";
-
-    private final String strGroupeId="Groupe ID";
-
-    private final String strArtefactID="Artefact ID";
-
-    private final String strProcessID="Process ID";
-
-    private final String strServerName="Server Name";
-
-    private final String strStatus="Status";
+    private TextField nameDeploy;
+    private TextField nameProject;
+    private TextField groupeId;
+    private TextField artifactId;
+    private TextField processId;
+    private TextField serverName;
+    private ComboBox status;
 
     //SERVICE
-
     private ProjectPersistService projectPersistService;
 
     private SqueletteComposant squeletteComposant;
 
     public DeploymentView(SqueletteComposant squeletteComposant) {
 
-        this.squeletteComposant=squeletteComposant;
-        projectPersistService=AppContext.getApplicationContext().getBean(ProjectPersistService.class);
+        this.squeletteComposant = squeletteComposant;
+        projectPersistService = AppContext.getApplicationContext().getBean(ProjectPersistService.class);
 
         setClassName("deployment-content");
 
         add(new Label("Project"));
 
-        projectPersistGrid=new Grid<>();
+        projectPersistGrid = new Grid<>();
         projectPersistGrid.setClassName("deployment-grid-perso");
         projectPersistGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
 
 
-        Grid.Column<ProjectPersist> deployNameCo=projectPersistGrid.addColumn(projectPersist -> projectPersist.getDeploymentName());
-        nameDeploy=new TextField(strNameDeploy);
+        Grid.Column<ProjectPersist> deployNameCo = projectPersistGrid.addColumn(projectPersist -> projectPersist.getDeploymentName());
+        nameDeploy = new TextField(strNameDeploy);
         nameDeploy.setValueChangeMode(ValueChangeMode.EAGER);
         nameDeploy.addValueChangeListener(e -> {
             refreshtGrid(nameDeploy.getValue(), strNameDeploy);
         });
         deployNameCo.setHeader(nameDeploy);
 
-        Grid.Column<ProjectPersist> nameProjectCo=projectPersistGrid.addColumn(projectPersist -> projectPersist.getProjectName());
-        nameProject=new TextField(strNameProject);
+        Grid.Column<ProjectPersist> nameProjectCo = projectPersistGrid.addColumn(projectPersist -> projectPersist.getProjectName());
+        nameProject = new TextField(strNameProject);
         nameProject.setValueChangeMode(ValueChangeMode.EAGER);
         nameProject.addValueChangeListener(e -> {
             refreshtGrid(nameProject.getValue(), strNameProject);
@@ -111,26 +90,26 @@ public class DeploymentView extends VerticalLayout implements AddLog{
         nameProjectCo.setHeader(nameProject);
 
         projectPersistGrid.addColumn(projectPersist -> projectPersist.getMainClass()).setHeader("ClassName")
-                .setComparator((projectPersist,t1) -> projectPersist.getMainClass().compareTo(t1.getMainClass()));
+                .setComparator((projectPersist, t1) -> projectPersist.getMainClass().compareTo(t1.getMainClass()));
 
-        Grid.Column<ProjectPersist> groupIdCo=projectPersistGrid.addColumn(projectPersist -> projectPersist.getGroupID());
-        groupeId=new TextField(strGroupeId);
+        Grid.Column<ProjectPersist> groupIdCo = projectPersistGrid.addColumn(projectPersist -> projectPersist.getGroupID());
+        groupeId = new TextField(strGroupeId);
         groupeId.setValueChangeMode(ValueChangeMode.EAGER);
         groupeId.addValueChangeListener(e -> {
             refreshtGrid(groupeId.getValue(), strGroupeId);
         });
         groupIdCo.setHeader(groupeId);
 
-        Grid.Column<ProjectPersist> artifactIDCO=projectPersistGrid.addColumn(projectPersist -> projectPersist.getArtifactID());
-        artifactId=new TextField(strArtefactID);
+        Grid.Column<ProjectPersist> artifactIDCO = projectPersistGrid.addColumn(projectPersist -> projectPersist.getArtifactID());
+        artifactId = new TextField(strArtefactID);
         artifactId.setValueChangeMode(ValueChangeMode.EAGER);
         artifactId.addValueChangeListener(e -> {
             refreshtGrid(artifactId.getValue(), strArtefactID);
         });
         artifactIDCO.setHeader(artifactId);
 
-        Grid.Column<ProjectPersist> processIDco=projectPersistGrid.addColumn(projectPersist -> projectPersist.getProcessID());
-        processId=new TextField(strProcessID);
+        Grid.Column<ProjectPersist> processIDco = projectPersistGrid.addColumn(projectPersist -> projectPersist.getProcessID());
+        processId = new TextField(strProcessID);
         processId.setValueChangeMode(ValueChangeMode.EAGER);
         processId.addValueChangeListener(e -> {
             refreshtGrid(processId.getValue(), strProcessID);
@@ -138,8 +117,18 @@ public class DeploymentView extends VerticalLayout implements AddLog{
         processIDco.setHeader(processId);
 
 
-        Grid.Column<ProjectPersist> serverNameCo=projectPersistGrid.addColumn(projectPersist -> projectPersist.getServerName());
-        serverName=new TextField(strServerName);
+        Grid.Column<ProjectPersist> serverNameCo = projectPersistGrid.addColumn(projectPersist -> {
+            String result = null;
+            for (String serverName : projectPersist.getServerNames()) {
+                if (result != null) {
+                    result = result + ":" + serverName;
+                } else {
+                    result = serverName;
+                }
+            }
+            return result;
+        });
+        serverName = new TextField(strServerName);
         serverName.setValueChangeMode(ValueChangeMode.EAGER);
         serverName.addValueChangeListener(e -> {
             refreshtGrid(serverName.getValue(), strServerName);
@@ -148,21 +137,21 @@ public class DeploymentView extends VerticalLayout implements AddLog{
 
 
         projectPersistGrid.addColumn(projectPersist -> projectPersist.getProjectVersion()).setHeader("Version")
-                .setComparator((projectPersist,t1) -> projectPersist.getProjectVersion().compareTo(t1.getProjectVersion()));
+                .setComparator((projectPersist, t1) -> projectPersist.getProjectVersion().compareTo(t1.getProjectVersion()));
 
 
-        Grid.Column<ProjectPersist> statusCo=projectPersistGrid.addColumn(projectPersist -> projectPersist.getStatus());
-        status=new ComboBox(strProcessID);
+        Grid.Column<ProjectPersist> statusCo = projectPersistGrid.addColumn(projectPersist -> projectPersist.getStatus());
+        status = new ComboBox(strProcessID);
         status.setClassName("deployment-combobox");
 
-        ArrayList<String> tmp=new ArrayList<>();
+        ArrayList<String> tmp = new ArrayList<>();
         tmp.add(ProjectPersist.DEFINI);
         tmp.add(ProjectPersist.Deployable);
         tmp.add(ProjectPersist.ADEFINIR);
         tmp.add(" ");
         status.setItems(tmp);
         status.addValueChangeListener(e -> {
-            refreshtGrid(status.getValue()!=null?status.getValue().toString():" ", strStatus);
+            refreshtGrid(status.getValue() != null ? status.getValue().toString() : " ", strStatus);
         });
         statusCo.setHeader(status);
 
@@ -172,9 +161,9 @@ public class DeploymentView extends VerticalLayout implements AddLog{
 
         projectPersistGrid.addSelectionListener(selectionEvent -> {
 
-            if(selectionEvent.getFirstSelectedItem()!=null&&selectionEvent.getFirstSelectedItem().isPresent()) {
+            if (selectionEvent.getFirstSelectedItem() != null && selectionEvent.getFirstSelectedItem().isPresent()) {
                 majAction(selectionEvent.getFirstSelectedItem().get());
-            }else {
+            } else {
                 getDeploymentAction().getAssociateKieServer().setEnabled(false);
                 getDeploymentAction().getDefinirProject().setEnabled(false);
                 getDeploymentAction().getDeployer().setEnabled(false);
@@ -183,41 +172,40 @@ public class DeploymentView extends VerticalLayout implements AddLog{
         //add(new ConsoleDeploy());
     }
 
-    private void refreshtGrid(String value,String type){
+    private void refreshtGrid(String value, String type) {
 
-        filterDataProvider.setFilter(filterGrid(value.toUpperCase(),type));
+        filterDataProvider.setFilter(filterGrid(value.toUpperCase(), type));
         projectPersistGrid.getDataProvider().refreshAll();
     }
-    private SerializablePredicate<ProjectPersist> filterGrid(String value, String type){
+
+    private SerializablePredicate<ProjectPersist> filterGrid(String value, String type) {
         SerializablePredicate<ProjectPersist> columnPredicate = null;
 
-        if(value.equals("")||value.equals(" ")||type.equals(" ")){
+        if (value.equals("") || value.equals(" ") || type.equals(" ")) {
             columnPredicate = asset -> (true);
-        }else {
+        } else {
             if (type.equals(strArtefactID)) {
                 columnPredicate = asset -> (
-                        asset.getArtifactID()!=null&&asset.getArtifactID().toUpperCase().contains(value.toUpperCase()));
-            }else if(type.equals(strGroupeId)){
-                columnPredicate = asset -> (asset.getGroupID()!=null&&asset.getGroupID().toUpperCase().contains(value.toUpperCase()));
-            }
-            else if(type.equals(strNameDeploy)){
-                columnPredicate = asset -> (asset.getDeploymentName()!=null&&asset.getDeploymentName().toUpperCase().contains(value.toUpperCase()));
-            } else if(type.equals(strNameProject)){
-                columnPredicate = asset -> (asset.getProjectName()!=null&&asset.getProjectName().toString().toUpperCase().contains(value.toUpperCase()));
-            }else if(type.equals(strProcessID)){
-                columnPredicate = asset -> (asset.getProcessID()!=null&&asset.getProcessID().toUpperCase().contains(value.toUpperCase()));
-            }else if(type.equals(strStatus)){
-                columnPredicate = asset -> (asset.getStatus()!=null&&asset.getStatus().toUpperCase().equals(value.toUpperCase()));
-            }else if(type.equals(strServerName)){
-                columnPredicate = asset -> (asset.getServerName()!=null&&asset.getServerName().toUpperCase().equals(value.toUpperCase()));
+                        asset.getArtifactID() != null && asset.getArtifactID().toUpperCase().contains(value.toUpperCase()));
+            } else if (type.equals(strGroupeId)) {
+                columnPredicate = asset -> (asset.getGroupID() != null && asset.getGroupID().toUpperCase().contains(value.toUpperCase()));
+            } else if (type.equals(strNameDeploy)) {
+                columnPredicate = asset -> (asset.getDeploymentName() != null && asset.getDeploymentName().toUpperCase().contains(value.toUpperCase()));
+            } else if (type.equals(strNameProject)) {
+                columnPredicate = asset -> (asset.getProjectName() != null && asset.getProjectName().toString().toUpperCase().contains(value.toUpperCase()));
+            } else if (type.equals(strProcessID)) {
+                columnPredicate = asset -> (asset.getProcessID() != null && asset.getProcessID().toUpperCase().contains(value.toUpperCase()));
+            } else if (type.equals(strStatus)) {
+                columnPredicate = asset -> (asset.getStatus() != null && asset.getStatus().toUpperCase().equals(value.toUpperCase()));
             }
         }
         return columnPredicate;
     }
-    public void setDataProvider(){
 
-        HashMap<String,ProjectPersist> projectPersists = projectPersistService.getProjectsSession();
-        if(projectPersists!=null) {
+    public void setDataProvider() {
+
+        HashMap<String, ProjectPersist> projectPersists = projectPersistService.getProjectsSession();
+        if (projectPersists != null) {
             dataProvider = new ListDataProvider<>(projectPersists.values());
 
             filterDataProvider = dataProvider.withConfigurableFilter();
@@ -229,7 +217,8 @@ public class DeploymentView extends VerticalLayout implements AddLog{
 
         }
     }
-    public void reinitFilter(){
+
+    public void reinitFilter() {
 
         artifactId.setValue("");
         groupeId.setValue("");
@@ -237,34 +226,36 @@ public class DeploymentView extends VerticalLayout implements AddLog{
         nameProject.setValue("");
         nameDeploy.setValue("");
     }
-    public void majAction(ProjectPersist projectPersist){
-        if(projectPersist.getStatus().equals(ProjectPersist.DEFINI)){
+
+    public void majAction(ProjectPersist projectPersist) {
+        if (projectPersist.getStatus().equals(ProjectPersist.DEFINI)) {
 
             getDeploymentAction().getAssociateKieServer().setEnabled(true);
             getDeploymentAction().getDefinirProject().setEnabled(false);
             getDeploymentAction().getDeployer().setEnabled(false);
 
-        }else if(projectPersist.getStatus().equals(ProjectPersist.ADEFINIR)){
+        } else if (projectPersist.getStatus().equals(ProjectPersist.ADEFINIR)) {
 
             getDeploymentAction().getAssociateKieServer().setEnabled(false);
             getDeploymentAction().getDefinirProject().setEnabled(true);
             getDeploymentAction().getDeployer().setEnabled(false);
-        }else if(projectPersist.getStatus().equals(ProjectPersist.Deployable)){
+        } else if (projectPersist.getStatus().equals(ProjectPersist.Deployable)) {
 
-            getDeploymentAction().getAssociateKieServer().setEnabled(false);
-            getDeploymentAction().getDefinirProject().setEnabled(false);
+            getDeploymentAction().getAssociateKieServer().setEnabled(true);
+            getDeploymentAction().getDefinirProject().setEnabled(true);
             getDeploymentAction().getDeployer().setEnabled(true);
 
         }
     }
+
     @Override
-    public void addRow(String textToAdd,UI ui) {
+    public void addRow(String textToAdd, UI ui) {
 
-        ui.access(()->{
+        ui.access(() -> {
 
-            HorizontalLayout horizontalLayout=new HorizontalLayout();
+            HorizontalLayout horizontalLayout = new HorizontalLayout();
             horizontalLayout.setClassName("console-row");
-            Label date=new Label(new Date()+" : ");
+            Label date = new Label(new Date() + " : ");
             date.setClassName("console-date");
             horizontalLayout.add(date);
             horizontalLayout.add(new Label(textToAdd));
@@ -277,14 +268,15 @@ public class DeploymentView extends VerticalLayout implements AddLog{
             ui.getPushConfiguration().setPushMode(PushMode.AUTOMATIC);
             ui.push();
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             ui.getSession().unlock();
 
-        }finally {
+        } finally {
             ui.getSession().unlock();
         }
     }
+
     public Grid<ProjectPersist> getProjectPersistGrid() {
         return projectPersistGrid;
     }

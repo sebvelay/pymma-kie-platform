@@ -36,6 +36,7 @@ public class DefineProject extends VerticalLayout {
     private UserConnectedService userConnectedService;
 
     private ProjectPersistService projectPersistService;
+    private boolean createMode;
 
     public DefineProject(DeploymentView deploymentView,Dialog dialog, ProjectPersist projectPersist){
 
@@ -52,8 +53,12 @@ public class DefineProject extends VerticalLayout {
         label2.setClassName("creation-runtime-title2");
         add(label2);
 
-        nameDeploy=new TextFieldPerso("Name Deployment","",VaadinIcon.FILE_TEXT.create());
+        nameDeploy=new TextFieldPerso("Deployment Name ","",VaadinIcon.FILE_TEXT.create());
         nameDeploy.getTextField().setRequired(true);
+        if (projectPersist.getDeploymentName()!=null
+                && projectPersist.getDeploymentName().length()>0){
+            nameDeploy.getTextField().setValue((projectPersist.getDeploymentName()));
+        }
         nameDeploy.getTextField().addValueChangeListener(textFieldStringComponentValueChangeEvent -> {
             verify();
             projectPersist.setDeploymentName(nameDeploy.getTextField().getValue().replaceAll(" ","_"));
@@ -69,6 +74,10 @@ public class DefineProject extends VerticalLayout {
         mainClass=new ComboBoxPerso("MainClass", VaadinIcon.TREE_TABLE.create());
         mainClass.getComboBox().setItems(projectPersist.getClassNameList());
         mainClass.getComboBox().setRequired(true);
+        if (projectPersist.getMainClass()!= null
+                && projectPersist.getMainClass().length()>0){
+            mainClass.getComboBox().setValue("class="+(String)projectPersist.getMainClass());
+        }
         mainClass.getComboBox().addValueChangeListener(textFieldStringComponentValueChangeEvent -> {
             verify();
             String mainClassName=(String)mainClass.getComboBox().getValue();
@@ -82,6 +91,10 @@ public class DefineProject extends VerticalLayout {
 
         processID=new TextFieldPerso("Process ID","",VaadinIcon.TASKS.create());
         processID.getTextField().setRequired(true);
+        if (projectPersist.getProcessID()!= null
+                && projectPersist.getProcessID().length()>0){
+            processID.getTextField().setValue(projectPersist.getProcessID());
+        }
         processID.getTextField().setValueChangeMode(ValueChangeMode.EAGER);
         processID.getTextField().addValueChangeListener(textFieldStringComponentValueChangeEvent -> {
             verify();
@@ -90,11 +103,20 @@ public class DefineProject extends VerticalLayout {
 
         add(processID);
 
-        valider=new Button("Valider");
-        valider.setEnabled(false);
+        valider=new Button("Save");
+        if (projectPersist.getProcessID()!= null
+                && projectPersist.getProcessID().length()>0){
+            valider.setEnabled(true);
+            createMode=false;
+        }else {
+            valider.setEnabled(false);
+            createMode=true;
+        }
         valider.setClassName("login-application-connexion");
         valider.addClickListener(buttonClickEvent -> {
-            projectPersist.setStatus(ProjectPersist.DEFINI);
+            if (createMode==true) {
+                projectPersist.setStatus(ProjectPersist.DEFINI);
+            }
             projectPersistService.addProjectToSession(projectPersist,true);
             projectPersistService.getProjectRepository().save(projectPersist);
             deploymentView.setDataProvider();

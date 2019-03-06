@@ -1,12 +1,12 @@
 package org.chtijbug.drools.proxy.persistence.model;
 
-import org.bson.types.ObjectId;
 import org.chtijbug.drools.proxy.persistence.json.KeyProject;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Document
@@ -37,13 +37,26 @@ public class ProjectPersist implements Serializable {
 
     private String containerID;
 
-    private String serverName;
+    private List<String> serverNames= new ArrayList<>();
 
     private String status;
 
     private List<String> classNameList;
 
     public ProjectPersist(){}
+
+    public ProjectPersist(String deploymentName, KeyProject projectName, String mainClass, String groupID, String artifactID, String processID, String projectVersion, String containerID, List<String> serverNames, String status) {
+        this.deploymentName = deploymentName;
+        this.projectName = projectName;
+        this.mainClass = mainClass;
+        this.groupID = groupID;
+        this.artifactID = artifactID;
+        this.processID = processID;
+        this.projectVersion = projectVersion;
+        this.containerID = containerID;
+        this.serverNames = serverNames;
+        this.status = status;
+    }
 
     public String getDeploymentName() {
         return deploymentName;
@@ -109,12 +122,12 @@ public class ProjectPersist implements Serializable {
         this.projectVersion = projectVersion;
     }
 
-    public String getServerName() {
-        return serverName;
+    public List<String> getServerNames() {
+        return serverNames;
     }
 
-    public void setServerName(String serverName) {
-        this.serverName = serverName;
+    public void setServerName(List<String> serverNames) {
+        this.serverNames = serverNames;
     }
 
     public String getStatus() {
@@ -131,5 +144,12 @@ public class ProjectPersist implements Serializable {
 
     public void setClassNameList(List<String> classNameList) {
         this.classNameList = classNameList;
+    }
+
+    public ProjectPersist duplicate(){
+        ArrayList<String> listServerNames = new ArrayList<String>();
+        listServerNames.addAll(serverNames);
+        ProjectPersist duplicate = new ProjectPersist(deploymentName,projectName,mainClass,groupID,artifactID,processID,projectVersion,containerID,listServerNames,status);
+        return duplicate;
     }
 }
