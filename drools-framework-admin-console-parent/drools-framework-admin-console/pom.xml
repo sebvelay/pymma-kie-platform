@@ -373,15 +373,16 @@
 
                         <configuration>
                             <!--registry>192.168.1.184:12500</registry-->
-                            <dockerHost>${docker.Host}</dockerHost>
 
+                            <registry>registry.hub.docker.com/pymmasoftware</registry>
                             <!--  this is for Mac and Amazon Linux -->
                             <!--dockerHost>unix:///var/run/docker.sock</dockerHost-->
 
                             <verbose>true</verbose>
                             <images>
                                 <image>
-                                    <name>runtime-admin-console</name>
+                                    <name>runtime-admin-console:${project.version}</name>
+                                    <alias>runtime-admin-console</alias>
                                     <build>
                                         <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
 
@@ -403,6 +404,10 @@
                                     </run>
                                 </image>
                             </images>
+                            <authConfig>
+                                <username>pymmasoftwaredeploy</username>
+                                <password>pymmalomme</password>
+                            </authConfig>
                         </configuration>
 
                         <executions>
