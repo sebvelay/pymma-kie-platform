@@ -71,22 +71,30 @@ public class KieServiceCommon {
 
     public KieServiceCommon() {
         // for now, if no server impl is passed as parameter, create one
+        System.out.println("step01");
         this.server = KieServerLocator.getInstance();
-
+        System.out.println("step02");
         List<KieServerExtension> serverExtensions = this.server.getServerExtensions();
+        System.out.println("step03");
         for (KieServerExtension serverExtension : serverExtensions) {
             if (serverExtension instanceof DroolsChtijbugKieServerExtension) {
                 droolsChtijbugKieServerExtension = (DroolsChtijbugKieServerExtension) serverExtension;
+                System.out.println("step03a");
                 if (droolsChtijbugRulesExecutionService == null) {
 
                     droolsChtijbugRulesExecutionService = droolsChtijbugKieServerExtension.getRulesExecutionService();
+                    System.out.println("step03b");
                 }
                 if (registry == null) {
                     registry = droolsChtijbugRulesExecutionService.getContext();
+                    System.out.println("step03c");
                 }
             }
         }
+        System.out.println("step04");
         this.marshallerHelper = new MarshallerHelper(this.server.getServerRegistry());
+        System.out.println("step05");
+    }
 
     public static String getKieServerID(){
         return System.getProperty("org.kie.server.id");
