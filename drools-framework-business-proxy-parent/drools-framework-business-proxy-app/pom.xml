@@ -305,7 +305,7 @@
 
                         <configuration>
                             <registry>registry.hub.docker.com/pymmasoftware</registry>
-                            <dockerHost>unix:///var/run/docker.sock</dockerHost>
+                            <dockerHost>${docker.Host}</dockerHost>
                             <verbose>true</verbose>
                             <images>
                                 <image>
