@@ -304,12 +304,8 @@
                         <version>0.21.0</version>
 
                         <configuration>
-                            <!--registry>192.168.1.184:12500</registry-->
-                            <dockerHost>${docker.Host}</dockerHost>
-
-                            <!--  this is for Mac and Amazon Linux -->
-                            <!--dockerHost>unix:///var/run/docker.sock</dockerHost-->
-
+                            <registry>registry.hub.docker.com/pymmasoftware</registry>
+                            <dockerHost>unix:///var/run/docker.sock</dockerHost>
                             <verbose>true</verbose>
                             <images>
                                 <image>
@@ -337,15 +333,18 @@
                                     </run>
                                 </image>
                             </images>
+                            <authConfig>
+                                <username>pymmasoftwaredeploy</username>
+                                <password>pymmalomme</password>
+                            </authConfig>
                         </configuration>
 
                         <executions>
-
-
                             <execution>
                                 <id>mydeploy</id>
                                 <phase>deploy</phase>
                                 <goals>
+                                    <goal>build</goal>
                                     <goal>push</goal>
                                 </goals>
                             </execution>
