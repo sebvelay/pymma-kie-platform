@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component;
 public class DeclareNewSftpRouter extends RouteBuilder {
     @Override
     public void configure() throws Exception {
-        from("quartz2://myGroup/myTimerName?cron=0+0/1+*+?+*+MON-FRI").to("bean:startRouteService?method=updateConfig()");
+        from("quartz2://myGroup/myTimerName?cron=0/5+*+*+?+*+*").to("bean:startRouteService?method=updateConfig()");
     }
 }

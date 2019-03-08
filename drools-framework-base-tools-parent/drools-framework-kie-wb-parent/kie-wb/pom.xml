@@ -183,6 +183,7 @@
                     <ports>
                       <port>10080:8080</port>
                       <port>10001:8001</port>
+                      <port>50505:50505</port>
                     </ports>
                   </run>
                 </image>

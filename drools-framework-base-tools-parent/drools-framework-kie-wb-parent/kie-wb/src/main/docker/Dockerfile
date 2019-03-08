@@ -63,7 +63,6 @@ chown jboss:jboss $JBOSS_HOME/standalone/configuration/application-roles.propert
 # Switchback to jboss user
 USER root
 #RUN yum install -y git
-RUN mkdir /home/db
 RUN mkdir /home/lucene
 RUN mkdir /home/niodir
 RUN mkdir /home/kie-example
@@ -75,7 +74,7 @@ RUN mkdir /m2_kiewb/repository
 RUN mkdir -p /m2_kiewb/repository/org/guvnor/guvnor-asset-mgmt-project/$KIE_VERSION && \
 curl -o /m2_kiewb/repository/org/guvnor/guvnor-asset-mgmt-project/$KIE_VERSION/guvnor-asset-mgmt-project-$KIE_VERSION.jar $KIE_REPOSITORY/org/guvnor/guvnor-asset-mgmt-project/$KIE_VERSION/guvnor-asset-mgmt-project-$KIE_VERSION.jar
 
-RUN chown jboss:jboss /home/db
+
 RUN chown jboss:jboss /home/lucene
 RUN chown jboss:jboss /home/niodir
 RUN chown jboss:jboss /home/kie-example
@@ -88,9 +87,8 @@ RUN chown -R jboss:jboss /m2_kiewb/repository
 ####### EXPOSE INTERNAL JBPM GIT PORT ############
 EXPOSE 8001
 EXPOSE 8080
-
+EXPOSE 50505
 ####### RUNNING DROOLS-WB ############
-VOLUME /home/db
 VOLUME /home/lucene
 VOLUME /home/niodir
 WORKDIR $JBOSS_HOME/bin/

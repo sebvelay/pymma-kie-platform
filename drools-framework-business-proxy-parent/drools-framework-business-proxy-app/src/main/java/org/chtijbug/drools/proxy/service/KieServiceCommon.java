@@ -88,11 +88,12 @@ public class KieServiceCommon {
         }
         this.marshallerHelper = new MarshallerHelper(this.server.getServerRegistry());
 
+    public static String getKieServerID(){
+        return System.getProperty("org.kie.server.id");
     }
-
     @PostConstruct
     private void initCamelBusinessRoutes() {
-        String serverName = System.getProperty("org.kie.server.id");
+        String serverName = KieServiceCommon.getKieServerID();
         String sftpPort = System.getProperty("org.chtijbug.server.sftpPort");
         List<RuntimePersist> itIsMes = runtimeRepository.findByServerName(serverName);
         if (itIsMes.size() == 0) {
@@ -125,7 +126,7 @@ public class KieServiceCommon {
     }
     @PreDestroy
     public void stopRuntime(){
-        String serverName = System.getProperty("org.kie.server.id");
+        String serverName =KieServiceCommon.getKieServerID();
         List<RuntimePersist> itIsMes = runtimeRepository.findByServerName(serverName);
         if (itIsMes.size()==1){
             RuntimePersist runtimePersist =itIsMes.get(0);
@@ -179,6 +180,13 @@ public class KieServiceCommon {
         }
     }
 
+    public DroolsChtijbugRulesExecutionService getDroolsChtijbugRulesExecutionService() {
+        return droolsChtijbugRulesExecutionService;
+    }
+
+    public KieServerRegistry getRegistry() {
+        return registry;
+    }
 
     public KieServerImpl getServer() {
         return server;
@@ -207,7 +215,7 @@ public class KieServiceCommon {
     }
 
     public void updateConfig() throws Exception {
-        String serverName = System.getProperty("org.kie.server.id");
+        String serverName = KieServiceCommon.getKieServerID();
         List<ContainerPojoPersist> containers = containerRepository.findByServerNameAndStatus(serverName, ContainerPojoPersist.STATUS.TODEPLOY.toString());
         for (ContainerPojoPersist element : containers) {
             this.disposeContainer(element.getContainerId());
@@ -246,7 +254,7 @@ public class KieServiceCommon {
                 logger.info("GenericResource.runSession", e);
             }
             try {
-                String serverName = System.getProperty("org.kie.server.id");
+                String serverName = KieServiceCommon.getKieServerID();
                 ContainerPojoPersist containerPojoPersist = containerRepository.findByServerNameAndContainerId(serverName, id);
                 if (containerPojoPersist == null) {
                     containerPojoPersist = new ContainerPojoPersist();
@@ -322,7 +330,7 @@ public class KieServiceCommon {
 
     public ServiceResponse<Void> disposeContainer(String id) {
         ServiceResponse<Void> result = server.disposeContainer(id);
-        String serverName = System.getProperty("org.kie.server.id");
+        String serverName =KieServiceCommon.getKieServerID();
         ContainerPojoPersist element = containerRepository.findByServerNameAndContainerId(serverName, id);
         if (element != null) {
             containerRepository.delete(element);

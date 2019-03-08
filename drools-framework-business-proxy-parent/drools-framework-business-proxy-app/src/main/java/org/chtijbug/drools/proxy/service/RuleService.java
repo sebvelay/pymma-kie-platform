@@ -6,63 +6,41 @@ import org.chtijbug.drools.kieserver.extension.KieServerAddOnElement;
 import org.chtijbug.drools.kieserver.extension.KieServerLoggingDefinition;
 import org.chtijbug.drools.logging.SessionExecution;
 import org.chtijbug.kieserver.services.drools.ChtijbugObjectRequest;
-import org.chtijbug.kieserver.services.drools.DroolsChtijbugKieServerExtension;
-import org.chtijbug.kieserver.services.drools.DroolsChtijbugRulesExecutionService;
 import org.kie.server.services.api.KieContainerInstance;
-import org.kie.server.services.api.KieServerExtension;
-import org.kie.server.services.api.KieServerRegistry;
-import org.kie.server.services.impl.KieServerImpl;
-import org.kie.server.services.impl.KieServerLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoField;
-import java.util.List;
 import java.util.Set;
 
 @Service("ruleService")
 public class RuleService {
 
     private static final Logger logger = LoggerFactory.getLogger(RuleService.class);
-    private DroolsChtijbugRulesExecutionService droolsChtijbugRulesExecutionService = null;
-    private DroolsChtijbugKieServerExtension droolsChtijbugKieServerExtension;
-    private KieServerRegistry registry;
     private ObjectMapper mapper = new ObjectMapper();
-    private KieServerImpl server;
-
+    @Inject
+    private KieServiceCommon kieServiceCommon;
 
     public RuleService() {
-        this.server = KieServerLocator.getInstance();
-        List<KieServerExtension> serverExtensions = this.server.getServerExtensions();
-        for (KieServerExtension serverExtension : serverExtensions) {
-            if (serverExtension instanceof DroolsChtijbugKieServerExtension) {
-                droolsChtijbugKieServerExtension = (DroolsChtijbugKieServerExtension) serverExtension;
-                if (droolsChtijbugRulesExecutionService == null) {
-
-                    droolsChtijbugRulesExecutionService = droolsChtijbugKieServerExtension.getRulesExecutionService();
-                }
-                if (registry == null) {
-                    registry = droolsChtijbugRulesExecutionService.getContext();
-                }
-            }
-        }
+        System.out.println("rulestep01");
     }
 
     public Object runSessionObject(String transactionID, String id, String processID, Object input) throws IOException {
-        KieContainerInstance kci = registry.getContainer(id);
+        KieContainerInstance kci = kieServiceCommon.getRegistry().getContainer(id);
         ChtijbugObjectRequest chtijbugObjectRequest = new ChtijbugObjectRequest();
         chtijbugObjectRequest.setObjectRequest(input);
-        KieServerAddOnElement kieServerAddOnElement = droolsChtijbugRulesExecutionService.getKieServerAddOnElement();
+        KieServerAddOnElement kieServerAddOnElement = kieServiceCommon.getDroolsChtijbugRulesExecutionService().getKieServerAddOnElement();
         if (kieServerAddOnElement != null) {
             for (KieServerLoggingDefinition kieServerLoggingDefinition : kieServerAddOnElement.getKieServerLoggingDefinitions()) {
                 kieServerLoggingDefinition.OnFireAllrulesStart(kci.getKieContainer().getReleaseId().getGroupId(), kci.getKieContainer().getReleaseId().getArtifactId(), kci.getKieContainer().getReleaseId().getVersion(), input);
             }
         }
-        ChtijbugObjectRequest chtijbutObjectResponse = droolsChtijbugRulesExecutionService.FireAllRulesAndStartProcess(kci, chtijbugObjectRequest, processID);
+        ChtijbugObjectRequest chtijbutObjectResponse = kieServiceCommon.getDroolsChtijbugRulesExecutionService().FireAllRulesAndStartProcess(kci, chtijbugObjectRequest, processID);
         /**
          * remove facts from logging to avoid infinite loop when marshalling to json and size of logging
          */

@@ -19,6 +19,9 @@ package org.chtijbug.drools.proxy;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 // CHECKSTYLE:OFF
 @SpringBootApplication
 public class DroolsBusinessProxyServer {
@@ -28,6 +31,16 @@ public class DroolsBusinessProxyServer {
      * Main method to start the application.
      */
     public static void main(String[] args) {
+        if (System.getProperty("org.kie.server.id") == null) {
+            InetAddress inetAddress = null;
+            try {
+                inetAddress = InetAddress.getLocalHost();
+                String hostName = inetAddress.getHostName();
+                System.setProperty("org.kie.server.id", hostName);
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }
         SpringApplication.run(DroolsBusinessProxyServer.class, args);
     }
 

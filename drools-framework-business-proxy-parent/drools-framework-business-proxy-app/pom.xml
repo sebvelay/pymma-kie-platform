@@ -266,8 +266,8 @@
 
                                     <run>
                                         <extraHosts>
-                                            <host>mongodb:172.17.0.1</host>
-                                            <host>kie-wb:172.17.0.1</host>
+                                            <host>mongodb:192.168.2.17</host>
+                                            <host>kie-wb:192.168.2.17</host>
                                         </extraHosts>
                                         <ports>
                                             <port>8200:8200</port>
