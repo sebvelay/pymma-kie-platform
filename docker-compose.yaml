@@ -2,10 +2,10 @@ version: "3"
 
 
 networks:
-   drools-network:
+   drools-network-dev:
       ipam:
          config:
-            - subnet: 172.27.0.0/24
+            - subnet: 172.27.1.0/24
 
 
 services:
@@ -17,8 +17,8 @@ services:
          - gitdata:/home/niodir
          - lucenedata:/home/lucene
       networks:
-         drools-network:
-            ipv4_address: 172.27.0.5
+         drools-network-dev:
+            ipv4_address: 172.27.1.5
       ports:
          - 8080:8080
          - 8001:8001
@@ -30,8 +30,8 @@ services:
       image: runtime-admin-console
       container_name: "admin-console"
       networks:
-         drools-network:
-            ipv4_address: 172.27.0.6
+         drools-network-dev:
+            ipv4_address: 172.27.1.6
       ports:
          - 8200:8200
       links:
@@ -48,8 +48,8 @@ services:
       image: runtime-proxy
       container_name: "runtime-proxy-1"
       networks:
-         drools-network:
-            ipv4_address: 172.27.0.22
+         drools-network-dev:
+            ipv4_address: 172.27.1.22
       ports:
          - 8090
          - 9080
@@ -65,8 +65,8 @@ services:
       image: runtime-proxy
       container_name: "runtime-proxy-2"
       networks:
-         drools-network:
-            ipv4_address: 172.27.0.32
+         drools-network-dev:
+            ipv4_address: 172.27.1.32
       ports:
          - 8090
          - 9080
@@ -82,8 +82,8 @@ services:
       image: runtime-proxy
       container_name: "runtime-proxy-3"
       networks:
-         drools-network:
-            ipv4_address: 172.27.0.42
+         drools-network-dev:
+            ipv4_address: 172.27.1.42
       ports:
          - 8090
          - 9080
@@ -99,8 +99,8 @@ services:
       image: runtime-proxy
       container_name: "runtime-proxy-4"
       networks:
-         drools-network:
-            ipv4_address: 172.27.0.52
+         drools-network-dev:
+            ipv4_address: 172.27.1.52
       ports:
          - 8090
          - 9080
@@ -116,8 +116,8 @@ services:
       image: runtime-proxy
       container_name: "runtime-proxy-5"
       networks:
-         drools-network:
-            ipv4_address: 172.27.0.62
+         drools-network-dev:
+            ipv4_address: 172.27.1.62
       ports:
          - 8090
          - 9080
@@ -134,8 +134,8 @@ services:
       image: runtime-indexer
       container_name: "runtime-indexer"
       networks:
-         drools-network:
-            ipv4_address: 172.27.0.23
+         drools-network-dev:
+            ipv4_address: 172.27.1.23
       links:
          - businessProxyDB:mongodb
          - elasticsearchhost
@@ -148,8 +148,8 @@ services:
       image: runtime-reverse-proxy
       container_name: "runtime-reverse-proxy"
       networks:
-         drools-network:
-            ipv4_address: 172.27.0.25
+         drools-network-dev:
+            ipv4_address: 172.27.1.25
 
       links:
          - businessProxyDB:mongodb
@@ -174,8 +174,8 @@ services:
       volumes:
          - esdata2:/usr/share/elasticsearch/data
       networks:
-         drools-network:
-            ipv4_address: 172.27.0.7
+         drools-network-dev:
+            ipv4_address: 172.27.1.7
       ports:
          - 9300:9300
       restart: always
@@ -187,8 +187,8 @@ services:
          - mongodb:/data/db
          - mongodb_config:/data/configdb
       networks:
-         drools-network:
-            ipv4_address: 172.27.0.3
+         drools-network-dev:
+            ipv4_address: 172.27.1.3
       ports:
          - 28017:27017
       command: mongod

@@ -5,6 +5,8 @@ import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
 import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
 import org.chtijbug.drools.proxy.persistence.repository.ProjectRepository;
 import org.chtijbug.drools.proxy.persistence.repository.RuntimeRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,7 @@ import java.util.*;
 
 @Service("updateService")
 public class UpdateService {
+    private static final Logger logger = LoggerFactory.getLogger(UpdateService.class);
 
     @Autowired
     private ProjectRepository projectRepository;
@@ -93,17 +96,34 @@ public class UpdateService {
             if (projectPersist.getServerNames().size() > 0) {
                 projects.put(projectPersist.getContainerID(), projectPersist.duplicate());
                 MappingProperties mappingProperties2 = new MappingProperties();
+                String servList=null;
                 for (String serverName : projectPersist.getServerNames()) {
                     RuntimePersist runtimePersist = runtimes.get(serverName);
-                    String hostName = runtimePersist.getHostname() + "/api/" + projectPersist.getContainerID();
-                    mappingProperties2.getDestinations().add(hostName);
+                    if (runtimePersist!= null) {
+                        String hostName = runtimePersist.getHostname() + "/api/" + projectPersist.getContainerID();
+                        mappingProperties2.getDestinations().add(hostName);
+                        if (servList==null){
+                            servList=serverName;
+                        }else{
+                            servList=servList+":"+serverName;
+                        }
+
+                    }
                 }
-                paths.add(mappingProperties2);
                 mappingProperties2.setName(projectPersist.getContainerID());
                 mappingProperties2.setPath("/" + projectPersist.getContainerID());
                 mappingProperties2.getCustomConfiguration().put("connect", 2000);
                 mappingProperties2.getCustomConfiguration().put("read", 2000);
                 mappingProperties2.setStripPath(true);
+                if ( mappingProperties2.getDestinations().size()>0) {
+                    paths.add(mappingProperties2);
+                    logger.info("Project "+projectPersist.getContainerID()+" defined on servers - "+servList);
+
+                }else{
+                    logger.error("Project "+projectPersist.getContainerID()+" defined on non existing server");
+                }
+
+
             }
 
         }
