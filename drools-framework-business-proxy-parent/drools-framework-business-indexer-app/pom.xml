@@ -189,6 +189,7 @@
                                 <username>pymmasoftwaredeploy</username>
                                 <password>pymmalomme</password>
                             </authConfig>
+                            <retries>5</retries>
                         </configuration>
 
                         <executions>
