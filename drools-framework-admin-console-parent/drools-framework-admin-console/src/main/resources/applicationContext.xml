@@ -11,9 +11,6 @@
         <property name="userName" value="${kie-wb.username}"/>
         <property name="password" value="${kie-wb.password}"/>
         <property name="kiewbUrl" value="${kie-wb.baseurl}"/>
-        <property name="kieserverUserName" value="${kie-wb.kieserverUserName}"/>
-        <property name="kieserverPassword" value="${kie-wb.kieserverPassword}"/>
-        <property name="kieserverUrl" value="${kie-wb.kieserverUrl}"/>
 
     </bean>
     <!--bean class="org.chtijbug.drools.console.service.model.gitlab.GitLabConfigurationData">

@@ -8,11 +8,7 @@ public class KieConfigurationData {
 
     private String password;
 
-    private String kieserverUrl;
 
-    private String kieserverUserName;
-
-    private String kieserverPassword;
 
     public String getKiewbUrl() {
         return kiewbUrl;
@@ -38,27 +34,4 @@ public class KieConfigurationData {
         this.password = password;
     }
 
-    public String getKieserverUrl() {
-        return kieserverUrl;
-    }
-
-    public void setKieserverUrl(String kieserverUrl) {
-        this.kieserverUrl = kieserverUrl;
-    }
-
-    public String getKieserverUserName() {
-        return kieserverUserName;
-    }
-
-    public void setKieserverUserName(String kieserverUserName) {
-        this.kieserverUserName = kieserverUserName;
-    }
-
-    public String getKieserverPassword() {
-        return kieserverPassword;
-    }
-
-    public void setKieserverPassword(String kieserverPassword) {
-        this.kieserverPassword = kieserverPassword;
-    }
-}
+   }
