@@ -71,6 +71,11 @@ public class ProjectPersistService {
                 addProjectToSession(projectPersist, true);
 
             } else {
+                projectPersist.getClassNameList().clear();
+                for (String className : platformProjectResponse.getJavaClasses()){
+                    projectPersist.getClassNameList().add(className);
+                    projectRepository.save(projectPersist);
+                }
                 addProjectToSession(projectPersist, false);
             }
         }
