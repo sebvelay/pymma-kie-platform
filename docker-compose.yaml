@@ -46,6 +46,8 @@ services:
   runtime-proxy-1:
     image: runtime-proxy
     container_name: "runtime-proxy-1"
+    environment:
+      PYMMA_OPTS: "-Dorg.kie.server.id=server1"
     networks:
       drools-network-dev:
         ipv4_address: 172.27.1.22
@@ -63,6 +65,8 @@ services:
   runtime-proxy-2:
     image: runtime-proxy
     container_name: "runtime-proxy-2"
+    environment:
+      PYMMA_OPTS: "-Dorg.kie.server.id=server2"
     networks:
       drools-network-dev:
         ipv4_address: 172.27.1.32
@@ -80,6 +84,8 @@ services:
   runtime-proxy-3:
     image: runtime-proxy
     container_name: "runtime-proxy-3"
+    environment:
+      PYMMA_OPTS: "-Dorg.kie.server.id=server3"
     networks:
       drools-network-dev:
         ipv4_address: 172.27.1.42
@@ -97,6 +103,8 @@ services:
   runtime-proxy-4:
     image: runtime-proxy
     container_name: "runtime-proxy-4"
+    environment:
+      PYMMA_OPTS: "-Dorg.kie.server.id=server4"
     networks:
       drools-network-dev:
         ipv4_address: 172.27.1.52
@@ -114,6 +122,8 @@ services:
   runtime-proxy-5:
     image: runtime-proxy
     container_name: "runtime-proxy-5"
+    environment:
+      PYMMA_OPTS: "-Dorg.kie.server.id=server5"
     networks:
       drools-network-dev:
         ipv4_address: 172.27.1.62

@@ -71,34 +71,28 @@ public class KieServiceCommon {
 
     public KieServiceCommon() {
         // for now, if no server impl is passed as parameter, create one
-        System.out.println("step01");
         this.server = KieServerLocator.getInstance();
-        System.out.println("step02");
+
         List<KieServerExtension> serverExtensions = this.server.getServerExtensions();
-        System.out.println("step03");
+
         for (KieServerExtension serverExtension : serverExtensions) {
             if (serverExtension instanceof DroolsChtijbugKieServerExtension) {
                 droolsChtijbugKieServerExtension = (DroolsChtijbugKieServerExtension) serverExtension;
-                System.out.println("step03a");
                 if (droolsChtijbugRulesExecutionService == null) {
-
                     droolsChtijbugRulesExecutionService = droolsChtijbugKieServerExtension.getRulesExecutionService();
-                    System.out.println("step03b");
                 }
                 if (registry == null) {
                     registry = droolsChtijbugRulesExecutionService.getContext();
-                    System.out.println("step03c");
                 }
             }
         }
-        System.out.println("step04");
         this.marshallerHelper = new MarshallerHelper(this.server.getServerRegistry());
-        System.out.println("step05");
     }
 
     public static String getKieServerID(){
         return System.getProperty("org.kie.server.id");
     }
+
     @PostConstruct
     private void initCamelBusinessRoutes() {
         String serverName = KieServiceCommon.getKieServerID();
@@ -114,11 +108,25 @@ public class KieServiceCommon {
             } catch (UnknownHostException e) {
                 logger.info("initCamelBusinessRoutes.getLocalHost", e);
             }
-            RuntimePersist runtimePersist = new RuntimePersist(serverName, version, "http://" + hostName + ":" + serverPort, String.valueOf(serverPort), sftpPort,hostName,RuntimePersist.STATUS.UP.toString());
+            RuntimePersist runtimePersist = new RuntimePersist(serverName, version, "http://" + hostName + ":" + serverPort,
+                                            String.valueOf(serverPort), sftpPort,
+                                            hostName,RuntimePersist.STATUS.UP.toString());
             runtimeRepository.save(runtimePersist);
         }else{
             RuntimePersist runtimePersist =itIsMes.get(0);
             runtimePersist.setStatus(RuntimePersist.STATUS.UP.toString());
+            try {
+                /**
+                 * HostName may have changed by reboot so retake it and save it
+                 */
+                InetAddress inetAddress = InetAddress.getLocalHost();
+                String hostName = inetAddress.getHostName();
+                runtimePersist.setHostname("http://" + hostName + ":" + serverPort);
+                runtimePersist.setSftpHost(hostName);
+                runtimePersist.setSftpPort(sftpPort);
+            } catch (UnknownHostException e) {
+                logger.info("initCamelBusinessRoutes.getLocalHost", e);
+            }
             runtimeRepository.save(runtimePersist);
         }
         try {
