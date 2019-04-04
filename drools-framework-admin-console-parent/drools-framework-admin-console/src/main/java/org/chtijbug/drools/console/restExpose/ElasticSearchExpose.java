@@ -13,9 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -30,7 +27,7 @@ public class ElasticSearchExpose {
 
         BusinessTransactionPersistence tmp=null;
 
-        List<BusinessTransactionPersistence> businessTransactionPersistences = indexerService.getBusinessTransactionPersistenceRepository().findAllByTransactionId(transactionId,new PageRequest(0,50));
+        List<BusinessTransactionPersistence> businessTransactionPersistences = indexerService.getBusinessTransactionPersistenceRepository().findAllByTransactionId(transactionId,new PageRequest(0,5000));
 
         if(businessTransactionPersistences!=null) {
             for (BusinessTransactionPersistence b : businessTransactionPersistences) {
