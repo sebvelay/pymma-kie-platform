@@ -46,7 +46,7 @@ public class ElasticSearchExpose {
     @RequestMapping(value = "/findActionByBusinessId", method = RequestMethod.GET)
     public List<BusinessTransactionAction> findActionById(@RequestParam String businessId, HttpServletRequest request, HttpServletResponse response) {
 
-        List<BusinessTransactionAction> businessTransactionPersistences = indexerService.getBusinessTransactionActionRepository().findAllByBusinessTransactionId(businessId,new Sort(new Sort.Order(Sort.Direction.ASC,"eventNumber")),new PageRequest(0,50));
+        List<BusinessTransactionAction> businessTransactionPersistences = indexerService.getBusinessTransactionActionRepository().findAllByBusinessTransactionId(businessId,new Sort(new Sort.Order(Sort.Direction.ASC,"eventNumber")),new PageRequest(0,5000));
 
         return businessTransactionPersistences;
     }
