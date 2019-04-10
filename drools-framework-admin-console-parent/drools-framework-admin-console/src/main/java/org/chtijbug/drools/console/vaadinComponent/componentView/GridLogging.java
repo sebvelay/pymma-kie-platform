@@ -9,15 +9,14 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.SerializablePredicate;
 import org.chtijbug.drools.console.service.IndexerService;
-import org.chtijbug.drools.console.service.ProjectPersistService;
-import org.chtijbug.drools.console.service.RuntimeService;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionPersistence;
-import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
-import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 public class GridLogging extends Grid<BusinessTransactionPersistence> {
 

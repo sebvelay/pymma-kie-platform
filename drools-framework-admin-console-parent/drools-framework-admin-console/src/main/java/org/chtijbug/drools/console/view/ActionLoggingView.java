@@ -1,23 +1,14 @@
 package org.chtijbug.drools.console.view;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.component.treegrid.TreeGrid;
-import com.vaadin.flow.data.provider.ListDataProvider;
 import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.DialogPerso;
 import org.chtijbug.drools.console.vaadinComponent.componentView.GridActionLogging;
 import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionAction;
 import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionPersistence;
 import org.chtijbug.drools.logging.Fact;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 public class ActionLoggingView extends VerticalLayout {
@@ -110,7 +101,7 @@ public class ActionLoggingView extends VerticalLayout {
             if(b!=null&&b.getInputData()!=null&&b.getInputData().getRealFact()!=null){
 
                 VerticalLayout verticalLayout=new VerticalLayout();
-                Label label=new Label(b.getEventType().name()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
+                Label label=new Label(b.getEventType()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
                 label.setClassName("creation-runtime-title");
                 verticalLayout.add(label);
                 verticalLayout.setClassName("content-action-logging");
@@ -142,7 +133,7 @@ public class ActionLoggingView extends VerticalLayout {
             if(b!=null&&b.getFact()!=null&&b.getFact().getRealFact()!=null){
 
                 VerticalLayout verticalLayout=new VerticalLayout();
-                Label label=new Label(b.getEventType().name()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
+                Label label=new Label(b.getEventType()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
                 label.setClassName("creation-runtime-title");
                 verticalLayout.add(label);
                 verticalLayout.setClassName("content-action-logging");
@@ -174,7 +165,7 @@ public class ActionLoggingView extends VerticalLayout {
             if(b!=null&&b.getRuleExecution()!=null&&b.getRuleExecution().getThenFacts()!=null){
 
                 VerticalLayout verticalLayout=new VerticalLayout();
-                Label label=new Label(b.getEventType().name()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
+                Label label=new Label(b.getEventType()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
                 label.setClassName("creation-runtime-title");
                 verticalLayout.add(label);
                 verticalLayout.setClassName("content-action-logging");
@@ -207,7 +198,7 @@ public class ActionLoggingView extends VerticalLayout {
             if(b!=null&&b.getRuleExecution()!=null&&b.getRuleExecution().getWhenFacts()!=null){
 
                 VerticalLayout verticalLayout=new VerticalLayout();
-                Label label=new Label(b.getEventType().name()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
+                Label label=new Label(b.getEventType()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
                 label.setClassName("creation-runtime-title");
                 verticalLayout.add(label);
                 verticalLayout.setClassName("content-action-logging");
