@@ -5,7 +5,7 @@
     <parent>
         <artifactId>drools-framework-spring-boot-parent</artifactId>
         <groupId>com.pymmasoftware.jbpm</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -126,11 +126,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>com.pymmasoftware.jbpm</groupId>
-            <version>${project.version}</version>
-            <artifactId>drools-framework-kie-server-rest-drools</artifactId>
-        </dependency>
+
 
 
     </dependencies>

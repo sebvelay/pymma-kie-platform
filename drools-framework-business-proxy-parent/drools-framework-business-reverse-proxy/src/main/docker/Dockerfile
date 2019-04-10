@@ -2,7 +2,7 @@ FROM openjdk:8-jre-slim
 
 
 ADD application.properties /application.properties
-ADD maven/drools-framework-business-reverse-proxy-1.0-SNAPSHOT.jar app.jar
+ADD maven/drools-framework-business-reverse-proxy-1.1-SNAPSHOT.jar app.jar
 
 
 
