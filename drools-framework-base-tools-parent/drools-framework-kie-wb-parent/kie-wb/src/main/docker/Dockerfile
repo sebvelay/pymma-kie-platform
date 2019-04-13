@@ -3,7 +3,7 @@
 ###########################################################################
 
 ####### BASE ############
-FROM jboss/wildfly:14.0.1.Final
+FROM jboss/keycloak-adapter-wildfly:latest
 
 ####### MAINTAINER ############
 MAINTAINER "Nicolas Héron" "nicolas.heron@pymma-software.com"
@@ -51,8 +51,8 @@ EXPOSE 8001
 
 ####### Drools Workbench CUSTOM CONFIGURATION ############
 ADD etc/standalone-full-drools.xml $JBOSS_HOME/standalone/configuration/standalone-full-drools.xml
-ADD etc/application-users.properties $JBOSS_HOME/standalone/configuration/application-users.properties
-ADD etc/application-roles.properties $JBOSS_HOME/standalone/configuration/application-roles.properties
+#ADD etc/application-users.properties $JBOSS_HOME/standalone/configuration/application-users.properties
+#ADD etc/application-roles.properties $JBOSS_HOME/standalone/configuration/application-roles.properties
 
 # Added files are chowned to root user, change it to the jboss one.
 USER root
@@ -71,8 +71,8 @@ ADD settings.xml /m2_kiewb/settings.xml
 RUN mkdir /m2_kiewb/repository
 ####### MVN REPO ############
 # https://bugzilla.redhat.com/show_bug.cgi?id=1263738
-RUN mkdir -p /m2_kiewb/repository/org/guvnor/guvnor-asset-mgmt-project/$KIE_VERSION && \
-curl -o /m2_kiewb/repository/org/guvnor/guvnor-asset-mgmt-project/$KIE_VERSION/guvnor-asset-mgmt-project-$KIE_VERSION.jar $KIE_REPOSITORY/org/guvnor/guvnor-asset-mgmt-project/$KIE_VERSION/guvnor-asset-mgmt-project-$KIE_VERSION.jar
+#RUN mkdir -p /m2_kiewb/repository/org/guvnor/guvnor-asset-mgmt-project/$KIE_VERSION && \
+#curl -o /m2_kiewb/repository/org/guvnor/guvnor-asset-mgmt-project/$KIE_VERSION/guvnor-asset-mgmt-project-$KIE_VERSION.jar $KIE_REPOSITORY/org/guvnor/guvnor-asset-mgmt-project/$KIE_VERSION/guvnor-asset-mgmt-project-$KIE_VERSION.jar
 
 
 RUN chown jboss:jboss /home/lucene

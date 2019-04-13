@@ -20,6 +20,7 @@
         <extension module="org.jboss.as.security" />
         <extension module="org.jboss.as.transactions" />
         <extension module="org.jboss.as.webservices" />
+        <extension module="org.keycloak.keycloak-adapter-subsystem" />
         <extension module="org.jboss.as.weld" />
         <extension module="org.wildfly.extension.batch.jberet" />
         <extension module="org.wildfly.extension.bean-validation" />
@@ -279,6 +280,7 @@
                     <realm name="ManagementRealm" role-decoder="groups-to-roles" />
                     <realm name="local" role-mapper="super-user-mapper" />
                 </security-domain>
+
             </security-domains>
             <security-realms>
                 <identity-realm name="local" identity="$local" />
@@ -430,6 +432,18 @@
             <jpa default-datasource="" default-extended-persistence-inheritance="DEEP" />
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jsf:1.1" />
+        <subsystem xmlns="urn:jboss:domain:keycloak:1.1">
+            <secure-deployment name="kie-wb.war">
+                <realm>demo</realm>
+                <resource>kie</resource>
+                <enable-basic-auth>true</enable-basic-auth>
+                <realm-public-key>MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAoQBLWufOyICqNgRYzZZU/RsoosuKCH7gCsP/dOnfb8t3EUcZrt6rKvn9uSyVfCjJ0EhZBsaQQXNuyildY3Nbbs4uVlRUtHGZoqbnMZfdP1kZTrSnVLS+ckP19UoIVMZUykXEih8jmtmvXKCqeuB81GUW0zrUDHR3QCGihp5XyuLKvprXl+m3zUL7HYWlT6gXgWLx4C8P2XOcuj+G7/FHZjEvNWCUMp4EslVxMcmLoYjMs1y8sisXrpFbeE6blvoSNXL1RGanMJt9oVW/sWVw94wILavmiCxtd1VsZbzXTdBM8kX0Ro2So7OJKWBmBdq0M7v5U4A8yhkJt+2QYA3VtwIDAQAB</realm-public-key>
+                <auth-server-url>http://host.docker:10080/auth</auth-server-url>
+                <ssl-required>external</ssl-required>
+                <principal-attribute>preferred_username</principal-attribute>
+                <credential name="secret">dd7fc22d-ba01-4387-b68a-316b12a741e8</credential>
+            </secure-deployment>
+        </subsystem>
         <subsystem xmlns="urn:jboss:domain:jsr77:1.0" />
         <subsystem xmlns="urn:jboss:domain:mail:3.0">
             <mail-session name="default" jndi-name="java:jboss/mail/Default">
@@ -506,6 +520,11 @@
                     <authorization>
                         <policy-module code="Delegating" flag="required" />
                     </authorization>
+                </security-domain>
+                <security-domain name="keycloak">
+                    <authentication>
+                        <login-module code="org.keycloak.adapters.jboss.KeycloakLoginModule" flag="required" />
+                    </authentication>
                 </security-domain>
             </security-domains>
         </subsystem>

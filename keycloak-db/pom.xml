@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>pymma-jbpm-platform-parent</artifactId>
+        <groupId>com.pymmasoftware.jbpm</groupId>
+        <version>1.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>jar</packaging>
+    <artifactId>keycloak-db</artifactId>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.28.0</version>
+
+            </plugin>
+        </plugins>
+    </build>
+    <profiles>
+        <profile>
+            <id>docker-build</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.21.0</version>
+
+                        <configuration>
+                            <dockerHost>${docker.Host}</dockerHost>
+
+                            <verbose>true</verbose>
+                            <images>
+                                <image>
+                                    <name>keycloak-db</name>
+                                    <build>
+                                        <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+
+
+                                        <tags>
+                                            <tag>latest</tag>
+                                        </tags>
+
+                                    </build>
+
+                                    <run>
+                                        <extraHosts>
+                                            <host>mongodb:192.168.43.94</host>
+                                            <host>elasticsearchhost:192.168.43.94</host>
+                                        </extraHosts>
+                                        <ports>
+                                            <port>6666:5432</port>
+                                        </ports>
+                                    </run>
+                                </image>
+                            </images>
+                        </configuration>
+
+                        <executions>
+
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                </goals>
+                            </execution>
+
+
+                        </executions>
+
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>docker-deploy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.21.0</version>
+
+                        <configuration>
+                            <registry>registry.hub.docker.com/pymmasoftware</registry>
+                            <dockerHost>${docker.Host}</dockerHost>
+                            <verbose>true</verbose>
+                            <images>
+                                <image>
+                                    <name>keycloak-db</name>
+                                    <build>
+                                        <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+
+                                        <!--copies Jar to the maven directory (uses Assembly system)-->
+                                        <assembly>
+                                            <descriptorRef>artifact</descriptorRef>
+                                        </assembly>
+
+                                    </build>
+
+                                    <run>
+                                        <extraHosts>
+                                            <host>mongodb:192.168.1.100</host>
+                                        </extraHosts>
+
+                                    </run>
+                                </image>
+                            </images>
+                            <authConfig>
+                                <username>pymmasoftwaredeploy</username>
+                                <password>pymmalomme</password>
+                            </authConfig>
+                            <retries>5</retries>
+                        </configuration>
+
+                        <executions>
+
+
+                            <execution>
+                                <id>mydeploy</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                    <goal>push</goal>
+                                </goals>
+                            </execution>
+
+                        </executions>
+
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

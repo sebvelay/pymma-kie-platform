@@ -15,6 +15,7 @@
         <module>drools-framework-admin-console-parent</module>
         <module>drools-framework-business-proxy-parent</module>
         <module>drools-framework-base-tools-parent</module>
+        <module>keycloak-db</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -88,11 +89,11 @@
     <distributionManagement>
         <snapshotRepository>
             <id>pymma-snapshot</id>
-            <url>https://nexus.pymma-software.com/nexus/content/repositories/pymma-snapshot</url>
+            <url>https://nexus.pymma-software.com/nexus/content/repositories/chtijbug-snapshot</url>
         </snapshotRepository>
         <repository>
             <id>pymma-release</id>
-            <url>https://nexus.pymma-software.com/nexus/content/repositories/pymma-release</url>
+            <url>https://nexus.pymma-software.com/nexus/content/repositories/chtijbug-release</url>
         </repository>
     </distributionManagement>
     <developers>
