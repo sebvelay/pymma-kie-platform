@@ -18,6 +18,7 @@ package org.chtijbug.drools.proxy.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Route;
+import org.chtijbug.drools.proxy.PlatfomKieServerStateRepository;
 import org.chtijbug.drools.proxy.camel.DroolsRouter;
 import org.chtijbug.drools.proxy.persistence.model.ContainerPojoPersist;
 import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
@@ -30,7 +31,6 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.KieServerImpl;
-import org.kie.server.services.impl.KieServerLocator;
 import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,22 +71,7 @@ public class KieServiceCommon {
 
     public KieServiceCommon() {
         // for now, if no server impl is passed as parameter, create one
-        this.server = KieServerLocator.getInstance();
-
-        List<KieServerExtension> serverExtensions = this.server.getServerExtensions();
-
-        for (KieServerExtension serverExtension : serverExtensions) {
-            if (serverExtension instanceof DroolsChtijbugKieServerExtension) {
-                droolsChtijbugKieServerExtension = (DroolsChtijbugKieServerExtension) serverExtension;
-                if (droolsChtijbugRulesExecutionService == null) {
-                    droolsChtijbugRulesExecutionService = droolsChtijbugKieServerExtension.getRulesExecutionService();
-                }
-                if (registry == null) {
-                    registry = droolsChtijbugRulesExecutionService.getContext();
-                }
-            }
-        }
-        this.marshallerHelper = new MarshallerHelper(this.server.getServerRegistry());
+       // this.server = KieServerLocator.getInstance();
     }
 
     public static String getKieServerID(){
@@ -95,6 +80,27 @@ public class KieServiceCommon {
 
     @PostConstruct
     private void initCamelBusinessRoutes() {
+
+        this.server = new KieServerImpl(new PlatfomKieServerStateRepository(containerRepository,this));
+        this.server.init();
+
+        List<KieServerExtension> serverExtensions = this.server.getServerExtensions();
+        if (registry==null || droolsChtijbugKieServerExtension==null) {
+            for (KieServerExtension serverExtension : serverExtensions) {
+                if (serverExtension instanceof DroolsChtijbugKieServerExtension) {
+                    droolsChtijbugKieServerExtension = (DroolsChtijbugKieServerExtension) serverExtension;
+                    if (droolsChtijbugRulesExecutionService == null) {
+                        droolsChtijbugRulesExecutionService = droolsChtijbugKieServerExtension.getRulesExecutionService();
+                    }
+                    if (registry == null) {
+                        registry = droolsChtijbugRulesExecutionService.getContext();
+                    }
+                }
+            }
+        }
+
+        this.marshallerHelper = new MarshallerHelper(this.server.getServerRegistry());
+
         String serverName = KieServiceCommon.getKieServerID();
         String sftpPort = System.getProperty("org.chtijbug.server.sftpPort");
         List<RuntimePersist> itIsMes = runtimeRepository.findByServerName(serverName);
@@ -131,9 +137,16 @@ public class KieServiceCommon {
         }
         try {
 
-            List<ContainerPojoPersist> containers = containerRepository.findByServerName(serverName);
-            for (ContainerPojoPersist container : containers) {
-                this.initCamelBusinessRoute(container);
+            for (KieContainerResource kieContainerResource : this.server.getServerState().getResult().getContainers()){
+
+
+               // this.createContainer(container.getContainerId(),)
+
+                this.createContainer(kieContainerResource.getContainerId(), kieContainerResource);
+                List<ContainerPojoPersist> containers = containerRepository.findByContainerId(kieContainerResource.getContainerId());
+                if (containers.size()==1) {
+                    this.initCamelBusinessRoute(containers.get(0));
+                }
             }
         } catch (Exception e) {
             logger.info("initCamelBusinessRoutes", e);

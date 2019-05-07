@@ -34,12 +34,15 @@ public class UpdateService {
     }
 
     public void updateConfig() {
+        /**
         if (this.toUpdate==false) {
             this.toUpdate = isToUpdate();
             if (this.toUpdate==true){
                 generateMappings();
             }
         }
+         **/
+        generateMappings();
     }
 
     private boolean isToUpdate() {
