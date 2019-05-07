@@ -22,8 +22,6 @@ public class AdminRouter extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        System.out.println("coucou");
-
         restConfiguration()
                 .component("servlet")
                 .bindingMode(RestBindingMode.json)
