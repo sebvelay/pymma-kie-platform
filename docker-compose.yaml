@@ -43,11 +43,32 @@ services:
       - kie-wb
     restart: always
 
+
+  swimmingpool-wb:
+    image: swimmingpool-web-ui
+    container_name: "swimmingpool-web-ui"
+    environment:
+      PYMMA_OPTS: " "
+    networks:
+      drools-network-dev:
+        ipv4_address: 172.27.1.15
+    ports:
+      - 8080:12099
+    links:
+      - runtime-reverse-proxy:reverse-proxy
+    depends_on:
+      - runtime-reverse-proxy
+    restart: always
+
+
+#-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=4000,suspend=y
   runtime-proxy-1:
     image: runtime-proxy
     container_name: "runtime-proxy-1"
+    volumes:
+      - kieserverdir:/niodir-kieserver
     environment:
-      PYMMA_OPTS: "-Dorg.kie.server.id=server1"
+      PYMMA_OPTS: "-Dorg.kie.server.id=server1  "
     networks:
       drools-network-dev:
         ipv4_address: 172.27.1.22
@@ -65,6 +86,8 @@ services:
   runtime-proxy-2:
     image: runtime-proxy
     container_name: "runtime-proxy-2"
+    volumes:
+      - kieserverdir:/niodir-kieserver
     environment:
       PYMMA_OPTS: "-Dorg.kie.server.id=server2"
     networks:
@@ -84,6 +107,8 @@ services:
   runtime-proxy-3:
     image: runtime-proxy
     container_name: "runtime-proxy-3"
+    volumes:
+      - kieserverdir:/niodir-kieserver
     environment:
       PYMMA_OPTS: "-Dorg.kie.server.id=server3"
     networks:
@@ -103,6 +128,8 @@ services:
   runtime-proxy-4:
     image: runtime-proxy
     container_name: "runtime-proxy-4"
+    volumes:
+      - kieserverdir:/niodir-kieserver
     environment:
       PYMMA_OPTS: "-Dorg.kie.server.id=server4"
     networks:
@@ -122,6 +149,8 @@ services:
   runtime-proxy-5:
     image: runtime-proxy
     container_name: "runtime-proxy-5"
+    volumes:
+      - kieserverdir:/niodir-kieserver
     environment:
       PYMMA_OPTS: "-Dorg.kie.server.id=server5"
     networks:
@@ -212,3 +241,4 @@ volumes:
   gitdata:
   lucenedata:
   esdata2:
+  kieserverdir:

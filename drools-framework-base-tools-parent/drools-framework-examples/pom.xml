@@ -4,17 +4,21 @@
     <parent>
         <artifactId>drools-framework-base-tools-parent</artifactId>
         <groupId>com.pymmasoftware.jbpm</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>drools-framework-examples</artifactId>
+    <properties>
+        <spring-boot.version>2.1.2.RELEASE</spring-boot.version>
+    </properties>
+
     <packaging>pom</packaging>
     <modules>
-        <module>drools-framework-loyalty-model</module>
+        <!--module>drools-framework-loyalty-model</module-->
         <module>drools-framework-swimming-pool-model</module>
         <module>drools-framework-swimmingpool-web-ui</module>
-        <module>drools-framework-loyalty-web</module>
+        <!--module>drools-framework-loyalty-web</module-->
     </modules>
 
 </project>
