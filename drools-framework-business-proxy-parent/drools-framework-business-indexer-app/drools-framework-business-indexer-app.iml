@@ -131,7 +131,7 @@
     <orderEntry type="library" name="Maven: io.netty:netty-resolver:4.1.29.Final" level="project" />
     <orderEntry type="library" name="Maven: io.netty:netty-transport:4.1.29.Final" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.9.0" level="project" />
-    <orderEntry type="module" module-name="drools-framewwork-business-proxy-persistence" />
+    <orderEntry type="module" module-name="drools-framework-business-proxy-persistence" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-data-mongodb:2.1.0.RELEASE" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:mongodb-driver:3.8.2" level="project" />
     <orderEntry type="library" name="Maven: org.mongodb:bson:3.8.2" level="project" />
@@ -147,8 +147,8 @@
     <orderEntry type="library" name="Maven: com.google.guava:guava:13.0.1" level="project" />
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.6" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.9.7" level="project" />
-    <orderEntry type="library" name="Maven: org.kie:kie-internal:7.19.0.Final" level="project" />
-    <orderEntry type="library" name="Maven: org.kie:kie-api:7.19.0.Final" level="project" />
-    <orderEntry type="library" name="Maven: org.kie.soup:kie-soup-maven-support:7.19.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: org.kie:kie-internal:7.21.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: org.kie:kie-api:7.21.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: org.kie.soup:kie-soup-maven-support:7.21.0.Final" level="project" />
   </component>
 </module>
