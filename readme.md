@@ -1,11 +1,17 @@
 
-configuration du workbench
--XX:MaxNewSize=256m -XX:PermSize=256m -XX:MaxPermSize=556m -XX:+DisableExplicitGC -Dorg.kie.example.repositories=/home/nheron/kie-base/example-import -Dorg.kie.example=true -Dorg.uberfire.metadata.index.dir=/home/nheron/kie-base/lucene -Dorg.uberfire.nio.git.daemon.host=0.0.0.0 -Dorg.guvnor.m2repo.dir=/home/nheron/kie-base/M2_REPO -DM2_HOME=/Users/nheron/.m2/repository-Dorg.uberfire.nio.git.dir=/home/nheron/kie-base/niodir-Dorg.kie.demo=false -Dorg.kie.server.controller=http://localhost:8080/kie-wb/rest/controller
+To run the platform, we ecourage you to use the docker containers build with maven
+To be able to build the docker container, active the profiles as follow
+mvn clean install -Pdev,docker-build
+
+we have a docker-compose file.
+As we are using sso, you have in your /etc/hosts to add a line :
+YourHostIPnotLocalhost host.docker
+
+then on the root
+docker-compose up -d
 
 
+the workbench will be at the following url : htto://host.docker:8080/kie-wb
 
+We need an ip visible from your browser when used as a callback once identified 
 
-
-
-
-configuration du kie-server
