@@ -11,12 +11,11 @@
 
     <artifactId>drools-framework-kie-server-chtijbug-drools-springboot-jar</artifactId>
     <dependencies>
-        <dependency>
+        <!--dependency>
             <groupId>org.kie</groupId>
             <artifactId>kie-server-spring-boot-starter-drools</artifactId>
             <version>${jbpm.version}</version>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.kie/kie-server-spring-boot-starter-drools -->
+        </dependency-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

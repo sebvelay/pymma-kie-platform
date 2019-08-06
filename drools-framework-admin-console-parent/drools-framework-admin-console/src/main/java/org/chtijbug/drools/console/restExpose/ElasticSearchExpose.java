@@ -23,7 +23,7 @@ public class ElasticSearchExpose {
     private IndexerService indexerService;
 
     @RequestMapping(value = "/findLastByTransactionId", method = RequestMethod.GET)
-    public BusinessTransactionPersistence findTransactionById(@RequestParam String transactionId, HttpServletRequest request, HttpServletResponse response) {
+    public BusinessTransactionPersistence findTransactionById(@RequestParam String transactionId,HttpServletRequest request, HttpServletResponse response) {
 
         BusinessTransactionPersistence tmp=null;
 

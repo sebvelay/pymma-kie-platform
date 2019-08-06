@@ -101,7 +101,7 @@ public class ActionLoggingView extends VerticalLayout {
             if(b!=null&&b.getInputData()!=null&&b.getInputData().getRealFact()!=null){
 
                 VerticalLayout verticalLayout=new VerticalLayout();
-                Label label=new Label(b.getEventType()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
+                Label label=new Label(b.getEventType().name()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
                 label.setClassName("creation-runtime-title");
                 verticalLayout.add(label);
                 verticalLayout.setClassName("content-action-logging");
@@ -133,7 +133,7 @@ public class ActionLoggingView extends VerticalLayout {
             if(b!=null&&b.getFact()!=null&&b.getFact().getRealFact()!=null){
 
                 VerticalLayout verticalLayout=new VerticalLayout();
-                Label label=new Label(b.getEventType()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
+                Label label=new Label(b.getEventType().name()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
                 label.setClassName("creation-runtime-title");
                 verticalLayout.add(label);
                 verticalLayout.setClassName("content-action-logging");
@@ -165,7 +165,7 @@ public class ActionLoggingView extends VerticalLayout {
             if(b!=null&&b.getRuleExecution()!=null&&b.getRuleExecution().getThenFacts()!=null){
 
                 VerticalLayout verticalLayout=new VerticalLayout();
-                Label label=new Label(b.getEventType()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
+                Label label=new Label(b.getEventType().name()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
                 label.setClassName("creation-runtime-title");
                 verticalLayout.add(label);
                 verticalLayout.setClassName("content-action-logging");
@@ -198,7 +198,7 @@ public class ActionLoggingView extends VerticalLayout {
             if(b!=null&&b.getRuleExecution()!=null&&b.getRuleExecution().getWhenFacts()!=null){
 
                 VerticalLayout verticalLayout=new VerticalLayout();
-                Label label=new Label(b.getEventType()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
+                Label label=new Label(b.getEventType().name()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
                 label.setClassName("creation-runtime-title");
                 verticalLayout.add(label);
                 verticalLayout.setClassName("content-action-logging");

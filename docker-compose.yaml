@@ -76,7 +76,7 @@ services:
     volumes:
       - kieserverdir:/niodir-kieserver
     environment:
-      PYMMA_OPTS: "-Dorg.kie.server.id=server1  "
+      PYMMA_OPTS: "-Dorg.kie.server.id=server1"
     hostname: proxy1.pymma
     networks:
       drools-network-dev:

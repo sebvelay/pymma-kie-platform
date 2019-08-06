@@ -15,19 +15,15 @@
  */
 package org.chtijbug.swimmingpool.web;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+@Controller
+public class HomeController {
 
-
-@SpringBootApplication
-public class SwimmingPoolWebUIApplication {
-
-
-
-    public static void main(String[] args) {
-        SpringApplication.run(SwimmingPoolWebUIApplication.class, args);
+    @RequestMapping("/")
+    public String home() {
+        return "index";
     }
-
 
 }

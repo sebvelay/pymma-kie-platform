@@ -8,6 +8,7 @@
         <version>1.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
+    <artifactId>drools-framework-spring-boot-parent</artifactId>
     <packaging>pom</packaging>
 
     <properties>
@@ -16,10 +17,10 @@
     </properties>
     <modules>
         <module>drools-framework-kie-server-springboot-autoconfigure-drools</module>
-        <module>drools-framework-kie-server-chtijbug-drools-springboot-jar</module>
+        <!--module>drools-framework-kie-server-chtijbug-drools-springboot-jar</module-->
 
     </modules>
-    <artifactId>drools-framework-spring-boot-parent</artifactId>
+
 
 
 </project>

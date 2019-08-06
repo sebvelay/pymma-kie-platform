@@ -13,6 +13,7 @@
         <module>drools-framework-kie-server-services-drools</module>
         <module>drools-framework-kie-server-client-connector</module>
         <module>drools-framework-kie-server-extension-interface</module>
+        <module>drools-framework-kie-server-rest-drools</module>
     </modules>
 
 
