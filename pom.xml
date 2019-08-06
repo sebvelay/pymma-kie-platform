@@ -20,7 +20,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <jbpm.version>7.20.0.Final</jbpm.version>
+        <jbpm.version>7.24.0.Final</jbpm.version>
 
         <spring.boot.version>2.1.2.RELEASE</spring.boot.version>
 
@@ -91,11 +91,11 @@
     <distributionManagement>
         <snapshotRepository>
             <id>pymma-snapshot</id>
-            <url>https://nexus.pymma-software.com/nexus/content/repositories/chtijbug-snapshot</url>
+            <url>https://nexus.pymma-software.com/nexus/content/repositories/pymma-snapshot</url>
         </snapshotRepository>
         <repository>
             <id>pymma-release</id>
-            <url>https://nexus.pymma-software.com/nexus/content/repositories/chtijbug-release</url>
+            <url>https://nexus.pymma-software.com/nexus/content/repositories/pymma-release</url>
         </repository>
     </distributionManagement>
     <developers>
