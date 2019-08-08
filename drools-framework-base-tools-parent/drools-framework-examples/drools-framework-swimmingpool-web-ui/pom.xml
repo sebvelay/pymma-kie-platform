@@ -25,12 +25,7 @@
         </dependencies>
     </dependencyManagement>
 
-
     <dependencies>
-
-
-
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -43,16 +38,16 @@
             </exclusions>
         </dependency>
         <dependency>
-        <groupId>com.pymmasoftware.jbpm</groupId>
-        <artifactId>drools-framework-swimming-pool-model</artifactId>
-        <version>${project.version}</version>
-        <exclusions>
-            <exclusion>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-            </exclusion>
-        </exclusions>
-    </dependency>
+            <groupId>com.pymmasoftware.jbpm</groupId>
+            <artifactId>drools-framework-swimming-pool-model</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                    <artifactId>jackson-databind</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>com.pymmasoftware.jbpm</groupId>
             <artifactId>drools-framework-kie-server-client-connector</artifactId>
@@ -64,8 +59,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -132,21 +125,7 @@
             </resource>
         </resources>
         <plugins>
-            <!--plugin>
-                <groupId>com.github.trecloux</groupId>
-                <artifactId>yeoman-maven-plugin</artifactId>
-                <version>0.1</version>
-                <configuration>
-                    <yeomanProjectDirectory>${project.basedir}</yeomanProjectDirectory>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin-->
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -159,7 +138,15 @@
                     </execution>
                 </executions>
             </plugin>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <profiles>
