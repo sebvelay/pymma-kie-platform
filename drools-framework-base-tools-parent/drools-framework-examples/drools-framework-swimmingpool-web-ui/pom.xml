@@ -169,7 +169,7 @@
                             <verbose>true</verbose>
                             <images>
                                 <image>
-                                    <name>swimmingpool-web-ui</name>
+                                    <name>swimmingpool-web-ui:${version.number}</name>
                                     <build>
                                         <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
 
@@ -223,12 +223,12 @@
                         <version>0.21.0</version>
 
                         <configuration>
-                            <registry>registry.hub.docker.com/pymmasoftware</registry>
+                            <registry>${registry.host}</registry>
                             <dockerHost>${docker.Host}</dockerHost>
                             <verbose>true</verbose>
                             <images>
                                 <image>
-                                    <name>runtime-admin-console:${project.version}</name>
+                                    <name>runtime-admin-console:${version.number}</name>
                                     <alias>runtime-admin-console</alias>
                                     <build>
                                         <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
@@ -252,7 +252,7 @@
                                 </image>
                             </images>
                             <authConfig>
-                                <username>pymmasoftwaredeploy</username>
+                                <username>nheron</username>
                                 <password>pymmalomme</password>
                             </authConfig>
                             <retries>5</retries>

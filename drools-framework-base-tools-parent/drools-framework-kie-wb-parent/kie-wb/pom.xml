@@ -168,7 +168,7 @@
                             <verbose>true</verbose>
                             <images>
                                 <image>
-                                    <name>kie-wb</name>
+                                    <name>kie-wb:${version.number}</name>
                                     <build>
                                         <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
 
@@ -223,12 +223,12 @@
                         <version>0.21.0</version>
 
                         <configuration>
-                            <registry>registry.hub.docker.com/pymmasoftware</registry>
+                            <registry>${registry.host}</registry>
                             <dockerHost>${docker.Host}</dockerHost>
                             <verbose>true</verbose>
                             <images>
                                 <image>
-                                    <name>kie-wb</name>
+                                    <name>kie-wb:${version.number}</name>
                                     <build>
                                         <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
 
@@ -265,7 +265,7 @@
                                 </image>
                             </images>
                             <authConfig>
-                                <username>pymmasoftwaredeploy</username>
+                                <username>nheron</username>
                                 <password>pymmalomme</password>
                             </authConfig>
                             <retries>5</retries>
