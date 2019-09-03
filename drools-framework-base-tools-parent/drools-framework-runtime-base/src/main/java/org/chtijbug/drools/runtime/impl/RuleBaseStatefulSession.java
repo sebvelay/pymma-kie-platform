@@ -46,6 +46,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.*;
 
+//import org.drools.core.definitions.rule.impl.RuleImpl;
+
 /**
  * @author nheron
  */
@@ -171,7 +173,7 @@ public class RuleBaseStatefulSession implements RuleBaseSession {
 
     public DroolsRuleObject getDroolsRuleObject(Rule rule) {
         DroolsRuleObject droolsRuleObject = listRules.get(rule.toString());
-        RuleImpl ruleInstance = (RuleImpl) rule;
+       RuleImpl ruleInstance = (RuleImpl) rule;
         if (droolsRuleObject == null) {
             droolsRuleObject = DroolsRuleObject.createDroolRuleObject(rule.getName(), rule.getPackageName());
             droolsRuleObject.setRuleFlowGroup(ruleInstance.getRuleFlowGroup());

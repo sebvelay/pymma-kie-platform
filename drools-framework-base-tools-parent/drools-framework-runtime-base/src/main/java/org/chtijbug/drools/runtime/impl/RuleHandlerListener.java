@@ -23,8 +23,8 @@ import org.chtijbug.drools.entity.history.rule.AfterRuleFlowActivatedHistoryEven
 import org.chtijbug.drools.entity.history.rule.AfterRuleFlowDeactivatedHistoryEvent;
 import org.chtijbug.drools.entity.history.rule.BeforeRuleFiredHistoryEvent;
 import org.chtijbug.drools.entity.history.session.SessionFireAllRulesMaxNumberReachedEvent;
+import org.drools.core.common.DefaultFactHandle;
 import org.drools.core.common.InternalFactHandle;
-import org.drools.core.reteoo.InitialFactImpl;
 import org.kie.api.event.rule.*;
 import org.kie.api.runtime.KieRuntime;
 import org.kie.api.runtime.rule.FactHandle;
@@ -33,6 +33,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+
+//import org.drools.core.common.InternalFactHandle;
+//import org.drools.core.reteoo.InitialFactImpl;
 
 
 /**
@@ -86,16 +89,17 @@ public class RuleHandlerListener extends DefaultAgendaEventListener {
             BeforeRuleFiredHistoryEvent newBeforeRuleEvent = new BeforeRuleFiredHistoryEvent(this.ruleBaseSession.nextEventId(), this.nbRuleFired + 1, droolsRuleObject, this.ruleBaseSession.getRuleBaseID(), this.ruleBaseSession.getSessionId());
             //____ Adding all objects info contained in the Activation object into the history Events
             for (FactHandle h : listFact) {
-                if (h instanceof InternalFactHandle) {
+                if (h instanceof DefaultFactHandle) {
                     InternalFactHandle defaultFactHandle = (InternalFactHandle) h;
                     //System.out.println(defaultFactHandle.toString());
-                    if (defaultFactHandle.getObject() instanceof InitialFactImpl) {
-                        // org.drools.reteoo.InitialFactImpl initialFact = (org.drools.reteoo.InitialFactImpl)defaultFactHandle.getObject();
-                        //TODO in case of NOT, OR, etc..
-                    } else {
-                        DroolsFactObject sourceFactObject = ruleBaseSession.getLastFactObjectVersionFromFactHandle(h);
-                        newBeforeRuleEvent.getWhenObjects().add(sourceFactObject);
-                    }
+                    Object object = defaultFactHandle.getObject();
+                    DroolsFactObject sourceFactObject = ruleBaseSession.getLastFactObjectVersionFromFactHandle(h);
+                    newBeforeRuleEvent.getWhenObjects().add(sourceFactObject);
+
+                } else {
+                    DroolsFactObject sourceFactObject = ruleBaseSession.getLastFactObjectVersionFromFactHandle(h);
+                    newBeforeRuleEvent.getWhenObjects().add(sourceFactObject);
+
                 }
             }
             //_____ Add Event into the History Container
