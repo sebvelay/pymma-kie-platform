@@ -215,6 +215,7 @@
     </dependencies>
 
     <build>
+        <finalName>drools-framework-business-proxy-app</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

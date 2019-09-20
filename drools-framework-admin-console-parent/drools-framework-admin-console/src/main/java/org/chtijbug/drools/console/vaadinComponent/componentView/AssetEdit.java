@@ -1,30 +1,22 @@
 package org.chtijbug.drools.console.vaadinComponent.componentView;
 
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import org.chtijbug.drools.console.service.KieRepositoryService;
 import org.chtijbug.drools.console.service.UserConnectedService;
-import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
-import org.drools.workbench.models.datamodel.rule.InterpolationVariable;
+import org.chtijbug.drools.console.vaadinComponent.componentView.service.GuidedDecisionTableModelTransformer;
+import org.chtijbug.drools.console.vaadinComponent.componentView.service.GuidedRuleTemplateModelTransformer;
+import org.drools.workbench.models.guided.dtable.backend.GuidedDTXMLPersistence;
+import org.drools.workbench.models.guided.dtable.shared.model.GuidedDecisionTable52;
 import org.drools.workbench.models.guided.template.backend.RuleTemplateModelXMLPersistenceImpl;
 import org.drools.workbench.models.guided.template.shared.TemplateModel;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @StyleSheet("css/accueil.css")
 public class AssetEdit extends Grid<HashMap<String, Object>> {
@@ -48,21 +40,19 @@ public class AssetEdit extends Grid<HashMap<String, Object>> {
                 userConnectedService.getSpace(),
                 userConnectedService.getProject(),
                 userConnectedService.getAsset());
-
-        TemplateModel model = RuleTemplateModelXMLPersistenceImpl.getInstance().unmarshal(assetContent);
-        InterpolationVariable[] variablesList = model.getInterpolationVariablesList();
-
-        setClassName("grid-perso");
-
         Binder<HashMap<String, Object>> binder = new Binder<>();
         getEditor().setBinder(binder);
+        setClassName("grid-perso");
+        if (assetContent.startsWith("<decision-table52")==true){
+            GuidedDecisionTable52 model = GuidedDTXMLPersistence.getInstance().unmarshal(assetContent);
+            GuidedDecisionTableModelTransformer transform = new GuidedDecisionTableModelTransformer(model, binder, this);
+            transform.run();
+        }else {
+            TemplateModel model = RuleTemplateModelXMLPersistenceImpl.getInstance().unmarshal(assetContent);
+            GuidedRuleTemplateModelTransformer transform = new GuidedRuleTemplateModelTransformer(model,binder,this);
+            transform.run();
 
-
-        for (InterpolationVariable i : variablesList) {
-            addColumn(hashmap -> hashmap.get(i.getVarName())).setHeader(i.getVarName());
         }
-        fillTable(model);
-
     }
 
     public AssetEdit(List<HashMap<String, Object>> objects) {
@@ -93,22 +83,5 @@ public class AssetEdit extends Grid<HashMap<String, Object>> {
     }
 
 
-    private void fillTable(TemplateModel model) {
-        InterpolationVariable[] variablesList = model.getInterpolationVariablesList();
-        DateFormat format = new SimpleDateFormat("dd-MMM-yyyy", Locale.FRANCE);
-        String[][] contenuTable = model.getTableAsArray();
-        List<HashMap<String, Object>> rows = new ArrayList<>();
-        for (int i = 0; i < model.getRowsCount(); i++) {
-            HashMap<String, Object> newRow = new HashMap<>();
-            rows.add(newRow);
-            String[] ligne = contenuTable[i];
-            int k = 0;
-            for (InterpolationVariable j : variablesList) {
-                newRow.put(j.getVarName(), ligne[k]);
-                k++;
-            }
-        }
-        setItems(rows);
 
-    }
 }
