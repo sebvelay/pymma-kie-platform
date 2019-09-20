@@ -75,6 +75,8 @@
     </dependencies>
 
     <build>
+        <finalName>drools-framework-business-indexer-app</finalName>
+
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -87,6 +89,9 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <executable>true</executable>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

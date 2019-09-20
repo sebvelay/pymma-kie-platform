@@ -4,7 +4,7 @@ EXPOSE 9080
 EXPOSE 8090
 EXPOSE 4000
 ADD application.properties /application.properties
-ADD maven/drools-framework-business-proxy-app-1.1-SNAPSHOT.jar app.jar
+ADD maven/drools-framework-business-proxy-app.jar app.jar
 USER root
 RUN mkdir /m2_kieserver
 RUN mkdir /m2_kieserver/repository
