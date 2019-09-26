@@ -16,16 +16,19 @@
         <module>drools-framework-business-proxy-parent</module>
         <module>drools-framework-base-tools-parent</module>
         <module>keycloak-db</module>
+        <module>security-db</module>
     </modules>
     <packaging>pom</packaging>
 
     <properties>
-        <jbpm.version>7.23.0.Final</jbpm.version>
+        <jbpm.version>7.26.0.Final</jbpm.version>
 
         <spring.boot.version>2.1.2.RELEASE</spring.boot.version>
 
         <spring.version>4.3.16.RELEASE</spring.version>
         <version.thorntail>2.2.1.Final</version.thorntail>
+        <version.keycloack>5.0.0</version.keycloack>
+        <version.resteasyclient>3.1.4.Final</version.resteasyclient>
     </properties>
     <profiles>
         <profile>

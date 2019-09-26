@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.chtijbug.drools.console.vaadinComponent.componentView.service.dtmodel;
+package org.chtijbug.drools.console.service.model.dtmodel;
 
 
 import org.drools.workbench.models.guided.dtable.shared.model.DTCellValue52;

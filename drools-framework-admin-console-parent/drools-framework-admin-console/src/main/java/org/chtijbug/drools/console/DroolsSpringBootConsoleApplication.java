@@ -1,7 +1,9 @@
 package org.chtijbug.drools.console;
 
 
+import org.chtijbug.drools.console.service.KeyCloackService;
 import org.chtijbug.drools.console.service.util.ApplicationContextProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -18,6 +20,28 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @PropertySource("classpath:application.properties")
 @ImportResource("classpath:applicationContext.xml")
 public class DroolsSpringBootConsoleApplication extends SpringBootServletInitializer {
+
+
+    @Value("${kie.platform.keycloack.url}")
+    private String serverUrl;
+
+    @Value("${kie.platform.keycloack.realm}")
+    private String serverRealm;
+
+    @Value("${kie.platform.keycloack.username}")
+    private String serverUserName;
+
+    @Value("${kie.platform.keycloack.password}")
+    private String serverPassword;
+
+    @Value("${kie.platform.keycloack.clientId}")
+    private String serverClientId;
+
+
+    //@Bean
+    public KeyCloackService initKeyCloack(){
+        return new KeyCloackService( serverUrl,  serverRealm,  serverUserName,  serverPassword,  serverClientId);
+    }
 
     @Bean
     public ApplicationContextProvider getAppplicationContext() {

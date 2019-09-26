@@ -312,3 +312,5 @@ volumes:
   kieserverdir:
   pgdata1:
   pgdata2:
+  pgdata3:
+  pgdata4:

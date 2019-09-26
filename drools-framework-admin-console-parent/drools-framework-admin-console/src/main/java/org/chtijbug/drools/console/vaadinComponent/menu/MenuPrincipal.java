@@ -34,6 +34,8 @@ public class MenuPrincipal extends HorizontalLayout {
 
     private Button logging;
 
+    private Button administration;
+
     //METIER
 
     private UserConnectedService userConnectedService;
@@ -74,7 +76,7 @@ public class MenuPrincipal extends HorizontalLayout {
             }
         });
 
-        deployement=new Button("Déployment");
+        deployement=new Button("Deployment");
         deployement.setClassName("menu-principal-button");
         add(deployement);
         deployement.addClickListener(buttonClickEvent -> {

@@ -15,3 +15,13 @@ the workbench will be at the following url : htto://host.docker:8080/kie-wb
 
 We need an ip visible from your browser when used as a callback once identified 
 
+# 
+put http://localhost:9200/droolstransaction/_settings
+{
+  "index.mapping.total_fields.limit": 200000
+}
+
+put http://localhost:9200/droolsaction/_settings
+{
+  "index.mapping.total_fields.limit": 200000
+}

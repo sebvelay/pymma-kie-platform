@@ -1,4 +1,4 @@
-package org.chtijbug.drools.console.vaadinComponent.componentView.service;
+package org.chtijbug.drools.console.service;
 
 import com.vaadin.flow.data.binder.Binder;
 import org.chtijbug.drools.console.vaadinComponent.componentView.AssetEdit;

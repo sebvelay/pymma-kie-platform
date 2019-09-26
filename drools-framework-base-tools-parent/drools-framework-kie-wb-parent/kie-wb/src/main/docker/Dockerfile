@@ -12,7 +12,7 @@ MAINTAINER "Nicolas Héron" "nicolas.heron@pymma-software.com"
 ENV JBOSS_BIND_ADDRESS 0.0.0.0
 ENV KIE_REPOSITORY https://repository.jboss.org/nexus/content/groups/public-jboss
 ENV CHTIJBUG_REPOSITORY https://oss.sonatype.org/content/repositories/releases
-ENV KIE_VERSION 7.17.0.Final
+ENV KIE_VERSION 7.26.0.Final
 ENV KIE_CLASSIFIER wildfly10
 ENV KIE_CONTEXT_PATH kie-wb
 ENV KIE_SERVER_PROFILE standalone-full

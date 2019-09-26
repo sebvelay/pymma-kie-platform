@@ -1,11 +1,11 @@
-package org.chtijbug.drools.console.vaadinComponent.componentView.service;
+package org.chtijbug.drools.console.service;
 
 import com.vaadin.flow.data.binder.Binder;
 import org.chtijbug.drools.console.vaadinComponent.componentView.AssetEdit;
-import org.chtijbug.drools.console.vaadinComponent.componentView.service.dtmodel.ColumnDefinition;
-import org.chtijbug.drools.console.vaadinComponent.componentView.service.dtmodel.DecisionTable;
-import org.chtijbug.drools.console.vaadinComponent.componentView.service.dtmodel.GuidedException;
-import org.chtijbug.drools.console.vaadinComponent.componentView.service.dtmodel.Row;
+import org.chtijbug.drools.console.service.model.dtmodel.ColumnDefinition;
+import org.chtijbug.drools.console.service.model.dtmodel.DecisionTable;
+import org.chtijbug.drools.console.service.model.dtmodel.GuidedException;
+import org.chtijbug.drools.console.service.model.dtmodel.Row;
 import org.drools.workbench.models.guided.dtable.shared.model.GuidedDecisionTable52;
 
 import java.text.DateFormat;

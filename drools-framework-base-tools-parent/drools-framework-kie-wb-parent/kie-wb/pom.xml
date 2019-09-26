@@ -15,9 +15,91 @@
     <name>Pymma platform workbench</name>
     <description>Pymma Plarform Kie-wb</description>
 
-
     <dependencies>
+        <dependency>
+            <groupId>org.uberfire</groupId>
+            <artifactId>uberfire-security-management-keycloak</artifactId>
+            <version>2.23.0.Final</version>
+            <scope>runtime</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.uberfire</groupId>
+                    <artifactId>uberfire-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.uberfire</groupId>
+                    <artifactId>uberfire-commons</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.uberfire</groupId>
+                    <artifactId>uberfire-security-management-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.uberfire</groupId>
+                    <artifactId>uberfire-security-management-backend</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.errai</groupId>
+                    <artifactId>errai-bus</artifactId>
+                </exclusion>
 
+                <exclusion>
+                    <groupId>org.jboss.errai</groupId>
+                    <artifactId>errai-security-server</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.resteasy</groupId>
+                    <artifactId>resteasy-jackson-provider</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.codehaus.jackson</groupId>
+                    <artifactId>jackson-core-asl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.jboss.resteasy</groupId>
+                    <artifactId>resteasy-jaxrs</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.keycloak</groupId>
+                    <artifactId>keycloak-common</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- Keycloak  -->
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-core</artifactId>
+            <version>6.0.1</version>
+            <scope>runtime</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcpkix-jdk15on</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-common</artifactId>
+            <version>6.0.1</version>
+            <scope>runtime</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.bouncycastle</groupId>
+                    <artifactId>bcpkix-jdk15on</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <dependency>
             <groupId>com.pymmasoftware.jbpm</groupId>
             <artifactId>kie-drools-framework-rest-backend</artifactId>

@@ -1,0 +1,10 @@
+{
+  "realm": "demo",
+  "auth-server-url": "http://localhost:10080/auth",
+  "ssl-required": "external",
+  "resource": "kie-git",
+  "credentials": {
+    "secret": "a1c5a71b-0f14-4307-886d-f0e72e3d8a09"
+  },
+  "confidential-port": 0
+}

@@ -1,6 +1,5 @@
 package org.chtijbug.drools.console.service;
 
-import javassist.bytecode.ByteArray;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
@@ -11,10 +10,13 @@ import org.drools.workbench.models.guided.template.shared.TemplateModel;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
-public class ExcelService {
+public class ExcelServiceGuidedRule {
 
 
     private KieRepositoryService kieRepositoryService;
@@ -23,7 +25,7 @@ public class ExcelService {
     private UserConnectedService userConnectedService;
 
 
-    public ExcelService(){
+    public ExcelServiceGuidedRule(){
         this.kieRepositoryService = AppContext.getApplicationContext().getBean(KieRepositoryService.class);
         this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
         this.userConnectedService = AppContext.getApplicationContext().getBean(UserConnectedService.class);

@@ -5,11 +5,9 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.FileBuffer;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
-import com.vaadin.flow.component.upload.receivers.MultiFileBuffer;
 import com.vaadin.flow.server.StreamResource;
-import org.chtijbug.drools.console.service.ExcelService;
+import org.chtijbug.drools.console.service.ExcelServiceGuidedRule;
 import org.chtijbug.drools.console.service.KieRepositoryService;
 import org.chtijbug.drools.console.service.UserConnectedService;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
@@ -19,13 +17,9 @@ import com.vaadin.flow.component.html.Label;
 import org.chtijbug.drools.console.vaadinComponent.componentView.AssetEdit;
 import org.vaadin.olli.FileDownloadWrapper;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class EditTemplateView extends VerticalLayout {
@@ -38,7 +32,7 @@ public class EditTemplateView extends VerticalLayout {
 
     private AssetEdit assetEdit;
 
-    private ExcelService excelService;
+    private ExcelServiceGuidedRule excelService;
 
     private KieRepositoryService kieRepositoryService;
 
@@ -48,7 +42,7 @@ public class EditTemplateView extends VerticalLayout {
 
     public EditTemplateView(DialogPerso dialogPerso,String nameTemplate){
 
-        excelService= AppContext.getApplicationContext().getBean(ExcelService.class);
+        excelService= AppContext.getApplicationContext().getBean(ExcelServiceGuidedRule.class);
         kieRepositoryService=AppContext.getApplicationContext().getBean(KieRepositoryService.class);
         this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
         this.userConnectedService = AppContext.getApplicationContext().getBean(UserConnectedService.class);
