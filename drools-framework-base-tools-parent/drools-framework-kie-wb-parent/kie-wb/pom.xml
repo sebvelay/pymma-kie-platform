@@ -24,11 +24,7 @@
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.training.Leisure</groupId>
-            <artifactId>swimmingpool</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
-        </dependency>
+
         <dependency>
             <groupId>org.kie</groupId>
             <artifactId>business-central</artifactId>

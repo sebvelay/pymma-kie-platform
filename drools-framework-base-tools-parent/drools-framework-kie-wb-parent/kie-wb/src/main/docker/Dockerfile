@@ -51,8 +51,8 @@ EXPOSE 8001
 
 ####### Drools Workbench CUSTOM CONFIGURATION ############
 ADD etc/standalone-full-drools.xml $JBOSS_HOME/standalone/configuration/standalone-full-drools.xml
-#ADD etc/application-users.properties $JBOSS_HOME/standalone/configuration/application-users.properties
-#ADD etc/application-roles.properties $JBOSS_HOME/standalone/configuration/application-roles.properties
+ADD etc/application-users.properties $JBOSS_HOME/standalone/configuration/application-users.properties
+ADD etc/application-roles.properties $JBOSS_HOME/standalone/configuration/application-roles.properties
 
 # Added files are chowned to root user, change it to the jboss one.
 USER root

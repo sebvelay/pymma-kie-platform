@@ -20,10 +20,6 @@ services:
     networks:
       drools-network-dev:
         ipv4_address: 172.27.1.5
-    links:
-      - keycloak:keycloak
-    depends_on:
-      - keycloak
     ports:
       - 8080:8080
       - 8001:8001
@@ -250,42 +246,7 @@ services:
     command: mongod
     restart: always
 
-  postgres:
-    image: keycloak-db
-    volumes:
-      - pgdata1:/var/lib/postgresql/data
-      - pgdata2:/home/pgdata
-    hostname: pg.pymma
-    networks:
-      drools-network-dev:
-        ipv4_address: 172.27.1.200
-    ports:
-      - 6666:5432
-    restart: always
 
-  keycloak:
-    image: jboss/keycloak:5.0.0
-    environment:
-      DB_VENDOR: POSTGRES
-      DB_ADDR: 172.27.1.200
-      DB_DATABASE: keycloakdb
-      DB_USER: keycloak_user
-      DB_SCHEMA: public
-      DB_PASSWORD: keycloak_user
-      KEYCLOAK_USER: admin
-      KEYCLOAK_PASSWORD: admin
-        # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
-        #JDBC_PARAMS: "ssl=true"
-    hostname: keycloak.pymma
-    networks:
-      drools-network-dev:
-        ipv4_address: 172.27.1.201
-    links:
-      - postgres:postgres
-    ports:
-      - 10080:8080
-    depends_on:
-      - postgres
 
   dps:
     image: defreitas/dns-proxy-server:2.13.2
@@ -310,5 +271,3 @@ volumes:
   lucenedata:
   esdata2:
   kieserverdir:
-  pgdata1:
-  pgdata2:
