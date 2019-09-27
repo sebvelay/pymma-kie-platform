@@ -228,8 +228,8 @@
                             <verbose>true</verbose>
                             <images>
                                 <image>
-                                    <name>runtime-admin-console:${version.number}</name>
-                                    <alias>runtime-admin-console</alias>
+                                    <name>swimmingpool-web-ui:${version.number}</name>
+                                    <alias>swimmingpool-web-ui</alias>
                                     <build>
                                         <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
 
