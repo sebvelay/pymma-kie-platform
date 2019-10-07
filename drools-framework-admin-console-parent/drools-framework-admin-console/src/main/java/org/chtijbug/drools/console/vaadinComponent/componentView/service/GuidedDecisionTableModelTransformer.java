@@ -33,7 +33,9 @@ public class GuidedDecisionTableModelTransformer {
         try {
             DecisionTable decisionTable = new DecisionTable(model);
             for (ColumnDefinition columnDefinition : decisionTable.getColumnDefinitionList()) {
-                assetEdit.addColumn(hashmap -> hashmap.get(columnDefinition.getHeader())).setHeader(columnDefinition.getHeader());
+                if (columnDefinition.isHideColumn()==false) {
+                    assetEdit.addColumn(hashmap -> hashmap.get(columnDefinition.getHeader())).setHeader(columnDefinition.getHeader());
+                }
             }
             fillTable(decisionTable);
         } catch (GuidedException e) {

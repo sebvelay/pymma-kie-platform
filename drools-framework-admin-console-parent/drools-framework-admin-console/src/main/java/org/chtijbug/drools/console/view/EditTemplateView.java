@@ -1,34 +1,39 @@
 package org.chtijbug.drools.console.view;
 
+import com.vaadin.flow.component.ClickEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.FileBuffer;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
-import com.vaadin.flow.component.upload.receivers.MultiFileBuffer;
 import com.vaadin.flow.server.StreamResource;
-import org.chtijbug.drools.console.service.ExcelService;
+import org.chtijbug.drools.console.service.DecisionTableExcelService;
+import org.chtijbug.drools.console.service.GuidedRuleTemplateExcelService;
 import org.chtijbug.drools.console.service.KieRepositoryService;
 import org.chtijbug.drools.console.service.UserConnectedService;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.DialogPerso;
-import com.vaadin.flow.component.html.Label;
 import org.chtijbug.drools.console.vaadinComponent.componentView.AssetEdit;
+import org.drools.workbench.models.datamodel.rule.InterpolationVariable;
+import org.drools.workbench.models.guided.template.backend.RuleTemplateModelXMLPersistenceImpl;
+import org.drools.workbench.models.guided.template.shared.TemplateModel;
 import org.vaadin.olli.FileDownloadWrapper;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 
 public class EditTemplateView extends VerticalLayout {
+    private static int GuidedRuleTemplate = 1;
+    private static int DecisionTable = 2;
+
+    private int tableType;
 
     private Button exportExcel;
 
@@ -36,9 +41,14 @@ public class EditTemplateView extends VerticalLayout {
 
     private Label title;
 
+    private Button saveButton;
+
+
     private AssetEdit assetEdit;
 
-    private ExcelService excelService;
+    private GuidedRuleTemplateExcelService guidedRuleTemplateExcelService;
+
+    private DecisionTableExcelService decisionTableExcelService;
 
     private KieRepositoryService kieRepositoryService;
 
@@ -46,10 +56,26 @@ public class EditTemplateView extends VerticalLayout {
 
     private UserConnectedService userConnectedService;
 
-    public EditTemplateView(DialogPerso dialogPerso,String nameTemplate){
+    private String assetName;
 
-        excelService= AppContext.getApplicationContext().getBean(ExcelService.class);
-        kieRepositoryService=AppContext.getApplicationContext().getBean(KieRepositoryService.class);
+    public String getAssetContent(){
+        if (tableType==GuidedRuleTemplate){
+            return guidedRuleTemplateExcelService.getAssetContent();
+        }else{
+            return decisionTableExcelService.getAssetContent();
+        }
+    }
+
+    public EditTemplateView(DialogPerso dialogPerso, String nameTemplate) {
+        this.assetName=nameTemplate;
+        if (nameTemplate.contains(".gdst") == false) {
+            guidedRuleTemplateExcelService = AppContext.getApplicationContext().getBean(GuidedRuleTemplateExcelService.class);
+            tableType = GuidedRuleTemplate;
+        } else {
+            decisionTableExcelService = AppContext.getApplicationContext().getBean(DecisionTableExcelService.class);
+            tableType = DecisionTable;
+        }
+        kieRepositoryService = AppContext.getApplicationContext().getBean(KieRepositoryService.class);
         this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
         this.userConnectedService = AppContext.getApplicationContext().getBean(UserConnectedService.class);
 
@@ -59,7 +85,7 @@ public class EditTemplateView extends VerticalLayout {
         MemoryBuffer fileBuffer = new MemoryBuffer();
 
 
-        importExcel=new Upload(fileBuffer);
+        importExcel = new Upload(fileBuffer);
         importExcel.setDropLabel(new Span("drag and Drop Excel file here"));
         importExcel.setClassName("menu-upload");
         importExcel.setId("exampleupload");
@@ -68,31 +94,55 @@ public class EditTemplateView extends VerticalLayout {
 
         importExcel.addSucceededListener(succeededEvent -> {
 
-            if(!succeededEvent.getFileName().contains("xlsx")){
+            if (!succeededEvent.getFileName().contains("xlsx")) {
 
                 Notification.show("The file is incompatible, it must be in xlsx format");
 
-            }else {
+            } else {
 
                 try {
-                    List<HashMap<String, Object>> objects= excelService.importExcel(fileBuffer.getInputStream());
-                    if(objects!=null&&objects.size()>0){
-                        if(objects.get(0).values().size()!=assetEdit.getColumns().size()){
-                            Notification.show("Unable to add columns with the excel import for the moment");
-                        }else {
-                            remove(assetEdit);
-                            assetEdit = new AssetEdit(objects);
-                            add(assetEdit);
+                    if (tableType == GuidedRuleTemplate) {
+                        List<HashMap<String, Object>> objects = guidedRuleTemplateExcelService.importExcel(fileBuffer.getInputStream());
+                        if (objects != null && objects.size() > 0) {
+                            if (objects.get(0).values().size() != assetEdit.getColumns().size()) {
+                                Notification.show("Unable to add columns with the excel import for the moment");
+                            } else {
+                                remove(assetEdit);
+                                assetEdit = new AssetEdit(objects);
+                                add(assetEdit);
+                                String assetSource=this.getAssetContent();
+                                TemplateModel model = RuleTemplateModelXMLPersistenceImpl.getInstance().unmarshal(assetSource);
+                                int id=model.getColsCount();
+                                model.clearRows();
+                                Map<String, List<String>> existingData = model.getTable();
+                                for (Map<String,Object> line : objects){
+                                    String[] cols =new String[model.getColsCount()];
+                                    int k=0;
+                                    for (InterpolationVariable interpolationVariable : model.getInterpolationVariablesList()){
 
-                            kieRepositoryService.updateAssetSource(config.getKiewbUrl(),
-                                    userConnectedService.getUserConnected().getUserName(),
-                                    userConnectedService.getUserConnected().getUserPassword(),
-                                    userConnectedService.getSpace(),
-                                    userConnectedService.getProject(),
-                                    userConnectedService.getAsset(),objects);
+                                        Object o = line.get(interpolationVariable.getVarName());
+                                        cols[k]=o.toString();
+                                        k++;
+                                    }
+                                    model.addRow(cols);
+                                }
+
+                                model.setIdCol(id);
+                                assetSource = RuleTemplateModelXMLPersistenceImpl.getInstance().marshal(model);
+                                kieRepositoryService.updateAssetSource(config.getKiewbUrl(),
+                                        userConnectedService.getUserConnected().getUserName(),
+                                        userConnectedService.getUserConnected().getUserPassword(),
+                                        userConnectedService.getSpace(),
+                                        userConnectedService.getProject(),
+                                        userConnectedService.getAsset(), assetSource);
+                            }
+                        } else {
+                            Notification.show("illegible or empty document");
                         }
-                    }else {
-                        Notification.show("illegible or empty document");
+                    } else {
+                        List<HashMap<String, Object>> objects = decisionTableExcelService.importExcel(fileBuffer.getInputStream());
+                        if (objects != null && objects.size() > 0) {
+                        }
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -103,27 +153,40 @@ public class EditTemplateView extends VerticalLayout {
         importExcel.addFailedListener(failedEvent -> {
             Notification.show("Error in the upload, please start again with another file");
         });
-
-        FileDownloadWrapper fileDownloadWrapper=new FileDownloadWrapper(
-                new StreamResource("fsdfs.xlsx",
-                        ()->excelService.exportExcel(nameTemplate)));
-
-        exportExcel=new Button("Export excel");
+        FileDownloadWrapper fileDownloadWrapper = null;
+        if (tableType == GuidedRuleTemplate) {
+            fileDownloadWrapper = new FileDownloadWrapper(
+                    new StreamResource(nameTemplate + ".xlsx",
+                            () -> guidedRuleTemplateExcelService.exportExcel(nameTemplate)));
+        } else {
+            fileDownloadWrapper = new FileDownloadWrapper(
+                    new StreamResource(nameTemplate + ".xlsx",
+                            () -> decisionTableExcelService.exportExcel(nameTemplate)));
+        }
+        exportExcel = new Button("Export excel");
         fileDownloadWrapper.wrapComponent(exportExcel);
         exportExcel.setClassName("menu-button-asset-edit");
-
 
 
         dialogPerso.getBar().add(fileDownloadWrapper);
 
 
-        title=new Label(nameTemplate);
+        title = new Label(nameTemplate);
         title.setClassName("creation-runtime-title");
 
         add(title);
 
-        assetEdit=new AssetEdit();
+        assetEdit = new AssetEdit();
+
         add(assetEdit);
+        saveButton = new Button("Save");
+        add(saveButton);
+        saveButton.addClickListener(new ComponentEventListener<ClickEvent<Button>>() {
+            @Override
+            public void onComponentEvent(ClickEvent<Button> buttonClickEvent) {
+                System.out.println("coucou");
+            }
+        });
 
     }
 }

@@ -34,9 +34,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.*;
 
@@ -126,7 +123,8 @@ public class PackageResource {
 
         return repoNames;
     }
-    private void toto(){
+
+    private void toto() {
 
     }
 
@@ -139,14 +137,14 @@ public class PackageResource {
         if (workspaceProject.getMainModule() != null) {
             Module kmodule = workspaceProject.getMainModule();
             EditorModelContent econtent = dataModelerService.loadContent(((KieModule) kmodule).getImportsPath());
-            DataModelImpl econtentDataModel = (DataModelImpl)econtent.getDataModel();
+            DataModelImpl econtentDataModel = (DataModelImpl) econtent.getDataModel();
             List<DataObject> dataObjects = econtentDataModel.getExternalClasses();
-            for (DataObject dataObject : dataObjects){
+            for (DataObject dataObject : dataObjects) {
                 System.out.println(dataObject.toString());
-                String className="class="+dataObject.getPackageName()+"."+dataObject.getName();
+                String className = "class=" + dataObject.getPackageName() + "." + dataObject.getName();
                 projectResponse.getJavaClasses().add(className);
 
-              }
+            }
             projectResponse.setArtifactId(workspaceProject.getMainModule().getPom().getGav().getArtifactId());
             projectResponse.setGroupId(workspaceProject.getMainModule().getPom().getGav().getGroupId());
             projectResponse.setVersion(workspaceProject.getMainModule().getPom().getGav().getVersion());
@@ -293,7 +291,9 @@ public class PackageResource {
                     return foundElementPath;
                 }
             } else {
-                if (dotFileFilter.accept(elementPath.getFileName().toString())) {
+                if (dotFileFilter.accept(elementPath.getFileName().toString())
+                        && elementPath.getFileName().toString().contains(assetName)) {
+                    System.out.println("coucou");
                     return elementPath;
                 }
             }
@@ -401,7 +401,7 @@ public class PackageResource {
     }
 
     @POST
-    @Path("{organizationalUnitName}/{projectName}/asset/{assetName:.+}}/source")
+    @Path("{organizationalUnitName}/{projectName}/asset/{assetName}/source")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
     public void updateAssetSource(
             @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName, @PathParam("assetName") String assetName, String content) {
@@ -419,17 +419,15 @@ public class PackageResource {
                 org.uberfire.java.nio.file.Path elementToUpdate = getFileElementPath(directoryStream, assetName);
                 File fileToUpdate = elementToUpdate.toFile();
                 if (fileToUpdate.isFile()) {
-                    FileOutputStream fileOutputStream = new FileOutputStream(fileToUpdate);
-                    fileOutputStream.write(content.getBytes());
-                    fileOutputStream.close();
+                    content = content.replace("\"", "");
+                    ioService.write(elementToUpdate, content);
+                    //   FileOutputStream fileOutputStream = new FileOutputStream(fileToUpdate);
+                    //   fileOutputStream.write(content.getBytes());
+                    //   fileOutputStream.close();
                 }
 
             }
         } catch (RuntimeException e) {
-            throw new WebApplicationException(e);
-        } catch (FileNotFoundException e) {
-            throw new WebApplicationException(e);
-        } catch (IOException e) {
             throw new WebApplicationException(e);
         }
     }

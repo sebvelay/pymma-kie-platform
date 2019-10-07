@@ -51,7 +51,7 @@ public class KieRepositoryService {
         return RuleTemplateModelXMLPersistenceImpl.getInstance().marshal(model);
     }
 
-    public void updateAssetSource(String url, String username, String password, String spaceName, String projectName, String assetName,List<HashMap<String,Object>> objects) {
+    public void updateAssetSource(String url, String username, String password, String spaceName, String projectName, String assetName,String assetSource) {
 
         String assetContent = getAssetSource(url,
                 username,
@@ -61,13 +61,11 @@ public class KieRepositoryService {
                 assetName);
 
 
-        String completeurl = url + "/chtijbug/" + spaceName + "/" + projectName + "/assets/" + assetName + "/source";
-
-        String content=pojoToStringMethod(assetContent,objects);
+        String completeurl = url + "/chtijbug/" + spaceName + "/" + projectName + "/asset/" + assetName + "/source";
         logger.info("url moteur reco : " + completeurl);
 
         ResponseEntity response = restTemplateKiewb
-                .execute(completeurl, HttpMethod.POST, requestCallback(content, username, password), clientHttpResponse -> {
+                .execute(completeurl, HttpMethod.POST, requestCallback(assetSource, username, password), clientHttpResponse -> {
                     String extractedResponse = null;
                     if (clientHttpResponse.getBody() != null) {
                         Scanner s = new Scanner(clientHttpResponse.getBody()).useDelimiter("\\A");
@@ -236,7 +234,13 @@ public class KieRepositoryService {
     private RequestCallback requestCallback(final Object content, String username, String password) {
         return clientHttpRequest -> {
             if (content != null) {
-                mapper.writeValue(clientHttpRequest.getBody(), content);
+                if (content instanceof String){
+                    String stringContent = (String)content;
+                    stringContent=stringContent.replace("\"","");
+                    mapper.writeValue(clientHttpRequest.getBody(), stringContent);
+                }else {
+                    mapper.writeValue(clientHttpRequest.getBody(), content);
+                }
             }
             clientHttpRequest.getHeaders().add(
                     HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);

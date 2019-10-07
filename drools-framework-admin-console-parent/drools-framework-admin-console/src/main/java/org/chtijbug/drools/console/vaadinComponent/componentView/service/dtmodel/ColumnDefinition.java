@@ -122,6 +122,13 @@ public class ColumnDefinition {
             case BOOLEAN:
                 value = Boolean.toString(cell.getBooleanValue());
                 break;
+            case NUMERIC_BIGDECIMAL:
+                if (cell.getNumericValue()!= null) {
+                    value = cell.getNumericValue().toString();
+                }else{
+                    value="";
+                }
+                break;
             case NUMERIC:
                 if (cell.getNumericValue()!= null) {
                     value = cell.getNumericValue().toString();

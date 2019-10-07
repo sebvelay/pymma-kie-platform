@@ -1,6 +1,5 @@
 package org.chtijbug.drools.console.service;
 
-import javassist.bytecode.ByteArray;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
@@ -8,27 +7,44 @@ import org.chtijbug.drools.console.service.util.AppContext;
 import org.drools.workbench.models.datamodel.rule.InterpolationVariable;
 import org.drools.workbench.models.guided.template.backend.RuleTemplateModelXMLPersistenceImpl;
 import org.drools.workbench.models.guided.template.shared.TemplateModel;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
-public class ExcelService {
+public class GuidedRuleTemplateExcelService {
 
+    @Value("${adminConsole.tmpdir}")
+    public String tmpDir;
 
     private KieRepositoryService kieRepositoryService;
     private KieConfigurationData config;
 
     private UserConnectedService userConnectedService;
 
+    private String assetContent;
 
-    public ExcelService(){
+    public GuidedRuleTemplateExcelService(){
         this.kieRepositoryService = AppContext.getApplicationContext().getBean(KieRepositoryService.class);
         this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
         this.userConnectedService = AppContext.getApplicationContext().getBean(UserConnectedService.class);
+
     }
 
+    public String getAssetContent() {
+        assetContent = kieRepositoryService.getAssetSource(config.getKiewbUrl(),
+                userConnectedService.getUserConnected().getUserName(),
+                userConnectedService.getUserConnected().getUserPassword(),
+                userConnectedService.getSpace(),
+                userConnectedService.getProject(),
+                userConnectedService.getAsset());
+        return assetContent;
+    }
 
     public List<HashMap<String,Object>> importExcel(InputStream inputStream) throws IOException {
 
@@ -126,7 +142,7 @@ public class ExcelService {
         }
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
-            FileOutputStream fileOutputStream=new FileOutputStream("/home/guillaume/test.xlsx");
+            FileOutputStream fileOutputStream=new FileOutputStream(tmpDir+"/"+nameTemplate+".xlsx");
             workbook.write(fileOutputStream);
         } catch (FileNotFoundException e) {
             e.printStackTrace();

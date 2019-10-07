@@ -57,7 +57,7 @@ services:
       drools-network-dev:
         ipv4_address: 172.27.1.15
     ports:
-      - 8080:12099
+      - 12099:12099
     links:
       - runtime-reverse-proxy:reverse-proxy
     depends_on:
