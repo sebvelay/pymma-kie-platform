@@ -2,19 +2,14 @@ package org.chtijbug.drools.proxy.camel;
 
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
-import org.chtijbug.drools.proxy.service.KieServiceCommon;
 import org.kie.server.api.model.KieServerInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 @Component
 public class AdminRouter extends RouteBuilder {
 
 
-    @Resource
-    KieServiceCommon kieServiceCommon;
     @Value("${server.port}")
     private int serverPort;
     @Value("${camel.component.servlet.mapping.context-path}")

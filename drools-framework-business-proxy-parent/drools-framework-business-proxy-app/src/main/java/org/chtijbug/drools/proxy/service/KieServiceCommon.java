@@ -36,10 +36,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -67,25 +67,30 @@ public class KieServiceCommon {
     @Value("${server.port}")
     private int serverPort;
 
-    private Map<String,DroolsRouter> routes = new HashMap<>();
+    @Autowired
+    private ApplicationContext appContext;
+
+    private String hostName= "localhost";
+
+    private Map<String, DroolsRouter> routes = new HashMap<>();
 
     public KieServiceCommon() {
         // for now, if no server impl is passed as parameter, create one
-       // this.server = KieServerLocator.getInstance();
+        // this.server = KieServerLocator.getInstance();
     }
 
-    public static String getKieServerID(){
+    public static String getKieServerID() {
         return System.getProperty("org.kie.server.id");
     }
 
     @PostConstruct
     private void initCamelBusinessRoutes() {
 
-        this.server = new KieServerImpl(new PlatfomKieServerStateRepository(containerRepository,this));
+        this.server = new KieServerImpl(new PlatfomKieServerStateRepository(containerRepository, this));
         this.server.init();
 
         List<KieServerExtension> serverExtensions = this.server.getServerExtensions();
-        if (registry==null || droolsChtijbugKieServerExtension==null) {
+        if (registry == null || droolsChtijbugKieServerExtension == null) {
             for (KieServerExtension serverExtension : serverExtensions) {
                 if (serverExtension instanceof DroolsChtijbugKieServerExtension) {
                     droolsChtijbugKieServerExtension = (DroolsChtijbugKieServerExtension) serverExtension;
@@ -103,72 +108,94 @@ public class KieServiceCommon {
 
         String serverName = KieServiceCommon.getKieServerID();
         String sftpPort = System.getProperty("org.chtijbug.server.sftpPort");
+
+        try {
+            InetAddress inetAddress = InetAddress.getLocalHost();
+            hostName = inetAddress.getHostName();
+        } catch (UnknownHostException e) {
+            logger.info("initCamelBusinessRoutes.getLocalHost", e);
+        }
         List<RuntimePersist> itIsMes = runtimeRepository.findByServerName(serverName);
+        ServiceResponse<KieServerInfo> result = server.getInfo();
+        String version = result.getResult().getVersion();
+        String isSwarm=System.getProperty("org.kie.server.swarm");
         if (itIsMes.size() == 0) {
-            ServiceResponse<KieServerInfo> result = server.getInfo();
-            String version = result.getResult().getVersion();
-            String hostName = "localhost";
-            try {
-                InetAddress inetAddress = InetAddress.getLocalHost();
-                hostName = inetAddress.getHostName();
-            } catch (UnknownHostException e) {
-                logger.info("initCamelBusinessRoutes.getLocalHost", e);
+
+            RuntimePersist runtimePersist = new RuntimePersist(serverName, version, hostName ,
+                    String.valueOf(serverPort), sftpPort,
+                    hostName, RuntimePersist.STATUS.UP.toString());
+            if ("1".equals(isSwarm)) {
+                runtimePersist.setServerUrl("http://" + serverName + ":" + serverPort);
+            }else {
+                runtimePersist.setServerUrl("http://" + hostName + ":" + serverPort);
             }
-            RuntimePersist runtimePersist = new RuntimePersist(serverName, version, "http://" + hostName + ":" + serverPort,
-                                            String.valueOf(serverPort), sftpPort,
-                                            hostName,RuntimePersist.STATUS.UP.toString());
             runtimeRepository.save(runtimePersist);
-        }else{
-            RuntimePersist runtimePersist =itIsMes.get(0);
-            runtimePersist.setStatus(RuntimePersist.STATUS.UP.toString());
-            try {
-                /**
-                 * HostName may have changed by reboot so retake it and save it
-                 */
-                InetAddress inetAddress = InetAddress.getLocalHost();
-                String hostName = inetAddress.getHostName();
-                runtimePersist.setHostname("http://" + hostName + ":" + serverPort);
+        } else {
+            List<RuntimePersist> byServerNameAndHostname = runtimeRepository.findByServerNameAndHostname(serverName, hostName);
+            if (byServerNameAndHostname.size() == 0) {
+                 RuntimePersist runtimePersist = new RuntimePersist(serverName, version, hostName ,
+                        String.valueOf(serverPort), sftpPort,
+                        hostName, RuntimePersist.STATUS.UP.toString());
+                if ("1".equals(isSwarm)) {
+                    runtimePersist.setServerUrl("http://" + serverName + ":" + serverPort);
+                }else {
+                    runtimePersist.setServerUrl("http://" + hostName + ":" + serverPort);
+                }
                 runtimePersist.setSftpHost(hostName);
                 runtimePersist.setSftpPort(sftpPort);
-            } catch (UnknownHostException e) {
-                logger.info("initCamelBusinessRoutes.getLocalHost", e);
+
+                runtimeRepository.save(runtimePersist);
+            }else{
+                RuntimePersist runtimePersist =byServerNameAndHostname.get(0);
+                runtimePersist.setStatus(RuntimePersist.STATUS.UP.toString());
+                runtimeRepository.save(runtimePersist);
             }
-            runtimeRepository.save(runtimePersist);
         }
         try {
 
-            for (KieContainerResource kieContainerResource : this.server.getServerState().getResult().getContainers()){
+            for (KieContainerResource kieContainerResource : this.server.getServerState().getResult().getContainers()) {
 
 
-               // this.createContainer(container.getContainerId(),)
+                // this.createContainer(container.getContainerId(),)
 
                 this.createContainer(kieContainerResource.getContainerId(), kieContainerResource);
                 List<ContainerPojoPersist> containers = containerRepository.findByContainerId(kieContainerResource.getContainerId());
-                if (containers.size()==1) {
+                if (containers.size() == 1) {
                     this.initCamelBusinessRoute(containers.get(0));
                 }
             }
         } catch (Exception e) {
             logger.info("initCamelBusinessRoutes", e);
         }
-
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                String serverName = KieServiceCommon.getKieServerID();
+                List<RuntimePersist> itIsMes = runtimeRepository.findByServerNameAndHostname(serverName,hostName);
+                if (itIsMes.size() == 1) {
+                    RuntimePersist runtimePersist = itIsMes.get(0);
+                    runtimePersist.setStatus(RuntimePersist.STATUS.DOWN.toString());
+                    runtimeRepository.delete(runtimePersist);
+                }
+            }});
     }
-    @PreDestroy
-    public void stopRuntime(){
-        String serverName =KieServiceCommon.getKieServerID();
-        List<RuntimePersist> itIsMes = runtimeRepository.findByServerName(serverName);
-        if (itIsMes.size()==1){
-            RuntimePersist runtimePersist =itIsMes.get(0);
-            runtimePersist.setStatus(RuntimePersist.STATUS.DOWN.toString());
+
+
+    public void setTimeStamp(){
+        String serverName = KieServiceCommon.getKieServerID();
+        List<RuntimePersist> itIsMes = runtimeRepository.findByServerNameAndHostname(serverName,hostName);
+        if (itIsMes.size() == 1) {
+            RuntimePersist runtimePersist = itIsMes.get(0);
+            runtimePersist.setTimeStamp(new Date());
             runtimeRepository.save(runtimePersist);
         }
     }
+
     public void deleteCamelBusinessRoute(String containerId) throws Exception {
-        if (routes.containsKey(containerId)){
-            DroolsRouter routeToDelete   = routes.get(containerId);
+        if (routes.containsKey(containerId)) {
+            DroolsRouter routeToDelete = routes.get(containerId);
             String target = routeToDelete.getRouteCollection().getRoutes().get(0).getId();
-            for (Route route : camelContext.getRoutes()){
-                if (route.getId().equals(target)){
+            for (Route route : camelContext.getRoutes()) {
+                if (route.getId().equals(target)) {
                     camelContext.stopRoute(route.getId());
                     camelContext.removeRoute(route.getId());
                 }
@@ -200,7 +227,7 @@ public class KieServiceCommon {
                 this.deleteCamelBusinessRoute(projectName);
                 DroolsRouter droolsRouter = new DroolsRouter(camelContext, theClass, projectName, kieContainerInstance, processId);
                 camelContext.addRoutes(droolsRouter);
-                routes.put(containerId,droolsRouter);
+                routes.put(containerId, droolsRouter);
             } finally {
                 if (localClassLoader != null) {
                     Thread.currentThread().setContextClassLoader(localClassLoader);
@@ -359,7 +386,7 @@ public class KieServiceCommon {
 
     public ServiceResponse<Void> disposeContainer(String id) {
         ServiceResponse<Void> result = server.disposeContainer(id);
-        String serverName =KieServiceCommon.getKieServerID();
+        String serverName = KieServiceCommon.getKieServerID();
         ContainerPojoPersist element = containerRepository.findByServerNameAndContainerId(serverName, id);
         if (element != null) {
             containerRepository.delete(element);

@@ -5,6 +5,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 @Document
 public class RuntimePersist {
     public enum STATUS {
@@ -18,8 +20,10 @@ public class RuntimePersist {
     private String serverName;
 
     private String version;
-
+    @Indexed
     private String hostname;
+
+    private String serverUrl;
 
     private String serverPort;
 
@@ -29,6 +33,11 @@ public class RuntimePersist {
 
     private String status;
 
+    private Date creationDate;
+
+    private Date timeStamp;
+
+
     public RuntimePersist(String serverName, String version, String hostname,String serverPort,String sftpPort,String sftpHost,String status) {
         this.serverName = serverName;
         this.version = version;
@@ -37,10 +46,19 @@ public class RuntimePersist {
         this.sftpPort = sftpPort;
         this.sftpHost = sftpHost;
         this.status=status;
+        this.creationDate = new Date();
+    }
+
+    public RuntimePersist(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public RuntimePersist() {
     }
 
     public RuntimePersist duplicate(){
         RuntimePersist duplicate = new RuntimePersist(serverName,version,hostname,serverPort,sftpPort,sftpHost,status);
+        duplicate.setServerUrl(this.serverUrl);
         return duplicate;
     }
 
@@ -106,5 +124,25 @@ public class RuntimePersist {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getServerUrl() {
+        return serverUrl;
+    }
+
+    public void setServerUrl(String serverUrl) {
+        this.serverUrl = serverUrl;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public Date getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(Date timeStamp) {
+        this.timeStamp = timeStamp;
     }
 }

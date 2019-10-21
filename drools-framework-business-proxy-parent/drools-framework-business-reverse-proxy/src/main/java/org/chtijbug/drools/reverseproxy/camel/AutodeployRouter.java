@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component;
 public class AutodeployRouter extends RouteBuilder {
     @Override
     public void configure() throws Exception {
-        from("quartz2://myGroup/myTimerName?cron=0/30+*+*+?+*+*").to("bean:updateService?method=updateConfig()");
+        from("quartz2://myGroup/myTimerName?cron=0/10+*+*+?+*+*").to("bean:updateService?method=updateConfig()");
     }
 }

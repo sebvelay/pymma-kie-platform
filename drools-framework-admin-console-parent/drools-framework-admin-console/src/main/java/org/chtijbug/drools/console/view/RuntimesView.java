@@ -13,7 +13,7 @@ public class RuntimesView extends VerticalLayout {
 
     public RuntimesView(){
 
-        add(new Label("Runtimes enrigistré"));
+        add(new Label("Runtimes stored"));
         add(new GridRuntime());
     }
 

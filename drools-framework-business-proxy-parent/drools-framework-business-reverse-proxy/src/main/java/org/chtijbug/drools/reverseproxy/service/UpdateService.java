@@ -49,8 +49,12 @@ public class UpdateService {
         boolean result = false;
         runtimes.clear();
         List<RuntimePersist> runtimePersists = runtimeRepository.findAll();
+        Map<String, String> urlMap = new HashMap<>();
         for (RuntimePersist runtimePersist : runtimePersists) {
-            runtimes.put(runtimePersist.getServerName(), runtimePersist.duplicate());
+            if (urlMap.containsKey(runtimePersist.getServerName()) == false) {
+                urlMap.put(runtimePersist.getServerName(), runtimePersist.getServerUrl());
+                runtimes.put(runtimePersist.getServerName(), runtimePersist.duplicate());
+            }
         }
         List<ProjectPersist> projectPersists = projectRepository.findAll();
         List<String> projectOk = new ArrayList<>();
@@ -95,6 +99,14 @@ public class UpdateService {
         projects.clear();
         List<MappingProperties> paths = new ArrayList<>();
         Collection<ProjectPersist> projectPersists = projectRepository.findAll();
+        Map<String, String> urlMap = new HashMap<>();
+        List<RuntimePersist> runtimePersists = runtimeRepository.findAll();
+        for (RuntimePersist runtimePersist : runtimePersists) {
+            if (urlMap.containsKey(runtimePersist.getServerName()) == false) {
+                urlMap.put(runtimePersist.getServerName(), runtimePersist.getServerUrl());
+                runtimes.put(runtimePersist.getServerName(), runtimePersist.duplicate());
+            }
+        }
         for (ProjectPersist projectPersist : projectPersists) {
             if (projectPersist.getServerNames().size() > 0) {
                 projects.put(projectPersist.getContainerID(), projectPersist.duplicate());
@@ -103,7 +115,7 @@ public class UpdateService {
                 for (String serverName : projectPersist.getServerNames()) {
                     RuntimePersist runtimePersist = runtimes.get(serverName);
                     if (runtimePersist!= null) {
-                        String hostName = runtimePersist.getHostname() + "/api/" + projectPersist.getContainerID();
+                        String hostName = runtimePersist.getServerUrl() + "/api/" + projectPersist.getContainerID();
                         mappingProperties2.getDestinations().add(hostName);
                         if (servList==null){
                             servList=serverName;
@@ -120,7 +132,7 @@ public class UpdateService {
                 mappingProperties2.setStripPath(true);
                 if ( mappingProperties2.getDestinations().size()>0) {
                     paths.add(mappingProperties2);
-                    logger.info("Project "+projectPersist.getContainerID()+" defined on servers - "+servList);
+                    logger.info("Project "+projectPersist.getContainerID()+" defined on servers - "+mappingProperties2.getDestinations().toString());
 
                 }else{
                     logger.error("Project "+projectPersist.getContainerID()+" defined on non existing server");
@@ -136,16 +148,6 @@ public class UpdateService {
 
     @PostConstruct
     public void initConfig() {
-        List<RuntimePersist> runtimePersists = runtimeRepository.findAll();
-        for (RuntimePersist runtimePersist : runtimePersists) {
-            runtimes.put(runtimePersist.getServerName(), runtimePersist);
-        }
-        List<ProjectPersist> projectPersists = projectRepository.findAll();
-        for (ProjectPersist projectPersist : projectPersists) {
-            if (projectPersist.getServerNames().size() > 0) {
-                projects.put(projectPersist.getContainerID(), projectPersist.duplicate());
-            }
-        }
         generateMappings();
     }
 

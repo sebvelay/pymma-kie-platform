@@ -18,7 +18,13 @@ import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.DialogPerso;
 import org.chtijbug.drools.console.vaadinComponent.componentView.AssetEdit;
+import org.chtijbug.drools.console.vaadinComponent.componentView.service.dtmodel.ColumnDefinition;
+import org.chtijbug.drools.console.vaadinComponent.componentView.service.dtmodel.DecisionTable;
+import org.chtijbug.drools.console.vaadinComponent.componentView.service.dtmodel.GuidedException;
+import org.chtijbug.drools.console.vaadinComponent.componentView.service.dtmodel.Row;
 import org.drools.workbench.models.datamodel.rule.InterpolationVariable;
+import org.drools.workbench.models.guided.dtable.backend.GuidedDTXMLPersistence;
+import org.drools.workbench.models.guided.dtable.shared.model.GuidedDecisionTable52;
 import org.drools.workbench.models.guided.template.backend.RuleTemplateModelXMLPersistenceImpl;
 import org.drools.workbench.models.guided.template.shared.TemplateModel;
 import org.vaadin.olli.FileDownloadWrapper;
@@ -114,7 +120,6 @@ public class EditTemplateView extends VerticalLayout {
                                 TemplateModel model = RuleTemplateModelXMLPersistenceImpl.getInstance().unmarshal(assetSource);
                                 int id=model.getColsCount();
                                 model.clearRows();
-                                Map<String, List<String>> existingData = model.getTable();
                                 for (Map<String,Object> line : objects){
                                     String[] cols =new String[model.getColsCount()];
                                     int k=0;
@@ -142,11 +147,35 @@ public class EditTemplateView extends VerticalLayout {
                     } else {
                         List<HashMap<String, Object>> objects = decisionTableExcelService.importExcel(fileBuffer.getInputStream());
                         if (objects != null && objects.size() > 0) {
+                            Notification.show("Unable to add columns with the excel import for the moment");
+                        }else{
+                            remove(assetEdit);
+                            assetEdit = new AssetEdit(objects);
+                            add(assetEdit);
+                            String assetSource=this.getAssetContent();
+                            GuidedDecisionTable52 model = GuidedDTXMLPersistence.getInstance().unmarshal(assetSource);
+                            org.chtijbug.drools.console.vaadinComponent.componentView.service.dtmodel.DecisionTable decisionTable = new DecisionTable(model);
+                            decisionTable.getRows().clear();
+                            List<ColumnDefinition> columnDefinitions = decisionTable.getColumnDefinitionList();
+                            int k=0;
+                            for (HashMap<String, Object> line : objects){
+                                Row row = decisionTable.createEmptyRow(k);
+                                for (ColumnDefinition columnDefinition : columnDefinitions){
+                                    line.get(columnDefinition.getHeader());
+
+                                    }
+                                }
+                                k++;
+                            }
+
+
+                            //row.
                         }
-                    }
+
                 } catch (IOException e) {
-                    e.printStackTrace();
                     Notification.show("The file is incompatible, it must be in xlsx format");
+                } catch (GuidedException e) {
+                    Notification.show("error "+e.getMessage());
                 }
             }
         });

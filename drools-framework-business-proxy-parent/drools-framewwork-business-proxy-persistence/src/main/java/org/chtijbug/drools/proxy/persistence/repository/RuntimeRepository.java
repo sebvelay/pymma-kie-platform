@@ -10,4 +10,5 @@ import java.util.List;
 public interface RuntimeRepository extends MongoRepository<RuntimePersist, String> {
 
     public List<RuntimePersist> findByServerName(String serverName);
+    public List<RuntimePersist> findByServerNameAndHostname(String serverName,String hostname);
 }
