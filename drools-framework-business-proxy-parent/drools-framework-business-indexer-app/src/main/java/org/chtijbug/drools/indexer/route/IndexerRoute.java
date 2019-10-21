@@ -27,8 +27,6 @@ public class IndexerRoute extends RouteBuilder {
 
     @Override
     public void configure() throws Exception {
-        System.out.println("coucou");
-
         //from("sftp://foo@myserver?password=secret&ftpClient.dataTimeout=30000").to("bean:foo");
         String url="sftp://"+login+"@"+host+":"+port+"?password="+password+"&move=.done";
         from(url).routeId(id).to("bean:storeService?method=store(${header.CamelFileName},${body})");

@@ -213,7 +213,7 @@ public class EditTemplateView extends VerticalLayout {
         saveButton.addClickListener(new ComponentEventListener<ClickEvent<Button>>() {
             @Override
             public void onComponentEvent(ClickEvent<Button> buttonClickEvent) {
-                System.out.println("coucou");
+                System.out.println("TODO");
             }
         });
 

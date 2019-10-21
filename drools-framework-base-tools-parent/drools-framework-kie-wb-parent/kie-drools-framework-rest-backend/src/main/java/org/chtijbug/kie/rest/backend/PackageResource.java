@@ -293,7 +293,6 @@ public class PackageResource {
             } else {
                 if (dotFileFilter.accept(elementPath.getFileName().toString())
                         && elementPath.getFileName().toString().contains(assetName)) {
-                    System.out.println("coucou");
                     return elementPath;
                 }
             }
