@@ -182,6 +182,9 @@ public class ProjectPersistService {
                             containerRepository.save(newContainer);
                         } else {
                             existingContainer.setStatus(ContainerPojoPersist.STATUS.TODEPLOY.toString());
+                            existingContainer.setProcessID(projectPersist.getProcessID());
+                            existingContainer.setClassName(projectPersist.getMainClass());
+                            existingContainer.setProcessID(projectPersist.getProcessID());
                             containerRepository.save(existingContainer);
                         }
 
