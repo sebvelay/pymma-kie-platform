@@ -9,9 +9,11 @@ import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.proxy.persistence.json.KeyProject;
 import org.chtijbug.drools.proxy.persistence.model.ContainerPojoPersist;
+import org.chtijbug.drools.proxy.persistence.model.ContainerRuntimePojoPersist;
 import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
 import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
 import org.chtijbug.drools.proxy.persistence.repository.ContainerRepository;
+import org.chtijbug.drools.proxy.persistence.repository.ContainerRuntimeRepository;
 import org.chtijbug.drools.proxy.persistence.repository.ProjectRepository;
 import org.chtijbug.drools.proxy.persistence.repository.RuntimeRepository;
 import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
@@ -43,6 +45,9 @@ public class ProjectPersistService {
     private ContainerRepository containerRepository;
 
     @Autowired
+    private ContainerRuntimeRepository containerRuntimeRepository;
+
+    @Autowired
     private RuntimeRepository runtimeRepository;
 
     public ProjectPersistService() {
@@ -72,7 +77,7 @@ public class ProjectPersistService {
 
             } else {
                 projectPersist.getClassNameList().clear();
-                for (String className : platformProjectResponse.getJavaClasses()){
+                for (String className : platformProjectResponse.getJavaClasses()) {
                     projectPersist.getClassNameList().add(className);
                     projectRepository.save(projectPersist);
                 }
@@ -85,7 +90,7 @@ public class ProjectPersistService {
         return (HashMap<String, ProjectPersist>) VaadinSession.getCurrent().getAttribute(PROJECT);
     }
 
-    public void addProjectToSession(ProjectPersist projectPersist,boolean isModifiable) {
+    public void addProjectToSession(ProjectPersist projectPersist, boolean isModifiable) {
 
         HashMap<String, ProjectPersist> projectPersists = getProjectsSession();
 
@@ -107,7 +112,8 @@ public class ProjectPersistService {
     }
 
     public boolean associate(ProjectPersist projectPersist, List<RuntimePersist> runtimePersists) {
-
+        projectPersist.setStatus(ProjectPersist.Deployable);
+        projectPersist.setContainerID(projectPersist.getDeploymentName() + "-" + projectPersist.getProjectName());
         projectPersist.getServerNames().clear();
         for (RuntimePersist runtimePersist : runtimePersists) {
             List<String> names = new ArrayList<String>();
@@ -115,13 +121,25 @@ public class ProjectPersistService {
             List<ProjectPersist> projectPersists = projectRepository.findByServerNamesInAndDeploymentName(names, projectPersist.getDeploymentName());
             //if (projectPersists.size() != 0) {
             //    return false;
-           // }
+            // }
             projectPersist.getServerNames().add(runtimePersist.getServerName());
+            ContainerPojoPersist existingContainer = containerRepository.findByServerNameAndContainerId(runtimePersist.getServerName(), projectPersist.getContainerID());
+            if (existingContainer == null) {
+                ContainerPojoPersist newContainer = new ContainerPojoPersist();
+                newContainer.setClassName(projectPersist.getMainClass());
+                newContainer.setProcessID(projectPersist.getProcessID());
+                newContainer.setContainerId(projectPersist.getContainerID());
+                newContainer.setServerName(runtimePersist.getServerName());
+                newContainer.setGroupId(projectPersist.getGroupID());
+                newContainer.setArtifactId(projectPersist.getArtifactID());
+                newContainer.setVersion(projectPersist.getProjectVersion());
+                containerRepository.save(newContainer);
+            }
         }
 
-        projectPersist.setStatus(ProjectPersist.Deployable);
-        projectPersist.setContainerID(projectPersist.getDeploymentName() + "-" + projectPersist.getProjectName());
+
         projectRepository.save(projectPersist);
+
         addProjectToSession(projectPersist, true);
 
         return true;
@@ -166,38 +184,27 @@ public class ProjectPersistService {
 
                 //   ContainerPojoPersist toto = containerRepository.findByServerNameAndContainerId(projectPersist.getContainerID());
                 for (String serverName : projectPersist.getServerNames()) {
-                    List<RuntimePersist> kieservers = runtimeRepository.findByServerName(serverName);
-                    if (kieservers.size() == 1) {
-                        ContainerPojoPersist existingContainer = containerRepository.findByServerNameAndContainerId(serverName, projectPersist.getContainerID());
-                        if (existingContainer == null) {
-                            ContainerPojoPersist newContainer = new ContainerPojoPersist();
-                            newContainer.setStatus(ContainerPojoPersist.STATUS.TODEPLOY.toString());
-                            newContainer.setClassName(projectPersist.getMainClass());
-                            newContainer.setProcessID(projectPersist.getProcessID());
-                            newContainer.setContainerId(projectPersist.getContainerID());
-                            newContainer.setServerName(serverName);
-                            newContainer.setGroupId(projectPersist.getGroupID());
-                            newContainer.setArtifactId(projectPersist.getArtifactID());
-                            newContainer.setVersion(projectPersist.getProjectVersion());
-                            containerRepository.save(newContainer);
-                        } else {
-                            existingContainer.setStatus(ContainerPojoPersist.STATUS.TODEPLOY.toString());
-                            existingContainer.setProcessID(projectPersist.getProcessID());
-                            existingContainer.setClassName(projectPersist.getMainClass());
-                            existingContainer.setProcessID(projectPersist.getProcessID());
-                            containerRepository.save(existingContainer);
+
+                    List<ContainerRuntimePojoPersist> existingContainers = containerRuntimeRepository.findByServerNameAndContainerId(serverName, projectPersist.getContainerID());
+                    if (existingContainers.size() > 0) {
+                        for (ContainerRuntimePojoPersist containerRuntimePojoPersist : existingContainers) {
+                            containerRuntimePojoPersist.setStatus(ContainerRuntimePojoPersist.STATUS.TODEPLOY.name());
+                            containerRuntimeRepository.save(containerRuntimePojoPersist);
+                        }
+                    } else {
+                        List<RuntimePersist> servers = runtimeRepository.findByServerName(serverName);
+                        for (RuntimePersist server : servers) {
+                            ContainerRuntimePojoPersist runtimePojoPersist = new ContainerRuntimePojoPersist();
+                            runtimePojoPersist.setServerName(serverName);
+                            runtimePojoPersist.setHostname(server.getHostname());
+                            runtimePojoPersist.setContainerId(projectPersist.getContainerID());
+                            runtimePojoPersist.setStatus(ContainerRuntimePojoPersist.STATUS.TODEPLOY.name());
+                            containerRuntimeRepository.save(runtimePojoPersist);
                         }
 
 
                     }
-                }
-                //remove container from other runtime
-                List<ContainerPojoPersist> containerPojoPersists = containerRepository.findByContainerId(projectPersist.getContainerID());
-                for (ContainerPojoPersist container : containerPojoPersists){
-                    if (projectPersist.getServerNames().contains(container.getServerName())==false){
-                        container.setStatus(ContainerPojoPersist.STATUS.TODELETE.toString());
-                        containerRepository.save(container);
-                    }
+
                 }
             }
         };

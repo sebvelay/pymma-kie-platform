@@ -5,6 +5,7 @@ import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
 import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
 import org.chtijbug.drools.proxy.persistence.repository.ProjectRepository;
 import org.chtijbug.drools.proxy.persistence.repository.RuntimeRepository;
+import org.chtijbug.drools.reverseproxy.mappings.CustomMappingsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +26,13 @@ public class UpdateService {
     private Map<String, RuntimePersist> runtimes = new HashMap<>();
     private Map<String, ProjectPersist> projects = new HashMap<>();
 
-    private Boolean toUpdate = false;
+    private Boolean toUpdate = true;
 
     private List<MappingProperties> mappings=new ArrayList<>();
+
+    private Map<String,MappingProperties>   mappingPropertiesMap = new HashMap<>();
+    @Autowired
+    private CustomMappingsProvider customMappingsProvider;
 
     public Boolean getToUpdate() {
         return toUpdate;
@@ -97,6 +102,7 @@ public class UpdateService {
     }
     private void generateMappings(){
         projects.clear();
+        mappingPropertiesMap.clear();
         List<MappingProperties> paths = new ArrayList<>();
         Collection<ProjectPersist> projectPersists = projectRepository.findAll();
         Map<String, String> urlMap = new HashMap<>();
@@ -131,6 +137,7 @@ public class UpdateService {
                 mappingProperties2.getCustomConfiguration().put("read", 2000);
                 mappingProperties2.setStripPath(true);
                 if ( mappingProperties2.getDestinations().size()>0) {
+                    mappingPropertiesMap.put(mappingProperties2.getPath(),mappingProperties2);
                     paths.add(mappingProperties2);
                     logger.info("Project "+projectPersist.getContainerID()+" defined on servers - "+mappingProperties2.getDestinations().toString());
 
@@ -144,6 +151,7 @@ public class UpdateService {
         }
         mappings.clear();
         mappings.addAll(paths);
+        this.customMappingsProvider.setMappingPropertiesMap(mappingPropertiesMap);
     }
 
     @PostConstruct

@@ -11,7 +11,9 @@ import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class CustomMappingsProvider extends MappingsProvider {
@@ -19,13 +21,22 @@ public class CustomMappingsProvider extends MappingsProvider {
 
     @Autowired
     private UpdateService updateService;
-
+    private Map<String,MappingProperties> mappingPropertiesMap = new HashMap<>();
 
     public CustomMappingsProvider(ServerProperties server, CharonProperties charon, MappingsCorrector mappingsCorrector, HttpClientProvider httpClientProvider) {
         super(server, charon, mappingsCorrector,httpClientProvider);
     }
 
+    @Override
+    public MappingProperties resolveMapping(String originUri, HttpServletRequest request) {
 
+        MappingProperties result = mappingPropertiesMap.get(originUri);
+        if (result!= null){
+            return result;
+        }else {
+            return super.resolveMapping(originUri, request);
+        }
+    }
 
     @Override
     protected boolean shouldUpdateMappings(HttpServletRequest httpServletRequest) {
@@ -35,5 +46,9 @@ public class CustomMappingsProvider extends MappingsProvider {
     @Override
     protected List<MappingProperties> retrieveMappings() {
           return updateService.retrievePath();
+    }
+
+    public void setMappingPropertiesMap(Map<String, MappingProperties> mappingPropertiesMap) {
+        this.mappingPropertiesMap = mappingPropertiesMap;
     }
 }
