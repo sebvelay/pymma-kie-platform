@@ -6,12 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
 public class ContainerPojoPersist {
-    public enum STATUS {
-        UP,
-        DOWN,
-        TODEPLOY,
-        TODELETE
-    }
+
     @Id
     private String id;
 
@@ -27,13 +22,14 @@ public class ContainerPojoPersist {
 
     private String projectName;
 
-    private String status;
+
 
     private String groupId;
 
     private String artifactId;
 
     private String version;
+
 
     public String getId() {
         return id;
@@ -83,13 +79,7 @@ public class ContainerPojoPersist {
         this.processID = processID;
     }
 
-    public String getStatus() {
-        return status;
-    }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     public String getGroupId() {
         return groupId;
@@ -115,6 +105,7 @@ public class ContainerPojoPersist {
         this.version = version;
     }
 
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("ContainerPojoPersist{");
@@ -124,7 +115,6 @@ public class ContainerPojoPersist {
         sb.append(", serverName='").append(serverName).append('\'');
         sb.append(", processID='").append(processID).append('\'');
         sb.append(", projectName='").append(projectName).append('\'');
-        sb.append(", status=").append(status);
         sb.append(", groupId='").append(groupId).append('\'');
         sb.append(", artifactId='").append(artifactId).append('\'');
         sb.append(", version='").append(version).append('\'');
