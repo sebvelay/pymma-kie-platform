@@ -19,14 +19,14 @@ package org.chtijbug.drools.indexer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 // CHECKSTYLE:OFF
 @SpringBootApplication
 @Configuration
 @EnableMongoRepositories(basePackages = "org.chtijbug.drools.proxy.persistence.repository")
-@EnableElasticsearchRepositories(basePackages = "org.chtijbug.drools.indexer.persistence.repository")
+
 public class DroolsBusinessIndexerServer {
 
 

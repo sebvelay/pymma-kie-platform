@@ -1,11 +1,11 @@
 package org.chtijbug.drools.console.service;
 
-import org.chtijbug.drools.indexer.persistence.repository.BusinessTransactionActionRepository;
-import org.chtijbug.drools.indexer.persistence.repository.BusinessTransactionPersistenceRepository;
+
+import org.chtijbug.drools.proxy.persistence.repository.BusinessTransactionActionRepository;
+import org.chtijbug.drools.proxy.persistence.repository.BusinessTransactionPersistenceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.GregorianCalendar;
 

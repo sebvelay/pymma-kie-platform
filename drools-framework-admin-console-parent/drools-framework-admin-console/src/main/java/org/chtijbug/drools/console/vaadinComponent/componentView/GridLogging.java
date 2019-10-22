@@ -10,7 +10,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.SerializablePredicate;
 import org.chtijbug.drools.console.service.IndexerService;
 import org.chtijbug.drools.console.service.util.AppContext;
-import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionPersistence;
+import org.chtijbug.drools.proxy.persistence.model.BusinessTransactionPersistence;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.ArrayList;

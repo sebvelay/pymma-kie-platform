@@ -1,8 +1,8 @@
 package org.chtijbug.drools.console.restExpose;
 
 import org.chtijbug.drools.console.service.IndexerService;
-import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionAction;
-import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionPersistence;
+import org.chtijbug.drools.proxy.persistence.model.BusinessTransactionAction;
+import org.chtijbug.drools.proxy.persistence.model.BusinessTransactionPersistence;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,7 +23,7 @@ public class ElasticSearchExpose {
     private IndexerService indexerService;
 
     @RequestMapping(value = "/findLastByTransactionId", method = RequestMethod.GET)
-    public BusinessTransactionPersistence findTransactionById(@RequestParam String transactionId,HttpServletRequest request, HttpServletResponse response) {
+    public BusinessTransactionPersistence findTransactionById(@RequestParam String transactionId, HttpServletRequest request, HttpServletResponse response) {
 
         BusinessTransactionPersistence tmp=null;
 
