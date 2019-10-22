@@ -11,7 +11,7 @@ import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.DialogPerso;
 import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.TextFieldPerso;
 import org.chtijbug.drools.console.view.ActionLoggingView;
 import org.chtijbug.drools.console.view.LoggingView;
-import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionPersistence;
+import org.chtijbug.drools.proxy.persistence.model.BusinessTransactionPersistence;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;

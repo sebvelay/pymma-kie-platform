@@ -2,12 +2,12 @@ package org.chtijbug.drools.indexer.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.chtijbug.drools.SessionContext;
-import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionAction;
-import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionPersistence;
-import org.chtijbug.drools.indexer.persistence.model.EventType;
-import org.chtijbug.drools.indexer.persistence.repository.BusinessTransactionActionRepository;
-import org.chtijbug.drools.indexer.persistence.repository.BusinessTransactionPersistenceRepository;
 import org.chtijbug.drools.logging.*;
+import org.chtijbug.drools.proxy.persistence.model.BusinessTransactionAction;
+import org.chtijbug.drools.proxy.persistence.model.BusinessTransactionPersistence;
+import org.chtijbug.drools.proxy.persistence.model.EventType;
+import org.chtijbug.drools.proxy.persistence.repository.BusinessTransactionActionRepository;
+import org.chtijbug.drools.proxy.persistence.repository.BusinessTransactionPersistenceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

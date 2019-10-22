@@ -7,14 +7,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.*;
-import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 @Configuration
 @SpringBootApplication
-@ComponentScan({"org.chtijbug.drools.proxy.persistence","org.chtijbug.drools.indexer"})
+@ComponentScan({"org.chtijbug.drools.proxy.persistence"})
 @EnableMongoRepositories("org.chtijbug.drools.proxy.persistence.repository")
-@EnableElasticsearchRepositories(basePackages = "org.chtijbug.drools.indexer.persistence.repository")
+
 @PropertySource("classpath:application.properties")
 @ImportResource("classpath:applicationContext.xml")
 public class DroolsSpringBootConsoleApplication extends SpringBootServletInitializer {

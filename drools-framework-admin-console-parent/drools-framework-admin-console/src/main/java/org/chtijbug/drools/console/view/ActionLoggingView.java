@@ -6,9 +6,9 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.DialogPerso;
 import org.chtijbug.drools.console.vaadinComponent.componentView.GridActionLogging;
-import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionAction;
-import org.chtijbug.drools.indexer.persistence.model.BusinessTransactionPersistence;
 import org.chtijbug.drools.logging.Fact;
+import org.chtijbug.drools.proxy.persistence.model.BusinessTransactionAction;
+import org.chtijbug.drools.proxy.persistence.model.BusinessTransactionPersistence;
 
 
 public class ActionLoggingView extends VerticalLayout {
@@ -25,7 +25,7 @@ public class ActionLoggingView extends VerticalLayout {
 
     private Button thenFact;
 
-    public ActionLoggingView(BusinessTransactionPersistence businessTransactionPersistence,DialogPerso dialogPerso){
+    public ActionLoggingView(BusinessTransactionPersistence businessTransactionPersistence, DialogPerso dialogPerso){
 
         dialogPerso.getClose().setVisible(false);
 
