@@ -21,7 +21,16 @@ ENV CHTIJBUG_VERSION 2.0.10
 ENV KIE_DEMO false
 ENV JAVA_OPTS -Xms256m -Xmx4512m
 
+####### Pymma Kie Realm #########
 
+
+##com.pymmasoftware.kie-realm
+RUN mkdir /opt/jboss/wildfly/modules/com
+RUN mkdir /opt/jboss/wildfly/modules/com/pymmasoftware
+RUN mkdir /opt/jboss/wildfly/modules/com/pymmasoftware/kie-realm
+RUN mkdir /opt/jboss/wildfly/modules/com/pymmasoftware/kie-realm/main
+ADD maven/pymma-kie-elytron.jar   /opt/jboss/wildfly/modules/com/pymmasoftware/kie-realm/main/pymma-kie-elytron.jar
+ADD etc/module.xml /opt/jboss/wildfly/modules/com/pymmasoftware/kie-realm/main/module.xml
 
 ####### DROOLS-WB ############
 
@@ -38,7 +47,7 @@ ADD maven/kie-wb.war  /opt/jboss/wildfly/standalone/deployments/$KIE_CONTEXT_PAT
 USER root
 ADD etc/start_drools-wb.sh $JBOSS_HOME/bin/start_drools-wb.sh
 RUN chown jboss:jboss $JBOSS_HOME/bin/start_drools-wb.sh
-
+RUN chown -R jboss:jboss /opt/jboss/wildfly/modules/com/pymmasoftware
 
 
 ####### ENVIRONMENT ############

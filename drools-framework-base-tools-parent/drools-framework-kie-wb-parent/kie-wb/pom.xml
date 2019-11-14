@@ -38,6 +38,13 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.pymmasoftware.jbpm</groupId>
+            <artifactId>drools-framework-elytron-realm</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
 
     </dependencies>
 
@@ -89,6 +96,8 @@
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
+                            <excludeArtifactIds>drools-framework-elytron-realm</excludeArtifactIds>
+                            <includeGroupIds>com.pymmasoftware.jbpm</includeGroupIds>
                         </configuration>
                     </execution>
                 </executions>
@@ -141,7 +150,63 @@
                     </archive>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>com.pymmasoftware.jbpm</groupId>
+                                    <artifactId>drools-framework-elytron-realm</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>yes</overWrite>
+                                    <outputDirectory>${project.build.directory}/</outputDirectory>
+                                    <destFileName>pymma-kie-elytron.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mongodb</groupId>
+                                    <artifactId>mongodb-driver</artifactId>
+                                    <version>${version.mongodb.driver}</version>
+                                    <type>jar</type>
+                                    <overWrite>yes</overWrite>
+                                    <outputDirectory>${project.build.directory}/</outputDirectory>
+                                    <destFileName>mongodb-driver.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mongodb</groupId>
+                                    <artifactId>bson</artifactId>
+                                    <version>${version.mongodb.driver}</version>
+                                    <type>jar</type>
+                                    <overWrite>yes</overWrite>
+                                    <outputDirectory>${project.build.directory}/</outputDirectory>
+                                    <destFileName>bson.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.mongodb</groupId>
+                                    <artifactId>mongodb-driver-core</artifactId>
+                                    <version>${version.mongodb.driver}</version>
+                                    <type>jar</type>
+                                    <overWrite>yes</overWrite>
+                                    <outputDirectory>${project.build.directory}/</outputDirectory>
+                                    <destFileName>mongodb-driver-core.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                            <outputDirectory>${project.build.directory}/</outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <profiles>
@@ -169,8 +234,42 @@
                                         <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
 
                                         <!--copies Jar to the maven directory (uses Assembly system)-->
+                                        <!--copies Jar to the maven directory (uses Assembly system)-->
                                         <assembly>
-                                            <descriptorRef>artifact</descriptorRef>
+                                            <mode>dir</mode>
+                                            <name>maven/</name>
+                                            <inline xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+                                                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                                    xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+                                                <id>middleware-rest</id>
+                                                <files>
+                                                    <file>
+                                                        <source>${project.build.directory}/kie-wb.war</source>
+                                                        <outputDirectory>./</outputDirectory>
+                                                        <destName>kie-wb.war</destName>
+                                                    </file>
+                                                    <file>
+                                                        <source>${project.build.directory}/pymma-kie-elytron.jar</source>
+                                                        <outputDirectory>./</outputDirectory>
+                                                        <destName>pymma-kie-elytron.jar</destName>
+                                                    </file>
+                                                    <file>
+                                                        <source>${project.build.directory}/bson.jar</source>
+                                                        <outputDirectory>./</outputDirectory>
+                                                        <destName>bson.jar</destName>
+                                                    </file>
+                                                    <file>
+                                                        <source>${project.build.directory}/mongodb-driver-core.jar</source>
+                                                        <outputDirectory>./</outputDirectory>
+                                                        <destName>mongodb-driver-core.jar</destName>
+                                                    </file>
+                                                    <file>
+                                                        <source>${project.build.directory}/mongodb-driver.jar</source>
+                                                        <outputDirectory>./</outputDirectory>
+                                                        <destName>mongodb-driver.jar</destName>
+                                                    </file>
+                                                </files>
+                                            </inline>
                                         </assembly>
                                         <tags>
                                             <tag>latest</tag>
@@ -241,6 +340,11 @@
                                                         <source>${project.build.directory}/kie-wb.war</source>
                                                         <outputDirectory>./</outputDirectory>
                                                         <destName>kie-wb.war</destName>
+                                                    </file>
+                                                    <file>
+                                                        <source>${project.build.directory}/pymma-kie-elytron.jar</source>
+                                                        <outputDirectory>./</outputDirectory>
+                                                        <destName>pymma-kie-elytron.jar</destName>
                                                     </file>
                                                 </files>
                                             </inline>

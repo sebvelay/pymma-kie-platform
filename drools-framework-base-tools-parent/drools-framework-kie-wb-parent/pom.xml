@@ -14,6 +14,8 @@
         <module>kie-wb</module>
         <module>kie-drools-framework-rest-backend</module>
         <module>drools-framework-kie-wb-rest-pojo</module>
+        <module>drools-framework-uberfire-security-service</module>
+        <module>drools-framework-elytron-realm</module>
     </modules>
 
     <dependencyManagement>
