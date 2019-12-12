@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>drools-framework-kie-wb-parent</artifactId>
+        <groupId>com.pymmasoftware.jbpm</groupId>
+        <version>1.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>drools-framework-uberfire-security-service</artifactId>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.uberfire</groupId>
+            <artifactId>uberfire-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.uberfire</groupId>
+            <artifactId>uberfire-commons</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kie.soup</groupId>
+            <artifactId>kie-soup-commons</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.uberfire</groupId>
+            <artifactId>uberfire-security-management-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.uberfire</groupId>
+            <artifactId>uberfire-security-management-backend</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.errai</groupId>
+            <artifactId>errai-javax-enterprise</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.errai</groupId>
+            <artifactId>errai-security-server</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.errai</groupId>
+            <artifactId>errai-bus</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+        </dependency>
+    </dependencies>
+
+</project>

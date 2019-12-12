@@ -23,7 +23,7 @@
                 <repository>
                     <id>guvnor-m2-repo</id>
                     <name>Guvnor M2 Repo</name>
-                    <url>http://kie-wb:8080/kie-wb/maven2/</url>
+                    <url>${kie-wb.m2repo}</url>
                     <activation>
                         <activeByDefault>true</activeByDefault>
                     </activation>
@@ -42,7 +42,7 @@
                 <pluginRepository>
                     <id>guvnor-m2-repo</id>
                     <name>Guvnor M2 Repo</name>
-                    <url>http://kie-wb:8080/kie-wb/maven2/</url>
+                    <url>${kie-wb.m2repo}</url>
                     <layout>default</layout>
                     <releases>
                         <enabled>true</enabled>
