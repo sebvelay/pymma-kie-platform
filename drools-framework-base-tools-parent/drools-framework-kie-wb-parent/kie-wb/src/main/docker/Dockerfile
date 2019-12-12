@@ -91,7 +91,7 @@ RUN chown jboss:jboss /m2_kiewb
 RUN chown -R jboss:jboss /m2_kiewb/repository
 
 #RUN cd /home/kie-example && git clone https://github.com/chtiJBUG/onboarding-nautic-project.git
-#RUN cd /home/kie-example && git clone https://github.com/chtiJBUG/onboarding-carinsurance-project.git
+#RUN cd /home/kie-example && git clone https://github.com/chtiJBUG/onboa rding-carinsurance-project.git
 #RUN cd /home/kie-example && git clone https://github.com/chtiJBUG/onboarding-loyalty-project.git
 ####### EXPOSE INTERNAL JBPM GIT PORT ############
 EXPOSE 8001
