@@ -1,6 +1,7 @@
 package org.chtijbug.drools.console.service;
 
 import org.apache.commons.io.FileUtils;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 @Service
+@DependsOn("applicationContext")
 public class GitRepositoryService {
 
     public static void main(String[] args) {

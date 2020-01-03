@@ -4,12 +4,14 @@ package org.chtijbug.drools.console.service;
 import org.chtijbug.drools.proxy.persistence.repository.BusinessTransactionActionRepository;
 import org.chtijbug.drools.proxy.persistence.repository.BusinessTransactionPersistenceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 @Service
+@DependsOn("applicationContext")
 public class IndexerService {
 
 

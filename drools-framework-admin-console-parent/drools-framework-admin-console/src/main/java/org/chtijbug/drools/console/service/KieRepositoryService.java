@@ -16,6 +16,7 @@ import org.drools.workbench.models.guided.template.shared.TemplateModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RequestCallback;
@@ -25,6 +26,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 @Service
+@DependsOn("applicationContext")
 public class KieRepositoryService {
 
 

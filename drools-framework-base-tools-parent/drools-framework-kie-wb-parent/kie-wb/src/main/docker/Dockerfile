@@ -27,10 +27,13 @@ ENV JAVA_OPTS -Xms256m -Xmx4512m
 ##com.pymmasoftware.kie-realm
 RUN mkdir /opt/jboss/wildfly/modules/com
 RUN mkdir /opt/jboss/wildfly/modules/com/pymmasoftware
-RUN mkdir /opt/jboss/wildfly/modules/com/pymmasoftware/loginmodule
-RUN mkdir /opt/jboss/wildfly/modules/com/pymmasoftware/loginmodule/main
-ADD maven/pymma-kie-login-module.jar /opt/jboss/wildfly/modules/com/pymmasoftware/loginmodule/main/pymma-kie-login-module.jar
-ADD etc/module-loginmodule.xml /opt/jboss/wildfly/modules/com/pymmasoftware/loginmodule/main/module.xml
+RUN mkdir /opt/jboss/wildfly/modules/com/pymmasoftware/pymma-kie-loginmodule
+RUN mkdir /opt/jboss/wildfly/modules/com/pymmasoftware/pymma-kie-loginmodule/main
+ADD maven/pymma-kie-login-module.jar /opt/jboss/wildfly/modules/com/pymmasoftware/pymma-kie-loginmodule/main/pymma-kie-loginmodule.jar
+ADD maven/mongodb-driver.jar /opt/jboss/wildfly/modules/com/pymmasoftware/pymma-kie-loginmodule/main/mongodb-driver.jar
+ADD maven/mongodb-driver-core.jar /opt/jboss/wildfly/modules/com/pymmasoftware/pymma-kie-loginmodule/main/mongodb-driver-core.jar
+ADD maven/bson.jar /opt/jboss/wildfly/modules/com/pymmasoftware/pymma-kie-loginmodule/main/bson.jar
+ADD etc/module-loginmodule.xml /opt/jboss/wildfly/modules/com/pymmasoftware/pymma-kie-loginmodule/main/module.xml
 
 
 
@@ -62,14 +65,12 @@ EXPOSE 8001
 
 ####### Drools Workbench CUSTOM CONFIGURATION ############
 ADD etc/standalone-full-drools.xml $JBOSS_HOME/standalone/configuration/standalone-full-drools.xml
-ADD etc/application-users.properties $JBOSS_HOME/standalone/configuration/application-users.properties
-ADD etc/application-roles.properties $JBOSS_HOME/standalone/configuration/application-roles.properties
+#ADD etc/application-users.properties $JBOSS_HOME/standalone/configuration/application-users.properties
+#ADD etc/application-roles.properties $JBOSS_HOME/standalone/configuration/application-roles.properties
 
 # Added files are chowned to root user, change it to the jboss one.
 USER root
-RUN chown jboss:jboss $JBOSS_HOME/standalone/configuration/standalone-full-drools.xml && \
-chown jboss:jboss $JBOSS_HOME/standalone/configuration/application-users.properties && \
-chown jboss:jboss $JBOSS_HOME/standalone/configuration/application-roles.properties
+RUN chown jboss:jboss $JBOSS_HOME/standalone/configuration/standalone-full-drools.xml
 
 # Switchback to jboss user
 USER root

@@ -19,6 +19,8 @@ services:
     hostname: kie-wb.pymma
     links:
       - businessProxyDB:mongodb
+    depends_on:
+      - businessProxyDB
     networks:
       drools-network-dev:
         ipv4_address: 172.27.1.5
@@ -39,6 +41,7 @@ services:
     ports:
       - 8200:8200
     links:
+      - kie-wb:kie-wb
       - businessProxyDB:mongodb
     depends_on:
       - businessProxyDB

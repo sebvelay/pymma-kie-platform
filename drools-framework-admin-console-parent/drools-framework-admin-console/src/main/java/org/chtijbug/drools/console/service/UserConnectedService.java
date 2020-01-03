@@ -2,9 +2,11 @@ package org.chtijbug.drools.console.service;
 
 import com.vaadin.flow.server.VaadinSession;
 import org.chtijbug.drools.console.service.model.UserConnected;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 @Service
+@DependsOn("applicationContext")
 public class UserConnectedService {
 
     public static String USER = "1";

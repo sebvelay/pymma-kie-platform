@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 import org.chtijbug.drools.console.service.model.gitlab.GitLabConfigurationData;
 import org.chtijbug.drools.console.service.model.jenkins.JenkinsConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ import java.net.URISyntaxException;
 import java.util.Map;
 
 @Service
+@DependsOn("applicationContext")
 public class JenkinsService {
     JenkinsServer jenkins = null;
 

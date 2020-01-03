@@ -5,6 +5,7 @@ import org.chtijbug.drools.console.service.model.gitlab.GroupElementResponse;
 import org.chtijbug.drools.console.service.model.gitlab.ProjectMoveResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Scanner;
 
 @Service
+@DependsOn("applicationContext")
 public class GitLabRepositoryService {
 
 

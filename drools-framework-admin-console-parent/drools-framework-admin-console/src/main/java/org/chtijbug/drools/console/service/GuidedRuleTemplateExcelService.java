@@ -8,6 +8,7 @@ import org.drools.workbench.models.datamodel.rule.InterpolationVariable;
 import org.drools.workbench.models.guided.template.backend.RuleTemplateModelXMLPersistenceImpl;
 import org.drools.workbench.models.guided.template.shared.TemplateModel;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@DependsOn("applicationContext")
 public class GuidedRuleTemplateExcelService {
 
     @Value("${adminConsole.tmpdir}")

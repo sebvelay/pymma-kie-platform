@@ -18,6 +18,7 @@ import org.chtijbug.drools.proxy.persistence.repository.ProjectRepository;
 import org.chtijbug.drools.proxy.persistence.repository.RuntimeRepository;
 import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
+@DependsOn("applicationContext")
 public class ProjectPersistService {
 
     public static String PROJECT = "4";
