@@ -17,18 +17,18 @@
 package org.chtijbug.guvnor.uberfire.security;
 
 import org.jboss.errai.security.shared.api.Group;
+import org.jboss.errai.security.shared.api.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.commons.config.ConfigProperties;
 import org.uberfire.ext.security.management.api.*;
 import org.uberfire.ext.security.management.api.exception.SecurityManagementException;
 import org.uberfire.ext.security.management.api.exception.UnsupportedServiceCapabilityException;
-import org.uberfire.ext.security.management.impl.GroupManagerSettingsImpl;
+import org.uberfire.ext.security.management.impl.RoleManagerSettingsImpl;
 import org.uberfire.ext.security.management.search.GroupsIdentifierRuntimeSearchEngine;
 import org.uberfire.ext.security.management.search.IdentifierRuntimeSearchEngine;
 import org.uberfire.ext.security.management.util.SecurityManagementUtils;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,24 +36,25 @@ import java.util.Map;
  * <p>Groups manager service provider implementation for Apache tomcat, when using default realm based on properties files.</p>
  * @since 0.8.0
  */
-public class KiePlatformGroupManager  implements GroupManager, ContextualManager {
+public class KiePlatformRoleManager implements RoleManager,ContextualManager {
 
-    private static final Logger LOG = LoggerFactory.getLogger(KiePlatformGroupManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(KiePlatformRoleManager.class);
 
 
 
     IdentifierRuntimeSearchEngine<Group> groupsSearchEngine;
 
-    public KiePlatformGroupManager() {
+    public KiePlatformRoleManager() {
         this(new ConfigProperties(System.getProperties()));
     }
 
 
-    public KiePlatformGroupManager(final Map<String, String> gitPrefs) {
+
+    public KiePlatformRoleManager(final Map<String, String> gitPrefs) {
         this(new ConfigProperties(gitPrefs));
     }
 
-    public KiePlatformGroupManager(final ConfigProperties gitPrefs) {
+    public KiePlatformRoleManager(final ConfigProperties gitPrefs) {
       //  loadConfig(gitPrefs);
     }
 
@@ -67,51 +68,53 @@ public class KiePlatformGroupManager  implements GroupManager, ContextualManager
 
     }
 
+
     @Override
-    public SearchResponse<Group> search(SearchRequest request) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_SEARCH_GROUPS);
+    public SearchResponse<Role> search(SearchRequest request) throws SecurityManagementException {
+        throw new UnsupportedServiceCapabilityException(Capability.CAN_SEARCH_ROLES);
     }
 
     @Override
-    public Group get(String identifier) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_READ_GROUP);
+    public Role get(String identifier) throws SecurityManagementException {
+        throw new UnsupportedServiceCapabilityException(Capability.CAN_READ_ROLE);
     }
 
     @Override
-    public Group create(Group entity) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_ADD_GROUP);
+    public Role create(Role entity) throws SecurityManagementException {
+        throw new UnsupportedServiceCapabilityException(Capability.CAN_ADD_ROLE);
     }
 
     @Override
-    public Group update(Group entity) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_UPDATE_GROUP);
+    public Role update(Role entity) throws SecurityManagementException {
+        throw new UnsupportedServiceCapabilityException(Capability.CAN_UPDATE_ROLE);
     }
+
+
 
     @Override
     public void delete(String... identifiers) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_DELETE_GROUP);
+        throw new UnsupportedServiceCapabilityException(Capability.CAN_DELETE_ROLE);
     }
 
     @Override
-    public GroupManagerSettings getSettings() {
+    public RoleManagerSettings getSettings() {
         final Map<Capability, CapabilityStatus> capabilityStatusMap = new HashMap<Capability, CapabilityStatus>(8);
-        for (final Capability capability : SecurityManagementUtils.GROUPS_CAPABILITIES) {
+        for (final Capability capability : SecurityManagementUtils.ROLES_CAPABILITIES) {
             capabilityStatusMap.put(capability,
                                     getCapabilityStatus(capability));
         }
-        return new GroupManagerSettingsImpl(capabilityStatusMap,
-                                            true);
+        return new RoleManagerSettingsImpl(capabilityStatusMap);
     }
 
     protected CapabilityStatus getCapabilityStatus(Capability capability) {
         /**
         if (capability != null) {
             switch (capability) {
-                case CAN_SEARCH_GROUPS:
-                case CAN_ADD_GROUP:
-                case CAN_UPDATE_GROUP:
-                case CAN_READ_GROUP:
-                case CAN_DELETE_GROUP:
+                case CAN_SEARCH_ROLES:
+                case CAN_ADD_ROLE:
+                case CAN_UPDATE_ROLE:
+                case CAN_READ_ROLE:
+                case CAN_DELETE_ROLE:
                     return CapabilityStatus.ENABLED;
             }
         }
@@ -119,9 +122,5 @@ public class KiePlatformGroupManager  implements GroupManager, ContextualManager
         return CapabilityStatus.UNSUPPORTED;
     }
 
-    @Override
-    public void assignUsers(String name,
-                            Collection<String> users) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_ASSIGN_GROUPS);
-    }
+
 }

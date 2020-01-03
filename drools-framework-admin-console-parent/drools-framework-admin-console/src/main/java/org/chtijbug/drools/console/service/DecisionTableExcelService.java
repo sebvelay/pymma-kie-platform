@@ -10,6 +10,7 @@ import org.chtijbug.drools.console.vaadinComponent.componentView.service.dtmodel
 import org.drools.workbench.models.guided.dtable.backend.GuidedDTXMLPersistence;
 import org.drools.workbench.models.guided.dtable.shared.model.GuidedDecisionTable52;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -18,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
+@DependsOn("applicationContext")
 public class DecisionTableExcelService {
 
     @Value("${adminConsole.tmpdir}")

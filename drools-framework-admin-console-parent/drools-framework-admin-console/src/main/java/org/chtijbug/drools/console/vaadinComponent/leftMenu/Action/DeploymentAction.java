@@ -1,7 +1,6 @@
 package org.chtijbug.drools.console.vaadinComponent.leftMenu.Action;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.chtijbug.drools.console.service.ProjectPersistService;
@@ -30,7 +29,7 @@ public class DeploymentAction extends VerticalLayout {
 
         projectPersistService= AppContext.getApplicationContext().getBean(ProjectPersistService.class);
 
-        definirProject =new Button("Défine your project", VaadinIcon.CODE.create());
+        definirProject =new Button("Define your project", VaadinIcon.CODE.create());
         definirProject.setClassName("leftMenu-global-button");
         definirProject.setEnabled(false);
         add(definirProject);

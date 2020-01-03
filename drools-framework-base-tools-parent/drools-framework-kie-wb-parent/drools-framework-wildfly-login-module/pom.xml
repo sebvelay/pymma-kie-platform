@@ -9,27 +9,22 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>drools-framework-elytron-realm</artifactId>
+    <artifactId>drools-framework-wildfly-login-module</artifactId>
+
     <dependencies>
-        <!-- interface SecurityRealm -->
-        <dependency>
-            <groupId>org.wildfly.security</groupId>
-            <artifactId>wildfly-elytron</artifactId>
-            <version>${version.org.wildfly.security.wildfly-elytron}</version>
-        </dependency>
-        <!-- interface Configurable -->
-        <dependency>
-            <groupId>org.wildfly.core</groupId>
-            <artifactId>wildfly-elytron-integration</artifactId>
-            <version>${version.org.wildfly.core}</version>
-        </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver</artifactId>
             <version>${version.mongodb.driver}</version>
         </dependency>
+        <dependency>
+            <groupId>org.picketbox</groupId>
+            <artifactId>picketbox</artifactId>
+            <version>5.0.3.Final</version>
+        </dependency>
     </dependencies>
     <build>
+        <finalName>pymma-kie-loginmodule</finalName>
         <plugins>
 
             <plugin>
@@ -82,4 +77,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

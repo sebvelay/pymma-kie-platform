@@ -251,12 +251,6 @@
                 </security-domain>
             </security-domains>
             <security-realms>
-                <custom-realm name="pymmaKieRealm" module="com.pymmasoftware.kie-realm" class-name="org.chtijbug.wildfly.realm.PymmaKieRealm">
-                    <configuration>
-                        <property name="connectionString" value="mongodb://mongodb:27017"/>
-                        <property name="name" value="businessProxyDB"/>
-                    </configuration>
-                </custom-realm>
                 <identity-realm name="local" identity="$local"/>
                 <properties-realm name="ApplicationRealm">
                     <users-properties path="application-users.properties" relative-to="jboss.server.config.dir" digest-realm-name="ApplicationRealm"/>
@@ -457,11 +451,9 @@
             <security-domains>
                 <security-domain name="other" cache-type="default">
                     <authentication>
-                        <login-module code="Remoting" flag="optional">
-                            <module-option name="password-stacking" value="useFirstPass"/>
-                        </login-module>
-                        <login-module code="RealmDirect" flag="required">
-                            <module-option name="password-stacking" value="useFirstPass"/>
+                        <login-module code="org.chtijbug.wildfly.loginmodule.KiePlatformLoginModule" flag="required" module="com.pymmasoftware.pymma-kie-loginmodule">
+                            <module-option name="connectionString" value="mongodb://mongodb:27017"/>
+                            <module-option name="name" value="businessProxyDB"/>
                         </login-module>
                     </authentication>
                 </security-domain>

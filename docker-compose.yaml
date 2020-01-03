@@ -17,6 +17,8 @@ services:
       - gitdata:/home/niodir
       - lucenedata:/home/lucene
     hostname: kie-wb.pymma
+    links:
+      - businessProxyDB:mongodb
     networks:
       drools-network-dev:
         ipv4_address: 172.27.1.5
@@ -38,12 +40,8 @@ services:
       - 8200:8200
     links:
       - businessProxyDB:mongodb
-      - elasticsearchhost:elasticdb
-      - kie-wb
     depends_on:
       - businessProxyDB
-      - elasticsearchhost
-      - kie-wb
     restart: always
 
 
@@ -181,10 +179,8 @@ services:
         ipv4_address: 172.27.1.23
     links:
       - businessProxyDB:mongodb
-      - elasticsearchhost:elasticdb
     depends_on:
       - businessProxyDB
-      - elasticsearchhost
     restart: always
 
   runtime-reverse-proxy:
@@ -201,30 +197,6 @@ services:
     ports:
       - 9500:9500
     restart: always
-
-
-
-  elasticsearchhost:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.2
-    container_name: "elasticsearchhost"
-    environment:
-    - network.host=0.0.0.0
-    - cluster.name=elasticsearch
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - esdata2:/usr/share/elasticsearch/data
-    hostname: es.pymma
-    networks:
-      drools-network-dev:
-        ipv4_address: 172.27.1.7
-    ports:
-      - 9300:9300
-      - 9200:9200
-    restart: always
-
 
   businessProxyDB:
     image: mongo
@@ -243,26 +215,9 @@ services:
 
 
 
-  dps:
-    image: defreitas/dns-proxy-server:2.13.2
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/resolv.conf:/etc/resolv.conf
-    environment:
-      - MG_LOG_LEVEL=ERROR
-    hostname: dns.pymma
-    networks:
-      drools-network-dev:
-        ipv4_address: 172.27.1.233
-    ports:
-      - 5380:5380
-
-
-
 volumes:
   mongodb:
   mongodb_config:
   gitdata:
   lucenedata:
-  esdata2:
   kieserverdir:

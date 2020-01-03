@@ -27,10 +27,12 @@ ENV JAVA_OPTS -Xms256m -Xmx4512m
 ##com.pymmasoftware.kie-realm
 RUN mkdir /opt/jboss/wildfly/modules/com
 RUN mkdir /opt/jboss/wildfly/modules/com/pymmasoftware
-RUN mkdir /opt/jboss/wildfly/modules/com/pymmasoftware/kie-realm
-RUN mkdir /opt/jboss/wildfly/modules/com/pymmasoftware/kie-realm/main
-ADD maven/pymma-kie-elytron.jar   /opt/jboss/wildfly/modules/com/pymmasoftware/kie-realm/main/pymma-kie-elytron.jar
-ADD etc/module.xml /opt/jboss/wildfly/modules/com/pymmasoftware/kie-realm/main/module.xml
+RUN mkdir /opt/jboss/wildfly/modules/com/pymmasoftware/loginmodule
+RUN mkdir /opt/jboss/wildfly/modules/com/pymmasoftware/loginmodule/main
+ADD maven/pymma-kie-login-module.jar /opt/jboss/wildfly/modules/com/pymmasoftware/loginmodule/main/pymma-kie-login-module.jar
+ADD etc/module-loginmodule.xml /opt/jboss/wildfly/modules/com/pymmasoftware/loginmodule/main/module.xml
+
+
 
 ####### DROOLS-WB ############
 

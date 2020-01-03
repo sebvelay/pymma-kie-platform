@@ -7,7 +7,7 @@ import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.JobStatus;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
-import org.chtijbug.drools.proxy.persistence.json.KeyProject;
+import org.chtijbug.drools.proxy.persistence.json.KieProject;
 import org.chtijbug.drools.proxy.persistence.model.ContainerPojoPersist;
 import org.chtijbug.drools.proxy.persistence.model.ContainerRuntimePojoPersist;
 import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
@@ -67,7 +67,7 @@ public class ProjectPersistService {
 
         for (PlatformProjectResponse platformProjectResponse : platformProjectResponses) {
 
-            ProjectPersist projectPersist = projectRepository.findByProjectName(new KeyProject(platformProjectResponse.getSpaceName(), platformProjectResponse.getName()));
+            ProjectPersist projectPersist = projectRepository.findByProjectName(new KieProject(platformProjectResponse.getSpaceName(), platformProjectResponse.getName()));
 
             if (projectPersist == null) {
                 projectPersist = platformProjectResponseToProjectPersist(platformProjectResponse);
@@ -158,7 +158,7 @@ public class ProjectPersistService {
         ProjectPersist projectPersist = new ProjectPersist();
         projectPersist.setArtifactID(platformProjectResponse.getArtifactId());
         projectPersist.setGroupID(platformProjectResponse.getGroupId());
-        projectPersist.setProjectName(new KeyProject(platformProjectResponse.getSpaceName(), platformProjectResponse.getName()));
+        projectPersist.setProjectName(new KieProject(platformProjectResponse.getSpaceName(), platformProjectResponse.getName()));
         projectPersist.setProjectVersion(platformProjectResponse.getVersion());
         projectPersist.setStatus(ProjectPersist.ADEFINIR);
         projectPersist.setClassNameList(platformProjectResponse.getJavaClasses());

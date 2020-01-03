@@ -7,7 +7,6 @@ import com.offbytwo.jenkins.model.View;
 import org.apache.commons.io.IOUtils;
 import org.chtijbug.drools.console.service.model.gitlab.GitLabConfigurationData;
 import org.chtijbug.drools.console.service.model.jenkins.JenkinsConfigurationData;
-import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ public class JenkinsService {
     JenkinsServer jenkins = null;
 
     public void createJobForRepo(String jenkinsServerUrl, String username, String password, String viewName, String groupId, String artifactId, String pomXml, String nexusName, String nexusUrl, String jdkVersion) throws URISyntaxException, IOException {
-        KieConfigurationData configKie = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
         GitLabConfigurationData configGitLab = AppContext.getApplicationContext().getBean(GitLabConfigurationData.class);
         JenkinsConfigurationData jenkinsConfigurationData = AppContext.getApplicationContext().getBean(JenkinsConfigurationData.class);
 

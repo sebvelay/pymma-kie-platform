@@ -104,9 +104,12 @@ public class FormulaireComposant extends VerticalLayout {
             }
         });
         add(login);
-
-        password.getPasswordField().setValue(configKie.getPassword());
-        username.getTextField().setValue(configKie.getUserName());
+        if (configKie.getPassword()!= null) {
+            password.getPasswordField().setValue(configKie.getPassword());
+        }
+        if (configKie.getUserName()!= null) {
+            username.getTextField().setValue(configKie.getUserName());
+        }
 
     }
     public void verifyValidity(){

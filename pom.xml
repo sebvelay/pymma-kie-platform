@@ -10,17 +10,14 @@
     <version>1.1-SNAPSHOT</version>
     <modules>
         <!--module>kie-wb-webapp</module-->
-
-
         <module>drools-framework-admin-console-parent</module>
         <module>drools-framework-business-proxy-parent</module>
         <module>drools-framework-base-tools-parent</module>
-        <module>keycloak-db</module>
     </modules>
     <packaging>pom</packaging>
 
     <properties>
-        <jbpm.version>7.28.0.Final</jbpm.version>
+        <jbpm.version>7.31.0.Final</jbpm.version>
         <node.version>v10.16.3</node.version>
         <npm.version>6.11.3</npm.version>
         <frontend-maven-plugin.version>1.8.0</frontend-maven-plugin.version>

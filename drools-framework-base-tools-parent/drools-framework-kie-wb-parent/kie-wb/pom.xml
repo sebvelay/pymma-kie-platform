@@ -40,11 +40,26 @@
         </dependency>
         <dependency>
             <groupId>com.pymmasoftware.jbpm</groupId>
-            <artifactId>drools-framework-elytron-realm</artifactId>
+            <artifactId>drools-framework-wildfly-login-module</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.uberfire</groupId>
+            <artifactId>uberfire-security-management-wildfly</artifactId>
+            <version>${jbpm.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.pymmasoftware.jbpm</groupId>
+            <artifactId>drools-framework-uberfire-security-service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver</artifactId>
+            <version>${version.mongodb.driver}</version>
+        </dependency>
 
     </dependencies>
 
@@ -96,7 +111,7 @@
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>false</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
-                            <excludeArtifactIds>drools-framework-elytron-realm</excludeArtifactIds>
+                            <excludeArtifactIds>drools-framework-wildfly-login-module</excludeArtifactIds>
                             <includeGroupIds>com.pymmasoftware.jbpm</includeGroupIds>
                         </configuration>
                     </execution>
@@ -165,12 +180,12 @@
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>com.pymmasoftware.jbpm</groupId>
-                                    <artifactId>drools-framework-elytron-realm</artifactId>
+                                    <artifactId>drools-framework-wildfly-login-module</artifactId>
                                     <version>${project.version}</version>
                                     <type>jar</type>
                                     <overWrite>yes</overWrite>
                                     <outputDirectory>${project.build.directory}/</outputDirectory>
-                                    <destFileName>pymma-kie-elytron.jar</destFileName>
+                                    <destFileName>pymma-kie-login-module.jar</destFileName>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>org.mongodb</groupId>
@@ -249,9 +264,9 @@
                                                         <destName>kie-wb.war</destName>
                                                     </file>
                                                     <file>
-                                                        <source>${project.build.directory}/pymma-kie-elytron.jar</source>
+                                                        <source>${project.build.directory}/pymma-kie-login-module.jar</source>
                                                         <outputDirectory>./</outputDirectory>
-                                                        <destName>pymma-kie-elytron.jar</destName>
+                                                        <destName>pymma-kie-login-module.jar</destName>
                                                     </file>
                                                     <file>
                                                         <source>${project.build.directory}/bson.jar</source>
@@ -342,9 +357,9 @@
                                                         <destName>kie-wb.war</destName>
                                                     </file>
                                                     <file>
-                                                        <source>${project.build.directory}/pymma-kie-elytron.jar</source>
+                                                        <source>${project.build.directory}/pymma-kie-login-module.jar</source>
                                                         <outputDirectory>./</outputDirectory>
-                                                        <destName>pymma-kie-elytron.jar</destName>
+                                                        <destName>pymma-kie-login-module.jar</destName>
                                                     </file>
                                                 </files>
                                             </inline>

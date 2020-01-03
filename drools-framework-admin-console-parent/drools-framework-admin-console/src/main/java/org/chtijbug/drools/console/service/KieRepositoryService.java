@@ -6,6 +6,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.chtijbug.drools.console.AddLog;
 import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.JobStatus;
+import org.chtijbug.drools.proxy.persistence.model.User;
+import org.chtijbug.drools.proxy.persistence.repository.UserRepository;
 import org.chtijbug.guvnor.server.jaxrs.api.UserLoginInformation;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
 import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
@@ -13,6 +15,7 @@ import org.drools.workbench.models.guided.template.backend.RuleTemplateModelXMLP
 import org.drools.workbench.models.guided.template.shared.TemplateModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RequestCallback;
@@ -27,23 +30,25 @@ public class KieRepositoryService {
 
     private static Logger logger = LoggerFactory.getLogger(KieRepositoryService.class);
 
+    @Autowired
+    private UserRepository userRepository;
 
     private RestTemplate restTemplateKiewb = new RestTemplate();
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    private String pojoToStringMethod(String assetContent,List<HashMap<String,Object>> objects){
+    private String pojoToStringMethod(String assetContent, List<HashMap<String, Object>> objects) {
 
         TemplateModel model = RuleTemplateModelXMLPersistenceImpl.getInstance().unmarshal(assetContent);
-        int i=0;
+        int i = 0;
         model.clearRows();
-        for(HashMap<String,Object> t:objects){
+        for (HashMap<String, Object> t : objects) {
 
-            List<String> row=new ArrayList<>();
-            for (Map.Entry<String,Object> entry:t.entrySet()){
-               row.add(String.valueOf(entry.getValue()));
+            List<String> row = new ArrayList<>();
+            for (Map.Entry<String, Object> entry : t.entrySet()) {
+                row.add(String.valueOf(entry.getValue()));
             }
-            model.addRow(i,row.toArray(new String[row.size()]));
+            model.addRow(i, row.toArray(new String[row.size()]));
             i++;
         }
 
@@ -51,7 +56,7 @@ public class KieRepositoryService {
         return RuleTemplateModelXMLPersistenceImpl.getInstance().marshal(model);
     }
 
-    public void updateAssetSource(String url, String username, String password, String spaceName, String projectName, String assetName,String assetSource) {
+    public void updateAssetSource(String url, String username, String password, String spaceName, String projectName, String assetName, String assetSource) {
 
         String assetContent = getAssetSource(url,
                 username,
@@ -76,11 +81,11 @@ public class KieRepositoryService {
                     return extractedValue;
                 });
 
-      // restTemplateKiewb.exchange(completeurl, HttpMethod.POST, requestCallBack(content, username, password), void.class);
+        // restTemplateKiewb.exchange(completeurl, HttpMethod.POST, requestCallBack(content, username, password), void.class);
         System.out.println("");
     }
 
-        public String getAssetSource(String url, String username, String password, String spaceName, String projectName, String assetName) {
+    public String getAssetSource(String url, String username, String password, String spaceName, String projectName, String assetName) {
         String completeurl = url + "/chtijbug/" + spaceName + "/" + projectName + "/assets/" + assetName + "/source";
         logger.info("url moteur reco : " + completeurl);
         ResponseEntity<String> response = restTemplateKiewb
@@ -122,30 +127,43 @@ public class KieRepositoryService {
     }
 
     public UserConnected login(String url, String username, String password) {
+
+        User user = userRepository.findByLogin(username);
         String completeurl = url + "/chtijbug/login";
-        logger.info("url moteur reco : " + completeurl);
-        ResponseEntity<UserLoginInformation> response = restTemplateKiewb
-                .execute(completeurl, HttpMethod.GET, requestCallback(null, username, password), clientHttpResponse -> {
-                    UserLoginInformation extractedResponse = null;
-                    if (clientHttpResponse.getBody() != null) {
-                        Scanner s = new Scanner(clientHttpResponse.getBody()).useDelimiter("\\A");
-                        String result = s.hasNext() ? s.next() : "";
-                        extractedResponse = mapper.readValue(result, UserLoginInformation.class);
+        if (user != null && user.getPassword().equals(password)) {
+            if (user.getCustomer()!= null &&
+                    user.getCustomer().getKieWorkbench()!= null
+                    && user.getCustomer().getKieWorkbench().getInternalUrl()!= null){
+                completeurl = user.getCustomer().getKieWorkbench().getInternalUrl()+"/rest/chtijbug/login";
+            }
 
-                    }
-                    ResponseEntity<UserLoginInformation> extractedValue = new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
-                    return extractedValue;
-                });
-        UserConnected userConnected = new UserConnected();
+            logger.info("url moteur reco : " + completeurl);
+            ResponseEntity<UserLoginInformation> response = restTemplateKiewb
+                    .execute(completeurl, HttpMethod.GET, requestCallback(null, username, password), clientHttpResponse -> {
+                        UserLoginInformation extractedResponse = null;
+                        if (clientHttpResponse.getBody() != null) {
+                            Scanner s = new Scanner(clientHttpResponse.getBody()).useDelimiter("\\A");
+                            String result = s.hasNext() ? s.next() : "";
+                            extractedResponse = mapper.readValue(result, UserLoginInformation.class);
 
-        UserLoginInformation responseBody = response.getBody();
-        userConnected.setUserName(username);
-        userConnected.setUserPassword(password);
-        userConnected.setUserPassword(password);
-        userConnected.getProjectResponses().addAll(responseBody.getProjects());
-        userConnected.setUserName(username);
+                        }
+                        ResponseEntity<UserLoginInformation> extractedValue = new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
+                        return extractedValue;
+                    });
+            UserConnected userConnected = new UserConnected();
 
-        return userConnected;
+            UserLoginInformation responseBody = response.getBody();
+            userConnected.setUserName(username);
+            userConnected.setUserPassword(password);
+            userConnected.setUserPassword(password);
+            userConnected.getProjectResponses().addAll(responseBody.getProjects());
+            userConnected.getRoles().addAll(responseBody.getRoles());
+            userConnected.setUserName(username);
+
+            return userConnected;
+        } else {
+            return null;
+        }
     }
 
     public List<Asset> getListAssets(String url, String username, String password, String spaceName, String projectName) {
@@ -187,7 +205,7 @@ public class KieRepositoryService {
         JobStatus reponseMoteur;
 
         reponseMoteur = response.getBody();
-        workOnGoingView.addRow(reponseMoteur.toString(),ui);
+        workOnGoingView.addRow(reponseMoteur.toString(), ui);
         return reponseMoteur;
     }
 
@@ -213,8 +231,8 @@ public class KieRepositoryService {
         return reponseMoteur;
     }
 
-    private HttpEntity requestCallBack(final Object content, String username, String password){
-        HttpHeaders httpHeaders=new HttpHeaders();
+    private HttpEntity requestCallBack(final Object content, String username, String password) {
+        HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(
                 HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         httpHeaders.add(
@@ -225,7 +243,7 @@ public class KieRepositoryService {
         String authHeader = "Basic " + new String(encodedAuth);
         httpHeaders.add(
                 HttpHeaders.AUTHORIZATION, authHeader);
-        HttpEntity httpEntity=new HttpEntity(content,httpHeaders);
+        HttpEntity httpEntity = new HttpEntity(content, httpHeaders);
 
 
         return httpEntity;
@@ -234,11 +252,11 @@ public class KieRepositoryService {
     private RequestCallback requestCallback(final Object content, String username, String password) {
         return clientHttpRequest -> {
             if (content != null) {
-                if (content instanceof String){
-                    String stringContent = (String)content;
-                    stringContent=stringContent.replace("\"","");
+                if (content instanceof String) {
+                    String stringContent = (String) content;
+                    stringContent = stringContent.replace("\"", "");
                     mapper.writeValue(clientHttpRequest.getBody(), stringContent);
-                }else {
+                } else {
                     mapper.writeValue(clientHttpRequest.getBody(), content);
                 }
             }

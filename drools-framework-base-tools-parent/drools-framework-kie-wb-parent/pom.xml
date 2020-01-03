@@ -15,7 +15,7 @@
         <module>kie-drools-framework-rest-backend</module>
         <module>drools-framework-kie-wb-rest-pojo</module>
         <module>drools-framework-uberfire-security-service</module>
-        <module>drools-framework-elytron-realm</module>
+        <module>drools-framework-wildfly-login-module</module>
     </modules>
 
     <dependencyManagement>
@@ -28,7 +28,7 @@
                      one of them, the ${project.version} property changes too and therefore also required version of
                      uberfire-bom. Usage of  this property makes it possible to change version of the (sub)module
                      and still use the original version of uberfire-bom. -->
-                <version>2.9.0.Final</version>
+                <version>${jbpm.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

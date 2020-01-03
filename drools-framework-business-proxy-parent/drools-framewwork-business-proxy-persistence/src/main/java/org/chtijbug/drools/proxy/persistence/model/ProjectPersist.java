@@ -1,6 +1,6 @@
 package org.chtijbug.drools.proxy.persistence.model;
 
-import org.chtijbug.drools.proxy.persistence.json.KeyProject;
+import org.chtijbug.drools.proxy.persistence.json.KieProject;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Document
-public class ProjectPersist implements Serializable {
+public class ProjectPersist  implements Serializable {
 
     public static final String ADEFINIR="A définir";
 
@@ -23,7 +23,7 @@ public class ProjectPersist implements Serializable {
 
     @Id
     @Indexed
-    private KeyProject projectName;
+    private KieProject projectName;
 
     private String mainClass;
 
@@ -45,7 +45,7 @@ public class ProjectPersist implements Serializable {
 
     public ProjectPersist(){}
 
-    public ProjectPersist(String deploymentName, KeyProject projectName, String mainClass, String groupID, String artifactID, String processID, String projectVersion, String containerID, List<String> serverNames, String status) {
+    public ProjectPersist(String deploymentName, KieProject projectName, String mainClass, String groupID, String artifactID, String processID, String projectVersion, String containerID, List<String> serverNames, String status) {
         this.deploymentName = deploymentName;
         this.projectName = projectName;
         this.mainClass = mainClass;
@@ -66,11 +66,11 @@ public class ProjectPersist implements Serializable {
         this.deploymentName = deploymentName;
     }
 
-    public KeyProject getProjectName() {
+    public KieProject getProjectName() {
         return projectName;
     }
 
-    public void setProjectName(KeyProject projectName) {
+    public void setProjectName(KieProject projectName) {
         this.projectName = projectName;
     }
 

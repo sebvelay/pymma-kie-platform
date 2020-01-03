@@ -2,15 +2,15 @@ package org.chtijbug.drools.proxy.persistence.json;
 
 import java.io.Serializable;
 
-public class KeyProject implements Serializable {
+public class KieProject implements Serializable {
 
     private String spaceName;
 
     private String name;
 
-    public KeyProject(){}
+    public KieProject(){}
 
-    public KeyProject(String spaceName, String name) {
+    public KieProject(String spaceName, String name) {
         this.spaceName = spaceName;
         this.name = name;
     }

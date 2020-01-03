@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.uberfire.commons.config.ConfigProperties;
 import org.uberfire.ext.security.management.api.*;
 import org.uberfire.ext.security.management.api.exception.SecurityManagementException;
+import org.uberfire.ext.security.management.api.exception.UnsupportedServiceCapabilityException;
 import org.uberfire.ext.security.management.impl.UserManagerSettingsImpl;
 import org.uberfire.ext.security.management.search.IdentifierRuntimeSearchEngine;
 import org.uberfire.ext.security.management.search.UsersIdentifierRuntimeSearchEngine;
@@ -32,20 +33,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.kie.soup.commons.validation.PortablePreconditions.checkNotNull;
-
 /**
  * <p>Users manager service provider implementation for Apache tomcat, when using default realm based on properties files.</p>
  *
  * @since 0.8.0
  */
-public class KiePlatformUserManager  implements UserManager,
-                                                                    ContextualManager {
+public class KiePlatformUserManager  implements UserManager, ContextualManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(KiePlatformUserManager.class);
 
     UserSystemManager userSystemManager;
     IdentifierRuntimeSearchEngine<User> usersSearchEngine;
+
+
 
     public KiePlatformUserManager() {
         this(new ConfigProperties(System.getProperties()));
@@ -58,6 +58,8 @@ public class KiePlatformUserManager  implements UserManager,
     public KiePlatformUserManager(final ConfigProperties gitPrefs) {
         //loadConfig(gitPrefs);
     }
+
+
 
     @Override
     public void initialize(final UserSystemManager userSystemManager) throws Exception {
@@ -72,28 +74,27 @@ public class KiePlatformUserManager  implements UserManager,
 
     @Override
     public SearchResponse<User> search(SearchRequest request) throws SecurityManagementException {
-      return null;
+        throw new UnsupportedServiceCapabilityException(Capability.CAN_SEARCH_USERS);
     }
 
     @Override
     public User get(String identifier) throws SecurityManagementException {
-        return null;
+        throw new UnsupportedServiceCapabilityException(Capability.CAN_READ_USER);
     }
 
     @Override
     public User create(User entity) throws SecurityManagementException {
-        return null;
+        throw new UnsupportedServiceCapabilityException(Capability.CAN_ADD_USER);
     }
 
     @Override
     public User update(User entity) throws SecurityManagementException {
-        return null;
+        throw new UnsupportedServiceCapabilityException(Capability.CAN_UPDATE_USER);
     }
 
     @Override
     public void delete(String... identifiers) throws SecurityManagementException {
-        checkNotNull("identifiers",
-                     identifiers);
+        throw new UnsupportedServiceCapabilityException(Capability.CAN_DELETE_USER);
 
     }
 
@@ -121,11 +122,7 @@ public class KiePlatformUserManager  implements UserManager,
     @Override
     public void assignRoles(String username,
                             Collection<String> roles) throws SecurityManagementException {
-        Set<String> userGroups = SecurityManagementUtils.groupsToString(SecurityManagementUtils.getGroups(userSystemManager,
-                                                                                                          username));
-        userGroups.addAll(roles);
-        doAssignGroups(username,
-                       userGroups);
+        throw new UnsupportedServiceCapabilityException(Capability.CAN_ASSIGN_ROLES);
     }
 
     private void doAssignGroups(String username,
@@ -136,13 +133,12 @@ public class KiePlatformUserManager  implements UserManager,
     @Override
     public void changePassword(String username,
                                String newPassword) throws SecurityManagementException {
-        checkNotNull("username",
-                     username);
-
+        throw new UnsupportedServiceCapabilityException(Capability.CAN_CHANGE_PASSWORD);
 
     }
 
     protected CapabilityStatus getCapabilityStatus(Capability capability) {
+        /**
         if (capability != null) {
             switch (capability) {
                 case CAN_SEARCH_USERS:
@@ -152,12 +148,13 @@ public class KiePlatformUserManager  implements UserManager,
                 case CAN_READ_USER:
                 case CAN_MANAGE_ATTRIBUTES:
                 case CAN_ASSIGN_GROUPS:
-                    /** As it is using the UberfireRoleManager. **/
+
                 case CAN_ASSIGN_ROLES:
                 case CAN_CHANGE_PASSWORD:
                     return CapabilityStatus.ENABLED;
             }
         }
+        **/
         return CapabilityStatus.UNSUPPORTED;
     }
 }

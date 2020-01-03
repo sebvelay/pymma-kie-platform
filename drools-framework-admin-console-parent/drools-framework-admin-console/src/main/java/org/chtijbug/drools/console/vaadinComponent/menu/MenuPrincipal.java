@@ -41,7 +41,11 @@ public class MenuPrincipal extends HorizontalLayout {
     public MenuPrincipal(SqueletteComposant squeletteComposant){
 
         userConnectedService= AppContext.getApplicationContext().getBean(UserConnectedService.class);
-
+        boolean isAdmin=false;
+        if (userConnectedService.getUserConnected().getRoles() != null
+                && userConnectedService.getUserConnected().getRoles().contains("admin")){
+            isAdmin=true;
+        }
         addClassName("menu-principal-menubar-content");
 
         InputStreamFactory inputStreamFactory=new InputStreamFactory() {
@@ -74,7 +78,7 @@ public class MenuPrincipal extends HorizontalLayout {
             }
         });
 
-        deployement=new Button("Déployment");
+        deployement=new Button("Artifact");
         deployement.setClassName("menu-principal-button");
         add(deployement);
         deployement.addClickListener(buttonClickEvent -> {
