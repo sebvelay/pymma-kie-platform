@@ -189,8 +189,11 @@ public class KieRepositoryService {
         return reponseMoteur;
     }
 
-    public JobStatus buildProject(String url, String username, String password, String space, String project, String command, AddLog workOnGoingView, UI ui) {
-        String completeurl = url + "/spaces/" + space + "/projects/" + project + "/maven/" + command;
+    public JobStatus buildProject(String url, String username, String password, String space, String project, String branchName,String command, AddLog workOnGoingView, UI ui) {
+        String completeurl= url + "/spaces/" + space + "/projects/" + project + "/maven/" + command;
+        if (branchName!= null && branchName.length()>0){
+            completeurl= url + "/spaces/" + space + "/projects/" + project +"/branches/"+branchName+ "/maven/" + command;
+        }
         logger.info("url Maven install : " + completeurl);
         ResponseEntity<JobStatus> response = restTemplateKiewb
                 .execute(completeurl, HttpMethod.POST, requestCallback(null, username, password), clientHttpResponse -> {

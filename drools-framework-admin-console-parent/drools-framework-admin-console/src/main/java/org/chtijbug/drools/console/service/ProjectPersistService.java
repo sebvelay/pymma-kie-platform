@@ -69,12 +69,12 @@ public class ProjectPersistService {
 
         for (PlatformProjectResponse platformProjectResponse : platformProjectResponses) {
 
-            ProjectPersist projectPersist = projectRepository.findByProjectName(new KieProject(platformProjectResponse.getSpaceName(), platformProjectResponse.getName()));
+            ProjectPersist projectPersist = projectRepository.findByProjectNameAndBranch(new KieProject(platformProjectResponse.getSpaceName(), platformProjectResponse.getName()),platformProjectResponse.getBranch());
 
             if (projectPersist == null) {
                 projectPersist = platformProjectResponseToProjectPersist(platformProjectResponse);
 
-                projectRepository.save(projectPersist);
+                projectPersist=projectRepository.save(projectPersist);
                 addProjectToSession(projectPersist, true);
 
             } else {
@@ -101,12 +101,12 @@ public class ProjectPersistService {
         }
 
         if (isModifiable) {
-            projectPersists.put(projectPersist.getProjectName().toString(), projectPersist);
+            projectPersists.put(projectPersist.getProjectName().toString()+"-"+projectPersist.getBranch(), projectPersist);
         } else {
 
-            ProjectPersist tmp = projectPersists.get(projectPersist.getProjectName().toString());
+            ProjectPersist tmp = projectPersists.get(projectPersist.getProjectName().toString()+"-"+projectPersist.getBranch());
             if (tmp == null) {
-                projectPersists.put(projectPersist.getProjectName().toString(), projectPersist);
+                projectPersists.put(projectPersist.getProjectName().toString()+"-"+projectPersist.getBranch(), projectPersist);
             }
         }
 
@@ -162,6 +162,7 @@ public class ProjectPersistService {
         projectPersist.setGroupID(platformProjectResponse.getGroupId());
         projectPersist.setProjectName(new KieProject(platformProjectResponse.getSpaceName(), platformProjectResponse.getName()));
         projectPersist.setProjectVersion(platformProjectResponse.getVersion());
+        projectPersist.setBranch(platformProjectResponse.getBranch());
         projectPersist.setStatus(ProjectPersist.ADEFINIR);
         projectPersist.setClassNameList(platformProjectResponse.getJavaClasses());
         return projectPersist;
@@ -175,12 +176,12 @@ public class ProjectPersistService {
             public void run() {
 
                 JobStatus result = kieRepositoryService.buildProject(config.getKiewbUrl(), userConnected.getUserName(),
-                        userConnected.getUserPassword(), projectPersist.getProjectName().getSpaceName(), projectPersist.getProjectName().getName(), "compile", workOnGoingView, ui);
+                        userConnected.getUserPassword(), projectPersist.getProjectName().getSpaceName(), projectPersist.getProjectName().getName(),projectPersist.getBranch(), "compile", workOnGoingView, ui);
 
                 executeWrite(url, username, password, workOnGoingView, result.getJobId(), ui);
 
                 result = kieRepositoryService.buildProject(config.getKiewbUrl(), userConnected.getUserName(),
-                        userConnected.getUserPassword(), projectPersist.getProjectName().getSpaceName(), projectPersist.getProjectName().getName(), "install", workOnGoingView, ui);
+                        userConnected.getUserPassword(), projectPersist.getProjectName().getSpaceName(), projectPersist.getProjectName().getName(),projectPersist.getBranch(), "install", workOnGoingView, ui);
 
                 executeWrite(url, username, password, workOnGoingView, result.getJobId(), ui);
 

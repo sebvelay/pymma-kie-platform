@@ -18,8 +18,8 @@ import org.kie.workbench.common.screens.datamodeller.model.EditorModelContent;
 import org.kie.workbench.common.screens.datamodeller.service.DataModelerService;
 import org.kie.workbench.common.services.datamodeller.core.DataObject;
 import org.kie.workbench.common.services.datamodeller.core.impl.DataModelImpl;
-import org.kie.workbench.common.services.shared.project.KieModule;
 import org.slf4j.LoggerFactory;
+import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.io.IOService;
 import org.uberfire.java.nio.base.options.CommentedOption;
 import org.uberfire.java.nio.file.DirectoryStream;
@@ -70,6 +70,7 @@ public class PackageResource {
     @Inject
     private WorkspaceProjectService workspaceProjectService;
 
+
     public PackageResource() {
         System.out.println("coucou");
     }
@@ -118,7 +119,11 @@ public class PackageResource {
 
         final List<PlatformProjectResponse> repoNames = new ArrayList<>();
         for (WorkspaceProject workspaceProject : workspaceProjectService.getAllWorkspaceProjects(ou)) {
-            repoNames.add(getProjectResponse(workspaceProject));
+            for (Branch branch : workspaceProject.getRepository().getBranches()){
+                repoNames.add(getProjectResponse(workspaceProject,branch));
+            }
+
+
         }
 
         return repoNames;
@@ -129,14 +134,16 @@ public class PackageResource {
     }
 
 
-    private PlatformProjectResponse getProjectResponse(WorkspaceProject workspaceProject) {
+    private PlatformProjectResponse getProjectResponse(WorkspaceProject workspaceProject,Branch branch) {
         final PlatformProjectResponse projectResponse = new PlatformProjectResponse();
         projectResponse.setName(workspaceProject.getName());
         projectResponse.setSpaceName(workspaceProject.getOrganizationalUnit().getName());
 
         if (workspaceProject.getMainModule() != null) {
             Module kmodule = workspaceProject.getMainModule();
-            EditorModelContent econtent = dataModelerService.loadContent(((KieModule) kmodule).getImportsPath());
+            org.uberfire.backend.vfs.Path importVFPath = PathFactory.newPath("project.imports", branch.getPath().toURI()+"project.imports");
+            EditorModelContent econtent = dataModelerService.loadContent(importVFPath);
+            //EditorModelContent econtent = dataModelerService.loadContent(((KieModule) kmodule).getImportsPath());
             DataModelImpl econtentDataModel = (DataModelImpl) econtent.getDataModel();
             List<DataObject> dataObjects = econtentDataModel.getExternalClasses();
             for (DataObject dataObject : dataObjects) {
@@ -149,6 +156,7 @@ public class PackageResource {
             projectResponse.setGroupId(workspaceProject.getMainModule().getPom().getGav().getGroupId());
             projectResponse.setVersion(workspaceProject.getMainModule().getPom().getGav().getVersion());
             projectResponse.setDescription(workspaceProject.getMainModule().getPom().getDescription());
+            projectResponse.setBranch(branch.getName());
         }
 
         final ArrayList<org.guvnor.rest.client.PublicURI> publicURIs = new ArrayList<>();
@@ -412,8 +420,11 @@ public class PackageResource {
             WorkspaceProject project = getProject(organizationalUnitName, projectName);
 
             if (project != null) {
+               // Optional<Branch> rr = project.getRepository().getBranch("ee");
+               // org.uberfire.backend.vfs.Path tata = rr.get().getPath();
                 org.uberfire.backend.vfs.Path rootPath = project.getRootPath();
                 org.uberfire.java.nio.file.Path nioPath = Paths.get(rootPath.toURI());
+
                 DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream = ioService.newDirectoryStream(nioPath);
                 org.uberfire.java.nio.file.Path elementToUpdate = getFileElementPath(directoryStream, assetName);
                 File fileToUpdate = elementToUpdate.toFile();

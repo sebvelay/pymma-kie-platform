@@ -11,6 +11,7 @@ public class JobStatus {
     private String result;
     private Date lastModified;
     private String detailedResult[];
+    private String branchName;
 
     @Override
     public String toString() {
@@ -80,5 +81,13 @@ public class JobStatus {
 
     public void setDetailedResult(String[] detailedResult) {
         this.detailedResult = detailedResult;
+    }
+
+    public String getBranchName() {
+        return branchName;
+    }
+
+    public void setBranchName(String branchName) {
+        this.branchName = branchName;
     }
 }

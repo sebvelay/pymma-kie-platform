@@ -19,7 +19,7 @@
     </properties>
     <modules>
         <module>drools-framework-business-proxy-app</module>
-        <module>drools-framewwork-business-proxy-persistence</module>
+        <module>drools-framework-business-proxy-persistence</module>
         <module>drools-framework-business-indexer-app</module>
         <module>drools-framework-business-indexer-persistence</module>
         <module>drools-framework-business-reverse-proxy</module>

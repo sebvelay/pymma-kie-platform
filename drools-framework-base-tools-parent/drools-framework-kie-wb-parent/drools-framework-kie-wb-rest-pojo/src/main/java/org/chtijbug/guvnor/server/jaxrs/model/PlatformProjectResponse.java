@@ -9,6 +9,8 @@ public class PlatformProjectResponse extends ProjectResponse {
 
     private String artifactId;
 
+    private String branch;
+
     private List<String> javaClasses = new ArrayList<>();
 
     public PlatformProjectResponse() {
@@ -29,5 +31,13 @@ public class PlatformProjectResponse extends ProjectResponse {
 
     public void setArtifactId(String artifactId) {
         this.artifactId = artifactId;
+    }
+
+    public String getBranch() {
+        return branch;
+    }
+
+    public void setBranch(String branch) {
+        this.branch = branch;
     }
 }

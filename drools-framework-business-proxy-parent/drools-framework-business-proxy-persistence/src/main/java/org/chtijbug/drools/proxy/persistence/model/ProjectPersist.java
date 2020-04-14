@@ -2,6 +2,8 @@ package org.chtijbug.drools.proxy.persistence.model;
 
 import org.chtijbug.drools.proxy.persistence.json.KieProject;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -10,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Document
+@CompoundIndexes({
+        @CompoundIndex(def = "{'projectName':1, 'branch':1}", name = "projectName_branch_Index")
+})
 public class ProjectPersist  implements Serializable {
 
     public static final String ADEFINIR="A définir";
@@ -23,6 +28,9 @@ public class ProjectPersist  implements Serializable {
 
     @Id
     @Indexed
+    private String uuid;
+
+
     private KieProject projectName;
 
     private String mainClass;
@@ -36,6 +44,8 @@ public class ProjectPersist  implements Serializable {
     private String projectVersion;
 
     private String containerID;
+
+    private String branch;
 
     private List<String> serverNames= new ArrayList<>();
 
@@ -144,6 +154,14 @@ public class ProjectPersist  implements Serializable {
 
     public void setClassNameList(List<String> classNameList) {
         this.classNameList = classNameList;
+    }
+
+    public String getBranch() {
+        return branch;
+    }
+
+    public void setBranch(String branch) {
+        this.branch = branch;
     }
 
     public ProjectPersist duplicate(){

@@ -13,7 +13,7 @@
     <modules>
         <module>drools-framework-common</module>
         <module>drools-framework-examples</module>
-        <!--module>drools-framework-kie-server-parent</module-->
+        <module>drools-framework-kie-server-parent</module>
         <module>drools-framework-runtime-base</module>
         <module>drools-framework-runtime-entity</module>
         <module>drools-framework-kie-wb-parent</module>

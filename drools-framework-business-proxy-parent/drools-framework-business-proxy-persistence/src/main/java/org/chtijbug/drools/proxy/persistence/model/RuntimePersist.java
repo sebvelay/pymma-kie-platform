@@ -20,6 +20,9 @@ public class RuntimePersist {
     private String serverName;
 
     private String version;
+
+    private String branch;
+
     @Indexed
     private String hostname;
 
@@ -144,5 +147,13 @@ public class RuntimePersist {
 
     public void setTimeStamp(Date timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public String getBranch() {
+        return branch;
+    }
+
+    public void setBranch(String branch) {
+        this.branch = branch;
     }
 }

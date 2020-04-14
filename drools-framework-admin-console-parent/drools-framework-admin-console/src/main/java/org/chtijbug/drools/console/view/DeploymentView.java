@@ -34,6 +34,7 @@ public class DeploymentView extends VerticalLayout implements AddLog {
     private final String strNameDeploy = "Deploy name";
     private final String strNameProject = "Project name";
     private final String strGroupeId = "Groupe ID";
+    private final String strBranchName = "Branch Name";
     private final String strArtefactID = "Artefact ID";
 
     //TEXTFIELD search
@@ -49,6 +50,7 @@ public class DeploymentView extends VerticalLayout implements AddLog {
     private TextField nameDeploy;
     private TextField nameProject;
     private TextField groupeId;
+    private TextField branchName;
     private TextField artifactId;
     private TextField processId;
     private TextField serverName;
@@ -91,6 +93,15 @@ public class DeploymentView extends VerticalLayout implements AddLog {
 
         projectPersistGrid.addColumn(projectPersist -> projectPersist.getMainClass()).setHeader("ClassName")
                 .setComparator((projectPersist, t1) -> projectPersist.getMainClass().compareTo(t1.getMainClass()));
+
+        Grid.Column<ProjectPersist> branchCo = projectPersistGrid.addColumn(projectPersist -> projectPersist.getBranch());
+        branchName = new TextField(strBranchName);
+        branchName.setValueChangeMode(ValueChangeMode.EAGER);
+        branchName.addValueChangeListener(e -> {
+            refreshtGrid(groupeId.getValue(), strBranchName);
+        });
+        branchCo.setHeader(branchName);
+
 
         Grid.Column<ProjectPersist> groupIdCo = projectPersistGrid.addColumn(projectPersist -> projectPersist.getGroupID());
         groupeId = new TextField(strGroupeId);
@@ -231,7 +242,7 @@ public class DeploymentView extends VerticalLayout implements AddLog {
         if (projectPersist.getStatus().equals(ProjectPersist.DEFINI)) {
 
             getDeploymentAction().getAssociateKieServer().setEnabled(true);
-            getDeploymentAction().getDefinirProject().setEnabled(false);
+            getDeploymentAction().getDefinirProject().setEnabled(true);
             getDeploymentAction().getDeployer().setEnabled(false);
 
         } else if (projectPersist.getStatus().equals(ProjectPersist.ADEFINIR)) {

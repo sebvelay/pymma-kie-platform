@@ -44,6 +44,10 @@ public class DeleteFactEventStrategy implements AbstractMemoryEventHandlerStrate
 
         } else {   // inserted from a rule that is not in a ruleflow/process
             existingInSessionRuleExecution = sessionContext.getRuleExecution();
+            if (existingInSessionRuleExecution==null){
+                existingInSessionRuleExecution = new RuleExecution();
+                sessionContext.setRuleExecution(existingInSessionRuleExecution);
+            }
             existingInSessionRuleExecution.getThenFacts().add(fact);
         }
 

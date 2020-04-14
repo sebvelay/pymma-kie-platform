@@ -25,6 +25,8 @@ public class GridRuntime extends Grid<RuntimePersist> {
 
     private TextField hostName;
 
+    private TextField branch ;
+
     private TextField version;
 
     private TextField status;
@@ -32,6 +34,8 @@ public class GridRuntime extends Grid<RuntimePersist> {
     private String strRuntimeName = "Runtime Name";
 
     private String strHostName = "Hostname";
+
+    private String strBranch = "Branch";
 
     private String strVersion = "Version";
 
@@ -87,13 +91,21 @@ public class GridRuntime extends Grid<RuntimePersist> {
             refreshtGrid(version.getValue(), strVersion);
         });
         versionCo.setHeader(version);
-        Grid.Column<RuntimePersist> statusCo = addColumn(runtimePersist -> runtimePersist.getStatus());
+        Grid.Column<RuntimePersist> statusCo = addColumn(runtimePersist -> runtimePersist.getBranch());
+        branch = new TextField(strBranch);
+        branch.setValueChangeMode(ValueChangeMode.EAGER);
+        branch.addValueChangeListener(e -> {
+            refreshtGrid(branch.getValue(), strBranch);
+        });
+        versionCo.setHeader(branch);
+
+        Grid.Column<RuntimePersist> branchCo = addColumn(runtimePersist -> runtimePersist.getStatus());
         status = new TextField(strStatus);
         status.setValueChangeMode(ValueChangeMode.EAGER);
         status.addValueChangeListener(e -> {
             refreshtGrid(status.getValue(), strVersion);
         });
-        statusCo.setHeader(status);
+        branchCo.setHeader(status);
 
         addColumn(new ComponentRenderer<>(runtimePersist -> {
             List<String> serverList = new ArrayList<>();
