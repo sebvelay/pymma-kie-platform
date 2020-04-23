@@ -111,7 +111,13 @@
         </plugins>
     </build>
 
-
+    <!--distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub OWNER Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/pymma/pymma-kie-platform</url>
+        </repository>
+    </distributionManagement-->
     <distributionManagement>
         <snapshotRepository>
             <id>pymma-snapshot</id>

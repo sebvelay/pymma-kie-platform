@@ -25,6 +25,7 @@ import org.chtijbug.drools.entity.history.rule.BeforeRuleFiredHistoryEvent;
 import org.chtijbug.drools.entity.history.session.SessionFireAllRulesMaxNumberReachedEvent;
 import org.drools.core.common.DefaultFactHandle;
 import org.drools.core.common.InternalFactHandle;
+import org.drools.core.event.rule.impl.BeforeActivationFiredEventImpl;
 import org.kie.api.event.rule.*;
 import org.kie.api.runtime.KieRuntime;
 import org.kie.api.runtime.rule.FactHandle;
@@ -32,6 +33,7 @@ import org.kie.api.runtime.rule.Match;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
 
 //import org.drools.core.common.InternalFactHandle;
@@ -81,29 +83,43 @@ public class RuleHandlerListener extends DefaultAgendaEventListener {
     public void beforeMatchFired(BeforeMatchFiredEvent event) {
         logger.debug(">>beforeActivationFired", event);
         try {
-            Match match = event.getMatch();
-            List<? extends FactHandle> listFact = match.getFactHandles();
-            //____ Getting the Rule object summary from the session
-            DroolsRuleObject droolsRuleObject = ruleBaseSession.getDroolsRuleObject(match.getRule());
-            //____ Creating the specific History event for history managment
-            BeforeRuleFiredHistoryEvent newBeforeRuleEvent = new BeforeRuleFiredHistoryEvent(this.ruleBaseSession.nextEventId(), this.nbRuleFired + 1, droolsRuleObject, this.ruleBaseSession.getRuleBaseID(), this.ruleBaseSession.getSessionId());
-            //____ Adding all objects info contained in the Activation object into the history Events
-            for (FactHandle h : listFact) {
-                if (h instanceof DefaultFactHandle) {
-                    InternalFactHandle defaultFactHandle = (InternalFactHandle) h;
-                    //System.out.println(defaultFactHandle.toString());
-                    Object object = defaultFactHandle.getObject();
-                    DroolsFactObject sourceFactObject = ruleBaseSession.getLastFactObjectVersionFromFactHandle(h);
-                    newBeforeRuleEvent.getWhenObjects().add(sourceFactObject);
+            if (event instanceof BeforeActivationFiredEventImpl) {
+                Match match = event.getMatch();
+                List<? extends FactHandle> listFact = match.getFactHandles();
+                //____ Getting the Rule object summary from the session
+                DroolsRuleObject droolsRuleObject = ruleBaseSession.getDroolsRuleObject(match.getRule());
+                //____ Creating the specific History event for history managment
+                BeforeRuleFiredHistoryEvent newBeforeRuleEvent = new BeforeRuleFiredHistoryEvent(this.ruleBaseSession.nextEventId(), this.nbRuleFired + 1, droolsRuleObject, this.ruleBaseSession.getRuleBaseID(), this.ruleBaseSession.getSessionId());
+                //____ Adding all objects info contained in the Activation object into the history Events
+                for (FactHandle h : listFact) {
+                    if (h instanceof DefaultFactHandle) {
+                        InternalFactHandle defaultFactHandle = (InternalFactHandle) h;
+                        //System.out.println(defaultFactHandle.toString());
+                        Object object = defaultFactHandle.getObject();
+                        DroolsFactObject sourceFactObject = ruleBaseSession.getLastFactObjectVersionFromFactHandle(h);
+                        if (sourceFactObject==null){
+                            try {
+                                if (object instanceof List){
+                                    List lst = (List)object;
+                                    sourceFactObject = new DroolsFactObject(lst.toArray(), 1);
+                                }else {
+                                    sourceFactObject = new DroolsFactObject(object, 1);
+                                }
+                            } catch (IOException e) {
+                                logger.info("Object not put as JSON possible"+object.toString());
+                            }
+                        }
+                        newBeforeRuleEvent.getWhenObjects().add(sourceFactObject);
 
-                } else {
-                    DroolsFactObject sourceFactObject = ruleBaseSession.getLastFactObjectVersionFromFactHandle(h);
-                    newBeforeRuleEvent.getWhenObjects().add(sourceFactObject);
+                    } else {
+                        DroolsFactObject sourceFactObject = ruleBaseSession.getLastFactObjectVersionFromFactHandle(h);
+                        newBeforeRuleEvent.getWhenObjects().add(sourceFactObject);
 
+                    }
                 }
+                //_____ Add Event into the History Container
+                ruleBaseSession.addHistoryElement(newBeforeRuleEvent);
             }
-            //_____ Add Event into the History Container
-            ruleBaseSession.addHistoryElement(newBeforeRuleEvent);
         } finally {
             logger.debug("<<beforeActivationFired");
         }
