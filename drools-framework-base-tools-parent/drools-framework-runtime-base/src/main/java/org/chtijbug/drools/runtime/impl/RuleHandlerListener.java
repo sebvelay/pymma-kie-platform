@@ -26,6 +26,7 @@ import org.chtijbug.drools.entity.history.session.SessionFireAllRulesMaxNumberRe
 import org.drools.core.common.DefaultFactHandle;
 import org.drools.core.common.InternalFactHandle;
 import org.drools.core.event.rule.impl.BeforeActivationFiredEventImpl;
+import org.drools.core.reteoo.InitialFactImpl;
 import org.kie.api.event.rule.*;
 import org.kie.api.runtime.KieRuntime;
 import org.kie.api.runtime.rule.FactHandle;
@@ -102,7 +103,11 @@ public class RuleHandlerListener extends DefaultAgendaEventListener {
                                 if (object instanceof List){
                                     List lst = (List)object;
                                     sourceFactObject = new DroolsFactObject(lst.toArray(), 1);
-                                }else {
+                                }if (object instanceof InitialFactImpl){
+                                    //InitialFactImpl initialFact = (InitialFactImpl)object;
+                                    // Do Nothing for the time
+                                }
+                                else {
                                     sourceFactObject = new DroolsFactObject(object, 1);
                                 }
                             } catch (IOException e) {
