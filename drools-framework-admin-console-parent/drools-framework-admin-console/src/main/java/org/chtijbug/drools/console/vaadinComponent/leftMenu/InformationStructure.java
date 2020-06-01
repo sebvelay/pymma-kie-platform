@@ -74,7 +74,7 @@ public class InformationStructure extends VerticalLayout {
 
         List<RuntimePersist> runtimePersists=runtimeService.getRuntimeRepository().findAll();
 
-        actualiseKieServer(runtimePersists!=null?runtimePersists.size():0);
+        actualiseKieServer(runtimePersists.size());
 
         numberKieWb=new Label(strKieWb+"0");
         numberKieWb.setClassName("leftMenu-global-inforStructure-label");

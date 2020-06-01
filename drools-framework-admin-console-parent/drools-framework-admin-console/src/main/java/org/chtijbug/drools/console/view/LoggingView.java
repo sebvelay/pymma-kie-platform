@@ -4,7 +4,6 @@ import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.chtijbug.drools.console.vaadinComponent.componentView.GridLogging;
-import org.chtijbug.drools.console.vaadinComponent.componentView.GridRuntime;
 import org.chtijbug.drools.console.vaadinComponent.leftMenu.Action.ActionLogging;
 
 @StyleSheet("css/accueil.css")
@@ -31,7 +30,7 @@ public class LoggingView extends VerticalLayout {
 
         gridLogging.addSelectionListener(selectionEvent -> {
 
-            if(selectionEvent.getFirstSelectedItem()!=null&&selectionEvent.getFirstSelectedItem().isPresent()) {
+            if(selectionEvent.getFirstSelectedItem().isPresent()) {
                 actionLogging.getViewAction().setEnabled(true);
             }else {
                 actionLogging.getViewAction().setEnabled(false);

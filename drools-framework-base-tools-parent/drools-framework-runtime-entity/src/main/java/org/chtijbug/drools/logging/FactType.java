@@ -20,7 +20,7 @@ public enum FactType {
 
     public static FactType getEnum(String factType) {
         for (FactType type : FactType.values()) {
-            if (type.name().equals(type))
+            if (type.name().equals(factType))
                 return type;
         }
         return null;

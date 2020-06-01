@@ -31,7 +31,7 @@ public class GuidedRuleTemplateExcelService {
 
     private String assetContent;
 
-    public GuidedRuleTemplateExcelService(){
+    public GuidedRuleTemplateExcelService() {
         this.kieRepositoryService = AppContext.getApplicationContext().getBean(KieRepositoryService.class);
         this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
         this.userConnectedService = AppContext.getApplicationContext().getBean(UserConnectedService.class);
@@ -48,37 +48,38 @@ public class GuidedRuleTemplateExcelService {
         return assetContent;
     }
 
-    public List<HashMap<String,Object>> importExcel(InputStream inputStream) throws IOException {
-
-        Workbook workbook= WorkbookFactory.create(inputStream);
-
-        DataFormatter dataFormatter = new DataFormatter();
-
-        List<HashMap<String,Object>> result=new ArrayList<>();
-
-        for(Sheet sheet: workbook) {
-            for (Row row: sheet) {
-
-                if(row.getRowNum()!=0) {
-
-                    HashMap<String, Object> tmp = new HashMap<>();
-                    result.add(tmp);
-
-                    for (Cell cell : row) {
-                        String cellValue = dataFormatter.formatCellValue(cell);
-
-                        Integer numColumn = cell.getColumnIndex();
-                        Cell title = sheet.getRow(0).getCell(numColumn);
-                        tmp.put(dataFormatter.formatCellValue(title), cellValue);
-
+    public List<HashMap<String, Object>> importExcel(InputStream inputStream) throws IOException {
+        List<HashMap<String, Object>> result = null;
+        Workbook workbook = null;
+        try {
+            workbook = WorkbookFactory.create(inputStream);
+            DataFormatter dataFormatter = new DataFormatter();
+            result = new ArrayList<>();
+            for (Sheet sheet : workbook) {
+                for (Row row : sheet) {
+                    if (row.getRowNum() != 0) {
+                        HashMap<String, Object> tmp = new HashMap<>();
+                        result.add(tmp);
+                        for (Cell cell : row) {
+                            String cellValue = dataFormatter.formatCellValue(cell);
+                            Integer numColumn = cell.getColumnIndex();
+                            Cell title = sheet.getRow(0).getCell(numColumn);
+                            tmp.put(dataFormatter.formatCellValue(title), cellValue);
+                        }
                     }
                 }
             }
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            if (workbook != null) {
+                workbook.close();
+            }
         }
-
         return result;
     }
-    public ByteArrayInputStream exportExcel(String nameTemplate){
+
+    public ByteArrayInputStream exportExcel(String nameTemplate) {
 
         //Récupération des objets JAVA
 
@@ -117,24 +118,24 @@ public class GuidedRuleTemplateExcelService {
         CellStyle headerCellStyle = workbook.createCellStyle();
         headerCellStyle.setFont(headerFont);
 
-        Row headerRow=sheet.createRow(0);
+        Row headerRow = sheet.createRow(0);
 
-        if(rows!=null&&rows.size()!=0){
-            int columnIndex=0;
-            for(Map.Entry<String,Object> t:rows.get(0).entrySet()){
-                Cell cell=headerRow.createCell(columnIndex);
+        if (rows != null && rows.size() != 0) {
+            int columnIndex = 0;
+            for (Map.Entry<String, Object> t : rows.get(0).entrySet()) {
+                Cell cell = headerRow.createCell(columnIndex);
                 cell.setCellValue(t.getKey());
                 cell.setCellStyle(headerCellStyle);
                 columnIndex++;
             }
-            int rowIndex=1;
-            for(HashMap<String,Object> t:rows) {
+            int rowIndex = 1;
+            for (HashMap<String, Object> t : rows) {
 
-                int columnIndexTmp=0;
-                Row r=sheet.createRow(rowIndex);
+                int columnIndexTmp = 0;
+                Row r = sheet.createRow(rowIndex);
 
                 for (Map.Entry<String, Object> tmp : t.entrySet()) {
-                    Cell cell=r.createCell(columnIndexTmp);
+                    Cell cell = r.createCell(columnIndexTmp);
                     cell.setCellValue(String.valueOf(tmp.getValue()));
                     cell.setCellStyle(headerCellStyle);
                     columnIndexTmp++;
@@ -144,7 +145,7 @@ public class GuidedRuleTemplateExcelService {
         }
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         try {
-            FileOutputStream fileOutputStream=new FileOutputStream(tmpDir+"/"+nameTemplate+".xlsx");
+            FileOutputStream fileOutputStream = new FileOutputStream(tmpDir + "/" + nameTemplate + ".xlsx");
             workbook.write(fileOutputStream);
         } catch (FileNotFoundException e) {
             e.printStackTrace();

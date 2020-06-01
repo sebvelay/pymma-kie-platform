@@ -311,13 +311,22 @@ public class PackageResource {
     private org.uberfire.java.nio.file.Path getDirectoryElementPath(DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream, String assetName) {
         for (org.uberfire.java.nio.file.Path elementPath : directoryStream) {
             if (org.uberfire.java.nio.file.Files.isDirectory(elementPath)) {
-                DirectoryStream<org.uberfire.java.nio.file.Path> adirectoryStream = ioService.newDirectoryStream(elementPath);
-                if (elementPath.getFileName().toString().equals(assetName)) {
-                    return elementPath;
-                }
-                org.uberfire.java.nio.file.Path foundElementPath = getDirectoryElementPath(adirectoryStream, assetName);
-                if (foundElementPath != null) {
-                    return foundElementPath;
+                DirectoryStream<org.uberfire.java.nio.file.Path> adirectoryStream=null;
+                try {
+                    adirectoryStream = ioService.newDirectoryStream(elementPath);
+                    if (elementPath.getFileName().toString().equals(assetName)) {
+                        return elementPath;
+                    }
+                    org.uberfire.java.nio.file.Path foundElementPath = getDirectoryElementPath(adirectoryStream, assetName);
+                    if (foundElementPath != null) {
+                        return foundElementPath;
+                    }
+                }catch (Exception e){
+
+                }finally {
+                    if (adirectoryStream!= null){
+                        adirectoryStream.close();
+                    }
                 }
             }
         }
@@ -390,17 +399,31 @@ public class PackageResource {
             @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName, Asset asset) {
         try {
             WorkspaceProject project = getProject(organizationalUnitName, projectName);
-            org.uberfire.backend.vfs.Path rootPath = project.getRootPath();
-            org.uberfire.java.nio.file.Path nioPathDirectory = Paths.get(rootPath.toURI());
-            DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream = ioService.newDirectoryStream(nioPathDirectory);
+            if (project!= null) {
+                org.uberfire.backend.vfs.Path rootPath = project.getRootPath();
+                org.uberfire.java.nio.file.Path nioPathDirectory = Paths.get(rootPath.toURI());
+                DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream=null;
+                try {
+                     directoryStream = ioService.newDirectoryStream(nioPathDirectory);
+                    org.uberfire.java.nio.file.Path directoryWhereCreateAsset = getDirectoryElementPath(directoryStream, asset.getTitle());
+                    if (directoryWhereCreateAsset!= null) {
+                        final org.uberfire.java.nio.file.Path nioPath = Paths.get(directoryWhereCreateAsset.toUri());
+                        if (ioService.exists(nioPath)) {
+                            throw new FileAlreadyExistsException(nioPath.toString());
+                        }
+                        CommentedOption commentedOption = new CommentedOption(asset.getComment());
+                        ioService.write(nioPath, asset.getContent().getBytes(), commentedOption);
+                    }
+                }catch (Exception e){
 
-            org.uberfire.java.nio.file.Path directoryWhereCreateAsset = getDirectoryElementPath(directoryStream, asset.getTitle());
-            final org.uberfire.java.nio.file.Path nioPath = Paths.get(directoryWhereCreateAsset.toUri());
-            if (ioService.exists(nioPath)) {
-                throw new FileAlreadyExistsException(nioPath.toString());
+                }finally {
+                    if (directoryStream!= null){
+                        directoryStream.close();
+                    }
+                }
+
+
             }
-            CommentedOption commentedOption = new CommentedOption(asset.getComment());
-            ioService.write(nioPath, asset.getContent().getBytes(), commentedOption);
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
@@ -420,22 +443,26 @@ public class PackageResource {
             WorkspaceProject project = getProject(organizationalUnitName, projectName);
 
             if (project != null) {
-               // Optional<Branch> rr = project.getRepository().getBranch("ee");
-               // org.uberfire.backend.vfs.Path tata = rr.get().getPath();
+                // Optional<Branch> rr = project.getRepository().getBranch("ee");
+                // org.uberfire.backend.vfs.Path tata = rr.get().getPath();
                 org.uberfire.backend.vfs.Path rootPath = project.getRootPath();
                 org.uberfire.java.nio.file.Path nioPath = Paths.get(rootPath.toURI());
 
                 DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream = ioService.newDirectoryStream(nioPath);
                 org.uberfire.java.nio.file.Path elementToUpdate = getFileElementPath(directoryStream, assetName);
-                File fileToUpdate = elementToUpdate.toFile();
-                if (fileToUpdate.isFile()) {
-                    content = content.replace("\"", "");
-                    ioService.write(elementToUpdate, content);
-                    //   FileOutputStream fileOutputStream = new FileOutputStream(fileToUpdate);
-                    //   fileOutputStream.write(content.getBytes());
-                    //   fileOutputStream.close();
-                }
+                if (elementToUpdate != null) {
+                    File fileToUpdate = elementToUpdate.toFile();
+                    if (fileToUpdate.isFile()) {
+                        content = content.replace("\"", "");
+                        ioService.write(elementToUpdate, content);
+                        //   FileOutputStream fileOutputStream = new FileOutputStream(fileToUpdate);
+                        //   fileOutputStream.write(content.getBytes());
+                        //   fileOutputStream.close();
+                    }
 
+                }
+            }else{
+                throw new WebApplicationException("Asset not found " + assetName);
             }
         } catch (RuntimeException e) {
             throw new WebApplicationException(e);

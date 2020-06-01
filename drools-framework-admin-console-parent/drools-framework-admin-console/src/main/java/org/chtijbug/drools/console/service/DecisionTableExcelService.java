@@ -32,7 +32,7 @@ public class DecisionTableExcelService {
 
     private String assetContent;
 
-    public DecisionTableExcelService(){
+    public DecisionTableExcelService() {
         this.kieRepositoryService = AppContext.getApplicationContext().getBean(KieRepositoryService.class);
         this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
         this.userConnectedService = AppContext.getApplicationContext().getBean(UserConnectedService.class);
@@ -48,37 +48,43 @@ public class DecisionTableExcelService {
         return assetContent;
     }
 
-    public List<HashMap<String,Object>> importExcel(InputStream inputStream) throws IOException {
+    public List<HashMap<String, Object>> importExcel(InputStream inputStream) throws IOException {
+        Workbook workbook = null;
+        List<HashMap<String, Object>> result = null;
+        try {
+            workbook = WorkbookFactory.create(inputStream);
+            result = new ArrayList<>();
+            DataFormatter dataFormatter = new DataFormatter();
+            for (Sheet sheet : workbook) {
+                for (Row row : sheet) {
 
-        Workbook workbook= WorkbookFactory.create(inputStream);
+                    if (row.getRowNum() != 0) {
 
-        DataFormatter dataFormatter = new DataFormatter();
+                        HashMap<String, Object> tmp = new HashMap<>();
+                        result.add(tmp);
 
-        List<HashMap<String,Object>> result=new ArrayList<>();
+                        for (Cell cell : row) {
+                            String cellValue = dataFormatter.formatCellValue(cell);
 
-        for(Sheet sheet: workbook) {
-            for (Row row: sheet) {
+                            Integer numColumn = cell.getColumnIndex();
+                            Cell title = sheet.getRow(0).getCell(numColumn);
+                            tmp.put(dataFormatter.formatCellValue(title), cellValue);
 
-                if(row.getRowNum()!=0) {
-
-                    HashMap<String, Object> tmp = new HashMap<>();
-                    result.add(tmp);
-
-                    for (Cell cell : row) {
-                        String cellValue = dataFormatter.formatCellValue(cell);
-
-                        Integer numColumn = cell.getColumnIndex();
-                        Cell title = sheet.getRow(0).getCell(numColumn);
-                        tmp.put(dataFormatter.formatCellValue(title), cellValue);
-
+                        }
                     }
                 }
             }
+        } catch (IOException e) {
+            throw e;
+        } finally {
+            if (workbook != null) {
+                workbook.close();
+            }
         }
-
         return result;
     }
-    public ByteArrayInputStream exportExcel(String nameTemplate) {
+
+    public ByteArrayInputStream exportExcel(String nameTemplate)  {
 
         //Récupération des objets JAVA
 
@@ -89,11 +95,10 @@ public class DecisionTableExcelService {
                 userConnectedService.getProject(),
                 userConnectedService.getAsset());
         GuidedDecisionTable52 model = GuidedDTXMLPersistence.getInstance().unmarshal(assetContent);
+        Workbook workbook = null;
         try {
+            workbook = new XSSFWorkbook();
             DecisionTable decisionTable = new DecisionTable(model);
-
-
-            Workbook workbook = new XSSFWorkbook();
             CreationHelper createHelper = workbook.getCreationHelper();
             Sheet sheet = workbook.createSheet(nameTemplate);
 
@@ -108,9 +113,9 @@ public class DecisionTableExcelService {
 
             if (decisionTable.getRows() != null && decisionTable.getRows().size() != 0) {
                 int columnIndex = 0;
-                int j=0;
+                int j = 0;
                 for (ColumnDefinition columnDefinition : decisionTable.getColumnDefinitionList()) {
-                    if (columnDefinition.isHideColumn()==false){
+                    if (columnDefinition.isHideColumn() == false) {
                         Cell cell = headerRow.createCell(j);
                         cell.setCellValue(columnDefinition.getHeader());
                         cell.setCellStyle(headerCellStyle);
@@ -123,16 +128,16 @@ public class DecisionTableExcelService {
                 for (int i = 0; i < decisionTable.getRows().size(); i++) {
                     org.chtijbug.drools.console.vaadinComponent.componentView.service.dtmodel.Row row = decisionTable.getRows().get(i);
                     int k = 0;
-                    int jj=0;
+                    int jj = 0;
                     Row r = sheet.createRow(rowIndex);
                     for (ColumnDefinition columnDefinition : decisionTable.getColumnDefinitionList()) {
-                        if (columnDefinition.isHideColumn()==false) {
+                        if (columnDefinition.isHideColumn() == false) {
                             Cell cell = r.createCell(k);
                             cell.setCellValue(row.getRowElements().get(jj).getValue());
                             cell.setCellStyle(headerCellStyle);
                             k++;
                         }
-                       jj++;
+                        jj++;
                     }
                     rowIndex++;
                 }
@@ -140,7 +145,7 @@ public class DecisionTableExcelService {
             }
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             try {
-                FileOutputStream fileOutputStream=new FileOutputStream(tmpDir+"/"+nameTemplate+".xlsx");
+                FileOutputStream fileOutputStream = new FileOutputStream(tmpDir + "/" + nameTemplate + ".xlsx");
                 workbook.write(fileOutputStream);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -165,6 +170,14 @@ public class DecisionTableExcelService {
 
         } catch (GuidedException e) {
             e.printStackTrace();
+        } finally {
+            if (workbook != null) {
+                try {
+                    workbook.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return null;
     }

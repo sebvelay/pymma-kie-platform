@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import static com.google.common.base.Throwables.propagate;
+
 @Service
 @DependsOn("applicationContext")
 public class ProjectPersistService {
@@ -229,10 +231,12 @@ public class ProjectPersistService {
             } else if ("ACCEPTED".equals(jobStatus.getStatus())
                     || ("APPROVED".equals(jobStatus.getStatus()))) {
                 try {
-                    workOnGoingView.addRow("JobID=" + jobID + " not yet finished", ui);
-                    Thread.sleep(1000);
+                    synchronized (this) {
+                        workOnGoingView.addRow("JobID=" + jobID + " not yet finished", ui);
+                        this.wait(1000);
+                    }
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    propagate(e);
                 }
             } /*else if("RESOURCE_NOT_EXIST".equals(jobStatus.getStatus())||
                             "SERVER_ERROR".equals(jobStatus.getStatus())||

@@ -172,7 +172,7 @@ public class DeploymentView extends VerticalLayout implements AddLog {
 
         projectPersistGrid.addSelectionListener(selectionEvent -> {
 
-            if (selectionEvent.getFirstSelectedItem() != null && selectionEvent.getFirstSelectedItem().isPresent()) {
+            if (selectionEvent.getFirstSelectedItem().isPresent()) {
                 majAction(selectionEvent.getFirstSelectedItem().get());
             } else {
                 getDeploymentAction().getAssociateKieServer().setEnabled(false);

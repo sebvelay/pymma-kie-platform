@@ -210,16 +210,18 @@ public class KieServiceCommon {
                 Set<Class<?>> classes = kieContainerInstance.getExtraClasses();
                 String className = container.getClassName();
                 Class foundClass = this.getClassFromName(classes, className);
-                ClassLoader classLoader = foundClass.getClassLoader();
-                Class<?> theClass = classLoader.loadClass(className);
-                camelContext.setApplicationContextClassLoader(classLoader);
-                Thread.currentThread().setContextClassLoader(classLoader);
-                String projectName = container.getContainerId();
-                String processId = container.getProcessID();
-                this.deleteCamelBusinessRoute(projectName);
-                DroolsRouter droolsRouter = new DroolsRouter(camelContext, theClass, projectName, kieContainerInstance, processId);
-                camelContext.addRoutes(droolsRouter);
-                routes.put(containerId, droolsRouter);
+                if (foundClass!=null) {
+                    ClassLoader classLoader = foundClass.getClassLoader();
+                    Class<?> theClass = classLoader.loadClass(className);
+                    camelContext.setApplicationContextClassLoader(classLoader);
+                    Thread.currentThread().setContextClassLoader(classLoader);
+                    String projectName = container.getContainerId();
+                    String processId = container.getProcessID();
+                    this.deleteCamelBusinessRoute(projectName);
+                    DroolsRouter droolsRouter = new DroolsRouter(camelContext, theClass, projectName, kieContainerInstance, processId);
+                    camelContext.addRoutes(droolsRouter);
+                    routes.put(containerId, droolsRouter);
+                }
             } finally {
                 if (localClassLoader != null) {
                     Thread.currentThread().setContextClassLoader(localClassLoader);

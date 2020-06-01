@@ -10,6 +10,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.shared.communication.PushMode;
 import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
 
+import java.util.Optional;
+
 @Push(PushMode.AUTOMATIC)
 @StyleSheet("css/accueil.css")
 @HtmlImport("frontend://styles/shared-styles.html")
@@ -22,7 +24,10 @@ public class AccueilView extends SqueletteComposant implements BeforeEnterObserv
 
         if (getUserConnectedService().getUserConnected()==null) {
             beforeEnterEvent.rerouteTo(LoginView.class);
-            UI.getCurrent().getUI().get().getPage().executeJavaScript("window.alert($0)", "Session expiré, veuillez-vous reconnecter");
+            Optional<UI> theUI = UI.getCurrent().getUI();
+            if (theUI.isPresent()) {
+                theUI.get().getPage().executeJavaScript("window.alert($0)", "Session expiré, veuillez-vous reconnecter");
+            }
         }
 
     }

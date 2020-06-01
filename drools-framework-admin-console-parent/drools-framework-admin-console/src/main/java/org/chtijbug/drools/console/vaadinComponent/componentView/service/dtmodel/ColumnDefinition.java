@@ -91,7 +91,7 @@ public class ColumnDefinition {
         this.header = actionSetFieldCol52.getHeader();
         if (actionSetFieldCol52.getDefaultValue() != null) {
             DTCellValue52 defaultValue = actionSetFieldCol52.getDefaultValue();
-            if (!(DataType.TYPE_STRING.equals(defaultValue.getDataType()) && defaultValue.getStringValue().isEmpty())) {
+            if (!(DataType.DataTypes.STRING.equals(defaultValue.getDataType()) && defaultValue.getStringValue().isEmpty())) {
                 this.hasDefaultValue = true;
                 this.defaultValue = getValue(actionSetFieldCol52.getDefaultValue());
             }
@@ -107,7 +107,7 @@ public class ColumnDefinition {
         this.header = actionInsertFact52.getHeader();
         if (actionInsertFact52.getDefaultValue() != null) {
             DTCellValue52 defaultValue = actionInsertFact52.getDefaultValue();
-            if (!(DataType.TYPE_STRING.equals(defaultValue.getDataType()) && defaultValue.getStringValue().isEmpty())) {
+            if (!(DataType.DataTypes.STRING.equals(defaultValue.getDataType()) && defaultValue.getStringValue().isEmpty())) {
                 this.hasDefaultValue = true;
                 this.defaultValue = getValue(actionInsertFact52.getDefaultValue());
             }

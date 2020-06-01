@@ -43,7 +43,7 @@ public class SftpServerService {
     public void initServer() throws IOException {
         if (System.getProperty("org.chtijbug.server.sftpPort") != null) {
             try {
-                port = Integer.valueOf(System.getProperty("org.chtijbug.server.sftpPort")).intValue();
+                port = Integer.valueOf(System.getProperty("org.chtijbug.server.sftpPort"));
             } catch (NumberFormatException e) {
                 port = 9080;
             }

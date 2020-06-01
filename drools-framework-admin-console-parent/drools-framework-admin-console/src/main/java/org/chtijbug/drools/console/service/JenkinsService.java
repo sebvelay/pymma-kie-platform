@@ -23,7 +23,7 @@ import java.util.Map;
 public class JenkinsService {
     JenkinsServer jenkins = null;
 
-    public void createJobForRepo(String jenkinsServerUrl, String username, String password, String viewName, String groupId, String artifactId, String pomXml, String nexusName, String nexusUrl, String jdkVersion) throws URISyntaxException, IOException {
+    public void createJobForRepo(String jenkinsServerUrl, String username, String password, String viewName, String groupId, String artifactId, String pomXml, String nexusName, String nexusUrl, String jdkVersion) throws URISyntaxException, IOException, InterruptedException {
         GitLabConfigurationData configGitLab = AppContext.getApplicationContext().getBean(GitLabConfigurationData.class);
         JenkinsConfigurationData jenkinsConfigurationData = AppContext.getApplicationContext().getBean(JenkinsConfigurationData.class);
 
@@ -57,9 +57,9 @@ public class JenkinsService {
                 } else {
                     synchronized (this) {
                         try {
-                            Thread.currentThread().wait(1000);
+                            this.wait(1000);
                         } catch (InterruptedException e) {
-                            e.printStackTrace();
+                           throw e;
                         }
                     }
                 }

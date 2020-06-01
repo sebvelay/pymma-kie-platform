@@ -195,8 +195,9 @@ public class GenericResource {
                         Method traceMethod = foundClass.getMethod("logTrace", String.class);
                         if (traceMethod != null) {
                             jsonInString = mapper.writeValueAsString(chtijbutObjectResponse.getSessionLogging());
+                            traceMethod.invoke(input, jsonInString);
                         }
-                        traceMethod.invoke(input, jsonInString);
+
                     } catch (Exception e) {
 
                     }

@@ -2,7 +2,6 @@ package org.chtijbug.drools.console.view;
 
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dependency.StyleSheet;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -16,12 +15,14 @@ import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.DialogPerso;
-import org.chtijbug.drools.console.vaadinComponent.componentView.AssetEdit;
 import org.chtijbug.drools.console.vaadinComponent.leftMenu.Action.TemplatesAction;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
 import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @StyleSheet("css/accueil.css")
 public class TemplateView extends VerticalLayout {
@@ -102,16 +103,19 @@ public class TemplateView extends VerticalLayout {
     public void edit(ComboBox<PlatformProjectResponse> spaceSelection){
         Set<Asset> selectedElements = assetListGrid.getSelectedItems();
         if (selectedElements.toArray().length > 0) {
-            String assetName = selectedElements.stream().findFirst().get().getTitle();
-            if (assetName != null) {
-                PlatformProjectResponse response =  spaceSelection.getValue();
-                userConnectedService.addAssetToSession(assetName);
-                userConnectedService.addProjectToSession(response.getName());
-                userConnectedService.addSpaceToSession(response.getSpaceName());
-                DialogPerso dialog=new DialogPerso();
+            Optional<Asset> assetOptional = selectedElements.stream().findFirst();
+            if (assetOptional.isPresent()) {
+                String assetName = assetOptional.get().getTitle();
+                if (assetName != null) {
+                    PlatformProjectResponse response = spaceSelection.getValue();
+                    userConnectedService.addAssetToSession(assetName);
+                    userConnectedService.addProjectToSession(response.getName());
+                    userConnectedService.addSpaceToSession(response.getSpaceName());
+                    DialogPerso dialog = new DialogPerso();
 
-                dialog.add(new EditTemplateView(dialog,assetName));
-                dialog.open();
+                    dialog.add(new EditTemplateView(dialog, assetName));
+                    dialog.open();
+                }
             }
         }
     }

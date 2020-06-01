@@ -41,7 +41,7 @@ public class GuidedException extends Exception {
     }
 
     public void setAttribute(String attribute) {
-        attribute = attribute;
+        this.attribute = attribute;
     }
 
     public String getValue() {

@@ -43,7 +43,6 @@ public class CalculatedAttribute {
 
     public void setClassName(String className) {
         this.className = className;
-        new Boolean(booleanValue).toString();
     }
 
     public String getKey() {

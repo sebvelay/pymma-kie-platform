@@ -63,7 +63,7 @@ public class DroolsFactObjectFactory {
             }
             return createFactObject;
         } catch (Exception e) {
-            logger.error("Not possible to introspect {} for reason {}", o, e);
+            logger.error("Not possible to introspect {} for reason {}", o, e.getMessage(),e);
             throw Throwables.propagate(e);
         } finally {
             logger.debug("<< createFactObject", createFactObject);

@@ -67,7 +67,7 @@ public class AssociateProjectKie extends VerticalLayout {
         });
 
         gridRuntime.addSelectionListener(selectionEvent -> {
-            if (selectionEvent.getFirstSelectedItem() != null && selectionEvent.getFirstSelectedItem().isPresent()) {
+            if ( selectionEvent.getFirstSelectedItem().isPresent()) {
 
                 associer.setEnabled(true);
             } else {
