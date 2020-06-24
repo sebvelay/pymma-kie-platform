@@ -14,8 +14,8 @@
 
     <properties>
         <category>Rest</category>
-        <spring.boot-version>2.1.0.RELEASE</spring.boot-version>
-        <camel.version>2.23.0</camel.version>
+        <spring.boot-version>${spring.boot.version}</spring.boot-version>
+        <camel.version>2.25.1</camel.version>
     </properties>
     <modules>
         <module>drools-framework-business-proxy-app</module>

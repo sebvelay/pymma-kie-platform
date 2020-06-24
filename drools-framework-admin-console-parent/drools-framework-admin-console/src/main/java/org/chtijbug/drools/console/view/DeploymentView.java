@@ -23,7 +23,7 @@ import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.Map;
 
 @StyleSheet("css/accueil.css")
 public class DeploymentView extends VerticalLayout implements AddLog {
@@ -215,7 +215,7 @@ public class DeploymentView extends VerticalLayout implements AddLog {
 
     public void setDataProvider() {
 
-        HashMap<String, ProjectPersist> projectPersists = projectPersistService.getProjectsSession();
+        Map<String, ProjectPersist> projectPersists = projectPersistService.getProjectsSession();
         if (projectPersists != null) {
             dataProvider = new ListDataProvider<>(projectPersists.values());
 

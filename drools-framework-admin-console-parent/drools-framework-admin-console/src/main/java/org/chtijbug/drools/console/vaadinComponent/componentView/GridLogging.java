@@ -103,7 +103,7 @@ public class GridLogging extends Grid<BusinessTransactionPersistence> {
         });
         serverNameC.setHeader(serverName);
 
-        setDataProvider(indexerService.getBusinessTransactionPersistenceRepository().findAll(new PageRequest(0,100)).getContent());
+        setDataProvider(indexerService.getBusinessTransactionPersistenceRepository().findAll(PageRequest.of(0,100)).getContent());
     }
     private void refreshtGrid(String value,String type){
 

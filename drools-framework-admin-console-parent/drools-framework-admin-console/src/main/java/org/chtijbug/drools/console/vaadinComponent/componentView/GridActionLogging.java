@@ -173,7 +173,7 @@ public class GridActionLogging extends Grid<BusinessTransactionAction> {
 
     public void setDataProvider(String id){
 
-        List<BusinessTransactionAction> businessTransactionPersistences = indexerService.getBusinessTransactionActionRepository().findAllByBusinessTransactionId(id,new Sort(new Sort.Order(Sort.Direction.ASC,"eventNumber")),new PageRequest(0,5000));
+        List<BusinessTransactionAction> businessTransactionPersistences = indexerService.getBusinessTransactionActionRepository().findAllByBusinessTransactionId(id,Sort.by(new Sort.Order(Sort.Direction.ASC,"eventNumber")),PageRequest.of(0,5000));
 
         if(businessTransactionPersistences!=null) {
             dataProvider = new ListDataProvider<>(businessTransactionPersistences);

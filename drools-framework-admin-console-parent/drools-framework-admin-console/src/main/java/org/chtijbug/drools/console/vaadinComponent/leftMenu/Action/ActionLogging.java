@@ -38,9 +38,9 @@ public class ActionLogging extends VerticalLayout {
 
                 if (textFieldStringComponentValueChangeEvent.getValue().isEmpty()) {
                     loggingView.getTitle().setText("Logging : ");
-                    loggingView.getGridLogging().setDataProvider(indexerService.getBusinessTransactionPersistenceRepository().findAll(new PageRequest(0, 100)).getContent());
+                    loggingView.getGridLogging().setDataProvider(indexerService.getBusinessTransactionPersistenceRepository().findAll(PageRequest.of(0, 100)).getContent());
                 } else {
-                    List<BusinessTransactionPersistence> b = indexerService.getBusinessTransactionPersistenceRepository().findAllByTransactionId(textFieldStringComponentValueChangeEvent.getValue(), new PageRequest(0, 100));
+                    List<BusinessTransactionPersistence> b = indexerService.getBusinessTransactionPersistenceRepository().findAllByTransactionId(textFieldStringComponentValueChangeEvent.getValue(), PageRequest.of(0, 100));
 
                     if (b != null) {
                         loggingView.getTitle().setText("Logging : " + textFieldStringComponentValueChangeEvent.getValue());

@@ -27,7 +27,7 @@ public class ElasticSearchExpose {
 
         BusinessTransactionPersistence tmp=null;
 
-        List<BusinessTransactionPersistence> businessTransactionPersistences = indexerService.getBusinessTransactionPersistenceRepository().findAllByTransactionId(transactionId,new PageRequest(0,5000));
+        List<BusinessTransactionPersistence> businessTransactionPersistences = indexerService.getBusinessTransactionPersistenceRepository().findAllByTransactionId(transactionId,PageRequest.of(0,5000));
 
         if(businessTransactionPersistences!=null) {
             for (BusinessTransactionPersistence b : businessTransactionPersistences) {
@@ -46,7 +46,7 @@ public class ElasticSearchExpose {
     @RequestMapping(value = "/findActionByBusinessId", method = RequestMethod.GET)
     public List<BusinessTransactionAction> findActionById(@RequestParam String businessId, HttpServletRequest request, HttpServletResponse response) {
 
-        List<BusinessTransactionAction> businessTransactionPersistences = indexerService.getBusinessTransactionActionRepository().findAllByBusinessTransactionId(businessId,new Sort(new Sort.Order(Sort.Direction.ASC,"eventNumber")),new PageRequest(0,5000));
+        List<BusinessTransactionAction> businessTransactionPersistences = indexerService.getBusinessTransactionActionRepository().findAllByBusinessTransactionId(businessId,Sort.by(new Sort.Order(Sort.Direction.ASC,"eventNumber")),PageRequest.of(0,5000));
 
         return businessTransactionPersistences;
     }
