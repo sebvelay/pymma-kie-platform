@@ -17,6 +17,8 @@ import org.chtijbug.drools.proxy.persistence.repository.ContainerRuntimeReposito
 import org.chtijbug.drools.proxy.persistence.repository.ProjectRepository;
 import org.chtijbug.drools.proxy.persistence.repository.RuntimeRepository;
 import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
@@ -24,14 +26,15 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import static com.google.common.base.Throwables.propagate;
+import java.util.Map;
 
 @Service
 @DependsOn("applicationContext")
 public class ProjectPersistService {
 
-    public static String PROJECT = "4";
+    private static final Logger logger = LoggerFactory.getLogger(ProjectPersistService.class);
+
+    private  static String projectVariable = "4";
 
     @Autowired
     private ProjectRepository projectRepository;
@@ -59,13 +62,8 @@ public class ProjectPersistService {
 
     }
 
-    public static String getPROJECT() {
-        return PROJECT;
-    }
 
-    public static void setPROJECT(String PROJECT) {
-        ProjectPersistService.PROJECT = PROJECT;
-    }
+
 
     public void saveIfnotExist(List<PlatformProjectResponse> platformProjectResponses) {
 
@@ -90,13 +88,13 @@ public class ProjectPersistService {
         }
     }
 
-    public HashMap<String, ProjectPersist> getProjectsSession() {
-        return (HashMap<String, ProjectPersist>) VaadinSession.getCurrent().getAttribute(PROJECT);
+    public Map<String, ProjectPersist> getProjectsSession() {
+        return (Map<String, ProjectPersist>) VaadinSession.getCurrent().getAttribute(projectVariable);
     }
 
     public void addProjectToSession(ProjectPersist projectPersist, boolean isModifiable) {
 
-        HashMap<String, ProjectPersist> projectPersists = getProjectsSession();
+        Map<String, ProjectPersist> projectPersists = getProjectsSession();
 
         if (projectPersists == null) {
             projectPersists = new HashMap<>();
@@ -112,7 +110,7 @@ public class ProjectPersistService {
             }
         }
 
-        VaadinSession.getCurrent().setAttribute(PROJECT, projectPersists);
+        VaadinSession.getCurrent().setAttribute(projectVariable, projectPersists);
     }
 
     public boolean associate(ProjectPersist projectPersist, List<RuntimePersist> runtimePersists) {
@@ -120,12 +118,8 @@ public class ProjectPersistService {
         projectPersist.setContainerID(projectPersist.getDeploymentName() + "-" + projectPersist.getProjectName());
         projectPersist.getServerNames().clear();
         for (RuntimePersist runtimePersist : runtimePersists) {
-            List<String> names = new ArrayList<String>();
+            List<String> names = new ArrayList<>();
             names.add(runtimePersist.getServerName());
-            List<ProjectPersist> projectPersists = projectRepository.findByServerNamesInAndDeploymentName(names, projectPersist.getDeploymentName());
-            //if (projectPersists.size() != 0) {
-            //    return false;
-            // }
             projectPersist.getServerNames().add(runtimePersist.getServerName());
             ContainerPojoPersist existingContainer = containerRepository.findByServerNameAndContainerId(runtimePersist.getServerName(), projectPersist.getContainerID());
             if (existingContainer == null) {
@@ -175,6 +169,7 @@ public class ProjectPersistService {
         UserConnected userConnected = userConnectedService.getUserConnected();
 
         Thread thread = new Thread() {
+            @Override
             public void run() {
 
                 JobStatus result = kieRepositoryService.buildProject(config.getKiewbUrl(), userConnected.getUserName(),
@@ -187,11 +182,10 @@ public class ProjectPersistService {
 
                 executeWrite(url, username, password, workOnGoingView, result.getJobId(), ui);
 
-                //   ContainerPojoPersist toto = containerRepository.findByServerNameAndContainerId(projectPersist.getContainerID());
-                for (String serverName : projectPersist.getServerNames()) {
+                 for (String serverName : projectPersist.getServerNames()) {
 
                     List<ContainerRuntimePojoPersist> existingContainers = containerRuntimeRepository.findByServerNameAndContainerId(serverName, projectPersist.getContainerID());
-                    if (existingContainers.size() > 0) {
+                    if (!existingContainers.isEmpty()) {
                         for (ContainerRuntimePojoPersist containerRuntimePojoPersist : existingContainers) {
                             containerRuntimePojoPersist.setStatus(ContainerRuntimePojoPersist.STATUS.TODEPLOY.name());
                             containerRuntimeRepository.save(containerRuntimePojoPersist);
@@ -236,13 +230,10 @@ public class ProjectPersistService {
                         this.wait(1000);
                     }
                 } catch (InterruptedException e) {
-                    propagate(e);
+                    logger.error("executeWrite",e);
+                    Thread.currentThread().interrupt();
                 }
-            } /*else if("RESOURCE_NOT_EXIST".equals(jobStatus.getStatus())||
-                            "SERVER_ERROR".equals(jobStatus.getStatus())||
-                            "FAIL".equals(jobStatus.getStatus())){
-                        isJobDone = "ERROR";
-                    }*/
+            }
         }
     }
 

@@ -25,7 +25,6 @@ import org.chtijbug.drools.runtime.listener.HistoryListener;
 import org.chtijbug.drools.runtime.resource.FileKnowledgeResource;
 import org.chtijbug.drools.runtime.resource.KnowledgeModule;
 import org.chtijbug.drools.runtime.resource.WorkbenchClient;
-import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.slf4j.Logger;
@@ -62,7 +61,6 @@ public class RuleBaseSingleton implements RuleBasePackage {
     private String ruleBaseName;
     private Long ruleBaseID;
     private KieContainer kieContainer;
-    private ReleaseId releaseId;
     private String groupId;
     private String artifactId;
     private String version;
@@ -135,9 +133,6 @@ public class RuleBaseSingleton implements RuleBasePackage {
             KnowledgeBaseCreatedEvent knowledgeBaseCreatedEvent = new KnowledgeBaseCreatedEvent(eventCounter.next(), new Date(), ruleBaseID);
             this.historyListener.fireEvent(knowledgeBaseCreatedEvent);
         }
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-        this.version = version;
         this.knowledgeModule = new KnowledgeModule(this.ruleBaseName, this.historyListener, eventCounter);
     }
     public RuleBaseSingleton(Long ruleBaseID, int maxNumberRulesToExecute, HistoryListener historyListener) throws DroolsChtijbugException {
@@ -148,9 +143,6 @@ public class RuleBaseSingleton implements RuleBasePackage {
             KnowledgeBaseCreatedEvent knowledgeBaseCreatedEvent = new KnowledgeBaseCreatedEvent(eventCounter.next(), new Date(), ruleBaseID);
             this.historyListener.fireEvent(knowledgeBaseCreatedEvent);
         }
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-        this.version = version;
         this.knowledgeModule = new KnowledgeModule(this.ruleBaseID, this.historyListener, eventCounter);
     }
 
@@ -178,7 +170,7 @@ public class RuleBaseSingleton implements RuleBasePackage {
 
     @Override
     public RuleBaseSession createRuleBaseSession(int maxNumberRulesToExecute, HistoryListener sessionHistoryListener, String sessionName) throws DroolsChtijbugException {
-        logger.debug(">>createRuleBaseSession", maxNumberRulesToExecute);
+        logger.debug(">>createRuleBaseSession number Rules to execute {}", maxNumberRulesToExecute);
         RuleBaseSession newRuleBaseSession = null;
         try {
             if (kieContainer != null) {
@@ -268,7 +260,7 @@ public class RuleBaseSingleton implements RuleBasePackage {
                     this.historyListener.fireEvent(new KnowledgeBaseAddResourceEvent(eventCounter.next(), new Date(), this.ruleBaseID));
                 }
             } catch (InterruptedException e) {
-                throw propagate(e);
+                Thread.currentThread().interrupt();
             }
         }
 
@@ -327,6 +319,15 @@ public class RuleBaseSingleton implements RuleBasePackage {
         }
     }
 
-
-
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("RuleBaseSingleton{");
+        sb.append("ruleBaseName='").append(ruleBaseName).append('\'');
+        sb.append(", ruleBaseID=").append(ruleBaseID);
+        sb.append(", groupId='").append(groupId).append('\'');
+        sb.append(", artifactId='").append(artifactId).append('\'');
+        sb.append(", version='").append(version).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }
