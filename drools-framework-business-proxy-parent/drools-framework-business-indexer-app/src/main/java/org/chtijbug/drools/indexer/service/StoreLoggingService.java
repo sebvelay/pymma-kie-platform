@@ -24,8 +24,9 @@ public class StoreLoggingService {
     @Autowired
     private BusinessTransactionActionRepository actionRepository;
 
+
     @KafkaListener(
-            topics = KafkaTopicConstants.LOGING_TOPIC,
+            topics = KafkaTopicConstants.LOGING_TOPIC,groupId = "${kafka.index.groupid}",
             containerFactory = "ruleKafkaListenerContainerFactory")
     public void store(ChtijbugObjectRequest result) {
         if (result != null) {

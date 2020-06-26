@@ -45,11 +45,13 @@ public class DroolsBusinessIndexerServer {
     private String bootstrapAddress;
 
 
+    @Value(value = "${kafka.index.groupid})")
+    private String groupID;
 
     public ConsumerFactory<String, ChtijbugObjectRequest> greetingConsumerFactory() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "greeting");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupID);
         return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(ChtijbugObjectRequest.class));
     }
     @Bean

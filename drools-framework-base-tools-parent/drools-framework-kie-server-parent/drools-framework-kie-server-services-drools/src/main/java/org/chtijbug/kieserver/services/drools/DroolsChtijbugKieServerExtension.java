@@ -19,7 +19,6 @@ import org.chtijbug.drools.kieserver.extension.KieServerAddOnElement;
 import org.chtijbug.drools.kieserver.extension.KieServerGlobalVariableDefinition;
 import org.chtijbug.drools.kieserver.extension.KieServerListenerDefinition;
 import org.chtijbug.drools.kieserver.extension.KieServerLoggingDefinition;
-import org.chtijbug.kieserver.services.drools.sftp.SftpServerService;
 import org.drools.compiler.kie.builder.impl.InternalKieModule;
 import org.drools.compiler.kie.builder.impl.KieRepositoryImpl;
 import org.kie.api.builder.KieRepository;
@@ -34,7 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
@@ -54,7 +52,7 @@ public class DroolsChtijbugKieServerExtension implements KieServerExtension {
 
     private boolean initialized = false;
 
-    private SftpServerService sftpServerService;
+
 
     @Override
     public boolean isInitialized() {
@@ -73,12 +71,6 @@ public class DroolsChtijbugKieServerExtension implements KieServerExtension {
         this.registry = registry;
         services.add(rulesExecutionService);
         initialized = true;
-        sftpServerService = new SftpServerService();
-        try {
-            sftpServerService.initServer();
-        } catch (IOException e) {
-            logger.error("Impossible to create sftp server", e);
-        }
     }
 
     private void initExtensionsList() {

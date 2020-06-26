@@ -18,9 +18,13 @@ package org.chtijbug.drools.proxy;
 
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.chtijbug.drools.ChtijbugObjectRequest;
+import org.chtijbug.drools.KieContainerResponse;
+import org.chtijbug.drools.KieContainerUpdate;
 import org.chtijbug.drools.common.KafkaTopicConstants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -28,10 +32,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaAdmin;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.core.*;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.net.InetAddress;
@@ -45,8 +48,8 @@ import java.util.Map;
 @EnableKafka
 public class DroolsBusinessProxyServer {
 
-
-
+    @Value(value = "${org.kie.server.id}")
+    private String groupID;
 
     @Value(value = "${kafka.bootstrapAddress}")
     private String bootstrapAddress;
@@ -62,10 +65,12 @@ public class DroolsBusinessProxyServer {
     public NewTopic loggingTopic() {
         return new NewTopic(KafkaTopicConstants.LOGING_TOPIC, 1, (short) 1);
     }
+
     @Bean
     public NewTopic actionResponseTopic() {
         return new NewTopic(KafkaTopicConstants.RESPONSE_TOPIC, 1, (short) 1);
     }
+
     @Bean
     public ProducerFactory<String, ChtijbugObjectRequest> producerFactory() {
         Map<String, Object> configProps = new HashMap<>();
@@ -79,6 +84,45 @@ public class DroolsBusinessProxyServer {
                 ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
                 JsonSerializer.class);
         return new DefaultKafkaProducerFactory<>(configProps);
+    }
+    @Bean
+    public ProducerFactory<String, KieContainerResponse> producerKieContainerResponseactory() {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                bootstrapAddress);
+        configProps.put(
+                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                StringSerializer.class);
+        configProps.put(
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                JsonSerializer.class);
+        return new DefaultKafkaProducerFactory<>(configProps);
+    }
+    @Bean
+    public KafkaTemplate<String, KieContainerResponse> kafkaKieContainerUpdateResponsableTemplate() {
+        return new KafkaTemplate<>(producerKieContainerResponseactory());
+    }
+    @Bean
+    public NewTopic actionDeployResponseTopic() {
+        return new NewTopic(KafkaTopicConstants.RESPONSE_DEPLOY_TOPIC, 1, (short) 1);
+    }
+
+
+    public ConsumerFactory<String, KieContainerUpdate> greetingConsumerFactory() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupID);
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(KieContainerUpdate.class));
+    }
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, KieContainerUpdate>
+    ruleKafkaListenerKieContainerUpdateFactory() {
+
+        ConcurrentKafkaListenerContainerFactory<String, KieContainerUpdate> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(greetingConsumerFactory());
+        return factory;
     }
 
     @Bean

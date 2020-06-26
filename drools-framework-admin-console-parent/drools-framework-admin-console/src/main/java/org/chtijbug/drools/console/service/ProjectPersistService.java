@@ -2,6 +2,7 @@ package org.chtijbug.drools.console.service;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinSession;
+import org.chtijbug.drools.KieContainerUpdate;
 import org.chtijbug.drools.ReverseProxyUpdate;
 import org.chtijbug.drools.common.KafkaTopicConstants;
 import org.chtijbug.drools.console.AddLog;
@@ -61,6 +62,9 @@ public class ProjectPersistService {
     private RuntimeRepository runtimeRepository;
     @Autowired
     private KafkaTemplate<String, ReverseProxyUpdate> kafkaTemplateProxyUpdate;
+
+    @Autowired
+    private KafkaTemplate<String, KieContainerUpdate> kafkaKieContainerUpdateTemplate;
 
     public ProjectPersistService() {
         this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
@@ -169,6 +173,8 @@ public class ProjectPersistService {
         return projectPersist;
     }
 
+
+
     public void waitForJobToBeEnded(String url, String username, String password, ProjectPersist projectPersist, AddLog workOnGoingView, UI ui) {
 
         UserConnected userConnected = userConnectedService.getUserConnected();
@@ -187,7 +193,10 @@ public class ProjectPersistService {
 
                 executeWrite(url, username, password, workOnGoingView, result.getJobId(), ui);
 
+
+
                 for (String serverName : projectPersist.getServerNames()) {
+
 
                     List<ContainerRuntimePojoPersist> existingContainers = containerRuntimeRepository.findByServerNameAndContainerId(serverName, projectPersist.getContainerID());
                     if (!existingContainers.isEmpty()) {
@@ -208,7 +217,15 @@ public class ProjectPersistService {
 
 
                     }
-
+                    KieContainerUpdate kieContainerUpdate = new KieContainerUpdate();
+                    kieContainerUpdate.setMainClass(projectPersist.getMainClass());
+                    kieContainerUpdate.setArtifactID(projectPersist.getArtifactID());
+                    kieContainerUpdate.setGroupID(projectPersist.getGroupID());
+                    kieContainerUpdate.setProjectVersion(projectPersist.getProjectVersion());
+                    kieContainerUpdate.setContainerID(projectPersist.getContainerID());
+                    kieContainerUpdate.setAction(KieContainerUpdate.STATUS.TODEPLOY);
+                    kafkaKieContainerUpdateTemplate.send(serverName,kieContainerUpdate);
+                    workOnGoingView.addRow("Deploy Request="+kieContainerUpdate,ui);
                 }
             }
         };

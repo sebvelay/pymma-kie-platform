@@ -3,8 +3,12 @@ package org.chtijbug.drools.console;
 
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.chtijbug.drools.KieContainerResponse;
+import org.chtijbug.drools.KieContainerUpdate;
 import org.chtijbug.drools.ReverseProxyUpdate;
 import org.chtijbug.drools.common.KafkaTopicConstants;
 import org.chtijbug.drools.console.middle.DababaseContentInit;
@@ -23,10 +27,9 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.kafka.annotation.EnableKafka;
-import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaAdmin;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.core.*;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.HashMap;
@@ -92,11 +95,48 @@ public class DroolsSpringBootConsoleApplication extends SpringBootServletInitial
                 JsonSerializer.class);
         return new DefaultKafkaProducerFactory<>(configProps);
     }
+    @Bean
+    public ProducerFactory<String, KieContainerUpdate> producerKieContainerUpdateFactory() {
+        Map<String, Object> configProps = new HashMap<>();
+        configProps.put(
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                bootstrapAddress);
+        configProps.put(
+                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                StringSerializer.class);
+        configProps.put(
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                JsonSerializer.class);
+        return new DefaultKafkaProducerFactory<>(configProps);
+    }
 
     @Bean
     public KafkaTemplate<String, ReverseProxyUpdate> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
+
+    @Bean
+    public KafkaTemplate<String, KieContainerUpdate> kafkaKieContainerUpdateTemplate() {
+        return new KafkaTemplate<>(producerKieContainerUpdateFactory());
+    }
+
+
+    public ConsumerFactory<String, KieContainerResponse> greetingConsumerFactory() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG,"Console");
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(KieContainerResponse.class));
+    }
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, KieContainerResponse>
+    ruleKafkaListenerKieContainerUpdateFactory() {
+
+        ConcurrentKafkaListenerContainerFactory<String, KieContainerResponse> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(greetingConsumerFactory());
+        return factory;
+    }
+
 
     public static void main(String[] args) {
         SpringApplication.run(DroolsSpringBootConsoleApplication.class, args);
