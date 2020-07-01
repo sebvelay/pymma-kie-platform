@@ -30,6 +30,7 @@ import org.uberfire.ext.security.management.util.SecurityManagementUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -75,6 +76,11 @@ public class KiePlatformGroupManager  implements GroupManager, ContextualManager
     @Override
     public Group get(String identifier) throws SecurityManagementException {
         throw new UnsupportedServiceCapabilityException(Capability.CAN_READ_GROUP);
+    }
+
+    @Override
+    public List<Group> getAll() throws SecurityManagementException {
+        return null;
     }
 
     @Override
