@@ -116,7 +116,7 @@ public class KieServiceCommon {
         this.marshallerHelper = new MarshallerHelper(this.server.getServerRegistry());
 
         String serverName = KieServiceCommon.getKieServerID();
-        String sftpPort = System.getProperty("org.chtijbug.server.sftpPort");
+
 
         try {
             InetAddress inetAddress = InetAddress.getLocalHost();
@@ -129,7 +129,7 @@ public class KieServiceCommon {
         String version = result.getResult().getVersion();
         if (itIsMes.size() == 0) {
             RuntimePersist runtimePersist = new RuntimePersist(serverName, version, hostName,
-                    String.valueOf(serverPort), sftpPort,
+                    String.valueOf(serverPort), null,
                     hostName, RuntimePersist.STATUS.UP.toString());
             String isSwarm = System.getProperty("org.kie.server.swarm");
             if ("1".equals(isSwarm)) {
@@ -178,6 +178,8 @@ public class KieServiceCommon {
                 }
             }
         });
+
+
     }
 
     public void setTimeStamp() {

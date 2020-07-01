@@ -15,7 +15,7 @@ import java.util.Optional;
 @Push(PushMode.AUTOMATIC)
 @StyleSheet("css/accueil.css")
 @HtmlImport("frontend://styles/shared-styles.html")
-@Route("accueil")
+@Route("admin/accueil")
 public class AccueilView extends SqueletteComposant implements BeforeEnterObserver {
 
 
