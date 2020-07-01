@@ -8,7 +8,7 @@ import org.chtijbug.drools.common.rest.MultipleInputs;
 import org.chtijbug.drools.kieserver.extension.KieServerAddOnElement;
 import org.chtijbug.drools.kieserver.extension.KieServerLoggingDefinition;
 import org.chtijbug.drools.logging.SessionExecution;
-import org.chtijbug.kieserver.services.drools.ChtijbugObjectRequest;
+import org.chtijbug.drools.ChtijbugObjectRequest;
 import org.chtijbug.kieserver.services.drools.DroolsChtijbugRulesExecutionService;
 import org.kie.server.services.api.KieContainerInstance;
 import org.kie.server.services.api.KieServerRegistry;

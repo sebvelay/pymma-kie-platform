@@ -16,18 +16,53 @@
  */
 package org.chtijbug.drools.indexer;
 
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.chtijbug.drools.ChtijbugObjectRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.core.ConsumerFactory;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
+
+import java.util.HashMap;
+import java.util.Map;
 
 // CHECKSTYLE:OFF
 @SpringBootApplication
 @Configuration
 @EnableMongoRepositories(basePackages = "org.chtijbug.drools.proxy.persistence.repository")
-
+@EnableKafka
 public class DroolsBusinessIndexerServer {
+    public final static String LOGING_TOPIC ="logging";
+    @Value(value = "${kafka.bootstrapAddress}")
+    private String bootstrapAddress;
+
+
+    @Value(value = "${kafka.index.groupid})")
+    private String groupID;
+
+    public ConsumerFactory<String, ChtijbugObjectRequest> greetingConsumerFactory() {
+        Map<String, Object> props = new HashMap<>();
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupID);
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(ChtijbugObjectRequest.class));
+    }
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, ChtijbugObjectRequest>
+    ruleKafkaListenerContainerFactory() {
+
+        ConcurrentKafkaListenerContainerFactory<String, ChtijbugObjectRequest> factory =
+                new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(greetingConsumerFactory());
+        return factory;
+    }
 
 
     /**

@@ -28,10 +28,7 @@ import org.uberfire.ext.security.management.search.IdentifierRuntimeSearchEngine
 import org.uberfire.ext.security.management.search.UsersIdentifierRuntimeSearchEngine;
 import org.uberfire.ext.security.management.util.SecurityManagementUtils;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * <p>Users manager service provider implementation for Apache tomcat, when using default realm based on properties files.</p>
@@ -80,6 +77,11 @@ public class KiePlatformUserManager  implements UserManager, ContextualManager {
     @Override
     public User get(String identifier) throws SecurityManagementException {
         throw new UnsupportedServiceCapabilityException(Capability.CAN_READ_USER);
+    }
+
+    @Override
+    public List<User> getAll() throws SecurityManagementException {
+        return null;
     }
 
     @Override

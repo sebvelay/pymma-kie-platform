@@ -30,6 +30,7 @@ import org.uberfire.ext.security.management.search.IdentifierRuntimeSearchEngine
 import org.uberfire.ext.security.management.util.SecurityManagementUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -77,6 +78,11 @@ public class KiePlatformRoleManager implements RoleManager,ContextualManager {
     @Override
     public Role get(String identifier) throws SecurityManagementException {
         throw new UnsupportedServiceCapabilityException(Capability.CAN_READ_ROLE);
+    }
+
+    @Override
+    public List<Role> getAll() throws SecurityManagementException {
+        return null;
     }
 
     @Override

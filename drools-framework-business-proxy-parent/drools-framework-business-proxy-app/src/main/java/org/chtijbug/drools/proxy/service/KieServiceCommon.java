@@ -18,6 +18,9 @@ package org.chtijbug.drools.proxy.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Route;
+import org.chtijbug.drools.KieContainerResponse;
+import org.chtijbug.drools.KieContainerUpdate;
+import org.chtijbug.drools.common.KafkaTopicConstants;
 import org.chtijbug.drools.proxy.PlatfomKieServerStateRepository;
 import org.chtijbug.drools.proxy.camel.DroolsRouter;
 import org.chtijbug.drools.proxy.persistence.model.ContainerPojoPersist;
@@ -39,6 +42,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -75,6 +80,9 @@ public class KieServiceCommon {
     private String hostName = "localhost";
     private Map<String, DroolsRouter> routes = new HashMap<>();
 
+    @Autowired
+    KafkaTemplate<String, KieContainerResponse> kafkaKieContainerUpdateResponseTemplate;
+
     public KieServiceCommon() {
         // for now, if no server impl is passed as parameter, create one
         // this.server = KieServerLocator.getInstance();
@@ -108,7 +116,7 @@ public class KieServiceCommon {
         this.marshallerHelper = new MarshallerHelper(this.server.getServerRegistry());
 
         String serverName = KieServiceCommon.getKieServerID();
-        String sftpPort = System.getProperty("org.chtijbug.server.sftpPort");
+
 
         try {
             InetAddress inetAddress = InetAddress.getLocalHost();
@@ -121,7 +129,7 @@ public class KieServiceCommon {
         String version = result.getResult().getVersion();
         if (itIsMes.size() == 0) {
             RuntimePersist runtimePersist = new RuntimePersist(serverName, version, hostName,
-                    String.valueOf(serverPort), sftpPort,
+                    String.valueOf(serverPort), null,
                     hostName, RuntimePersist.STATUS.UP.toString());
             String isSwarm = System.getProperty("org.kie.server.swarm");
             if ("1".equals(isSwarm)) {
@@ -170,6 +178,8 @@ public class KieServiceCommon {
                 }
             }
         });
+
+
     }
 
     public void setTimeStamp() {
@@ -210,7 +220,7 @@ public class KieServiceCommon {
                 Set<Class<?>> classes = kieContainerInstance.getExtraClasses();
                 String className = container.getClassName();
                 Class foundClass = this.getClassFromName(classes, className);
-                if (foundClass!=null) {
+                if (foundClass != null) {
                     ClassLoader classLoader = foundClass.getClassLoader();
                     Class<?> theClass = classLoader.loadClass(className);
                     camelContext.setApplicationContextClassLoader(classLoader);
@@ -264,41 +274,55 @@ public class KieServiceCommon {
         return result.getResult();
     }
 
-    public void updateConfig() throws Exception {
-        String serverName = KieServiceCommon.getKieServerID();
-        String isSwarm = System.getProperty("org.kie.server.swarm");
-        List<ContainerRuntimePojoPersist> containers = null;
 
-        containers = containerRuntimeRepository.findByServerNameAndStatusAndHostname(serverName, ContainerRuntimePojoPersist.STATUS.TODEPLOY.toString(), hostName);
-        for (ContainerRuntimePojoPersist element : containers) {
-            ContainerPojoPersist containerIds = containerRepository.findByServerNameAndContainerId(serverName, element.getContainerId());
-            if (containerIds != null) {
-
-                this.disposeContainer(element.getContainerId());
+    @KafkaListener(
+            topics = "${org.kie.server.id}", groupId = "${org.kie.server.id}",
+            containerFactory = "ruleKafkaListenerKieContainerUpdateFactory")
+    public void updateConfig(KieContainerUpdate update)  {
+        try {
+            String serverName = KieServiceCommon.getKieServerID();
+            if (update.getAction().equals(KieContainerUpdate.STATUS.TODEPLOY)) {
+                this.disposeContainer(update.getContainerID());
                 KieContainerResource newContainer = new KieContainerResource();
-                newContainer.setContainerId(element.getContainerId());
+                newContainer.setContainerId(update.getContainerID());
                 newContainer.setReleaseId(new ReleaseId());
-                newContainer.getReleaseId().setArtifactId(containerIds.getArtifactId());
-                newContainer.getReleaseId().setGroupId(containerIds.getGroupId());
-                newContainer.getReleaseId().setVersion(containerIds.getVersion());
-                this.createContainer(element.getContainerId(), newContainer);
+                newContainer.getReleaseId().setArtifactId(update.getArtifactID());
+                newContainer.getReleaseId().setGroupId(update.getGroupID());
+                newContainer.getReleaseId().setVersion(update.getProjectVersion());
+                this.createContainer(update.getContainerID(), newContainer);
+                ContainerPojoPersist containerIds = containerRepository.findByServerNameAndContainerId(serverName, update.getContainerID());
                 this.initCamelBusinessRoute(containerIds);
-                element.setStatus(ContainerRuntimePojoPersist.STATUS.UP.toString());
-                containerRuntimeRepository.save(element);
-            }
-
-        }
-        containers = containerRuntimeRepository.findByServerNameAndStatusAndHostname(serverName, ContainerRuntimePojoPersist.STATUS.TODELETE.toString(), hostName);
-
-        for (ContainerRuntimePojoPersist element : containers) {
-            ContainerPojoPersist containerIds = containerRepository.findByServerNameAndContainerId(serverName, element.getContainerId());
-            if (containerIds != null) {
-                this.disposeContainer(element.getContainerId());
-                this.deleteCamelBusinessRoute(element.getContainerId());
+                List<ContainerRuntimePojoPersist> containers = containerRuntimeRepository.findByServerNameAndContainerId(serverName, update.getContainerID());
+                for (ContainerRuntimePojoPersist element : containers) {
+                    element.setStatus(ContainerRuntimePojoPersist.STATUS.UP.toString());
+                    containerRuntimeRepository.save(element);
+                }
+            } else {
+                this.disposeContainer(update.getContainerID());
+                this.deleteCamelBusinessRoute(update.getContainerID());
+                ContainerPojoPersist containerIds = containerRepository.findByServerNameAndContainerId(serverName, update.getContainerID());
+                List<ContainerRuntimePojoPersist> containers = containerRuntimeRepository.findByServerNameAndContainerId(serverName, update.getContainerID());
+                for (ContainerRuntimePojoPersist element : containers) {
+                    element.setStatus(ContainerRuntimePojoPersist.STATUS.UP.toString());
+                    containerRuntimeRepository.save(element);
+                }
                 containerRepository.delete(containerIds);
             }
-        }
+            KieContainerResponse kieContainerResponse = new KieContainerResponse();
+            kieContainerResponse.setStatus(KieContainerResponse.STATUS.SUCCESS);
 
+            kafkaKieContainerUpdateResponseTemplate.send(KafkaTopicConstants.RESPONSE_DEPLOY_TOPIC,kieContainerResponse);
+
+        }catch (Exception e){
+            KieContainerResponse kieContainerResponse = new KieContainerResponse();
+            kieContainerResponse.setStatus(KieContainerResponse.STATUS.ERROR);
+            kieContainerResponse.setKieContainerUpdate(update);
+            kieContainerResponse.setMessageError(e.getMessage());
+            for (StackTraceElement stackTraceElement : e.getStackTrace()){
+                kieContainerResponse.getErrorMessages().add(stackTraceElement.toString());
+            }
+            kafkaKieContainerUpdateResponseTemplate.send(KafkaTopicConstants.RESPONSE_DEPLOY_TOPIC,kieContainerResponse);
+        }
     }
 
 

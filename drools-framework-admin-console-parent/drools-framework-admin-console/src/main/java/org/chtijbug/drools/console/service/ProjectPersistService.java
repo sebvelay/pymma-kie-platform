@@ -2,6 +2,9 @@ package org.chtijbug.drools.console.service;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinSession;
+import org.chtijbug.drools.KieContainerUpdate;
+import org.chtijbug.drools.ReverseProxyUpdate;
+import org.chtijbug.drools.common.KafkaTopicConstants;
 import org.chtijbug.drools.console.AddLog;
 import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.JobStatus;
@@ -21,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -34,7 +38,7 @@ public class ProjectPersistService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProjectPersistService.class);
 
-    private  static String projectVariable = "4";
+    private static String projectVariable = "4";
 
     @Autowired
     private ProjectRepository projectRepository;
@@ -56,6 +60,11 @@ public class ProjectPersistService {
 
     @Autowired
     private RuntimeRepository runtimeRepository;
+    @Autowired
+    private KafkaTemplate<String, ReverseProxyUpdate> kafkaTemplateProxyUpdate;
+
+    @Autowired
+    private KafkaTemplate<String, KieContainerUpdate> kafkaKieContainerUpdateTemplate;
 
     public ProjectPersistService() {
         this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
@@ -63,18 +72,16 @@ public class ProjectPersistService {
     }
 
 
-
-
     public void saveIfnotExist(List<PlatformProjectResponse> platformProjectResponses) {
 
         for (PlatformProjectResponse platformProjectResponse : platformProjectResponses) {
 
-            ProjectPersist projectPersist = projectRepository.findByProjectNameAndBranch(new KieProject(platformProjectResponse.getSpaceName(), platformProjectResponse.getName()),platformProjectResponse.getBranch());
+            ProjectPersist projectPersist = projectRepository.findByProjectNameAndBranch(new KieProject(platformProjectResponse.getSpaceName(), platformProjectResponse.getName()), platformProjectResponse.getBranch());
 
             if (projectPersist == null) {
                 projectPersist = platformProjectResponseToProjectPersist(platformProjectResponse);
 
-                projectPersist=projectRepository.save(projectPersist);
+                projectPersist = projectRepository.save(projectPersist);
                 addProjectToSession(projectPersist, true);
 
             } else {
@@ -101,12 +108,12 @@ public class ProjectPersistService {
         }
 
         if (isModifiable) {
-            projectPersists.put(projectPersist.getProjectName().toString()+"-"+projectPersist.getBranch(), projectPersist);
+            projectPersists.put(projectPersist.getProjectName().toString() + "-" + projectPersist.getBranch(), projectPersist);
         } else {
 
-            ProjectPersist tmp = projectPersists.get(projectPersist.getProjectName().toString()+"-"+projectPersist.getBranch());
+            ProjectPersist tmp = projectPersists.get(projectPersist.getProjectName().toString() + "-" + projectPersist.getBranch());
             if (tmp == null) {
-                projectPersists.put(projectPersist.getProjectName().toString()+"-"+projectPersist.getBranch(), projectPersist);
+                projectPersists.put(projectPersist.getProjectName().toString() + "-" + projectPersist.getBranch(), projectPersist);
             }
         }
 
@@ -117,6 +124,8 @@ public class ProjectPersistService {
         projectPersist.setStatus(ProjectPersist.Deployable);
         projectPersist.setContainerID(projectPersist.getDeploymentName() + "-" + projectPersist.getProjectName());
         projectPersist.getServerNames().clear();
+        ReverseProxyUpdate reverseProxyUpdate = new ReverseProxyUpdate();
+        reverseProxyUpdate.setPath("/" + projectPersist.getContainerID());
         for (RuntimePersist runtimePersist : runtimePersists) {
             List<String> names = new ArrayList<>();
             names.add(runtimePersist.getServerName());
@@ -132,14 +141,14 @@ public class ProjectPersistService {
                 newContainer.setArtifactId(projectPersist.getArtifactID());
                 newContainer.setVersion(projectPersist.getProjectVersion());
                 containerRepository.save(newContainer);
+
             }
+            String hostName = runtimePersist.getServerUrl() + "/api/" + projectPersist.getContainerID();
+            reverseProxyUpdate.getServerNames().add(hostName);
         }
-
-
         projectRepository.save(projectPersist);
-
         addProjectToSession(projectPersist, true);
-
+        kafkaTemplateProxyUpdate.send(KafkaTopicConstants.REVERSE_PROXY, reverseProxyUpdate);
         return true;
     }
 
@@ -164,6 +173,8 @@ public class ProjectPersistService {
         return projectPersist;
     }
 
+
+
     public void waitForJobToBeEnded(String url, String username, String password, ProjectPersist projectPersist, AddLog workOnGoingView, UI ui) {
 
         UserConnected userConnected = userConnectedService.getUserConnected();
@@ -173,16 +184,19 @@ public class ProjectPersistService {
             public void run() {
 
                 JobStatus result = kieRepositoryService.buildProject(config.getKiewbUrl(), userConnected.getUserName(),
-                        userConnected.getUserPassword(), projectPersist.getProjectName().getSpaceName(), projectPersist.getProjectName().getName(),projectPersist.getBranch(), "compile", workOnGoingView, ui);
+                        userConnected.getUserPassword(), projectPersist.getProjectName().getSpaceName(), projectPersist.getProjectName().getName(), projectPersist.getBranch(), "compile", workOnGoingView, ui);
 
                 executeWrite(url, username, password, workOnGoingView, result.getJobId(), ui);
 
                 result = kieRepositoryService.buildProject(config.getKiewbUrl(), userConnected.getUserName(),
-                        userConnected.getUserPassword(), projectPersist.getProjectName().getSpaceName(), projectPersist.getProjectName().getName(),projectPersist.getBranch(), "install", workOnGoingView, ui);
+                        userConnected.getUserPassword(), projectPersist.getProjectName().getSpaceName(), projectPersist.getProjectName().getName(), projectPersist.getBranch(), "install", workOnGoingView, ui);
 
                 executeWrite(url, username, password, workOnGoingView, result.getJobId(), ui);
 
-                 for (String serverName : projectPersist.getServerNames()) {
+
+
+                for (String serverName : projectPersist.getServerNames()) {
+
 
                     List<ContainerRuntimePojoPersist> existingContainers = containerRuntimeRepository.findByServerNameAndContainerId(serverName, projectPersist.getContainerID());
                     if (!existingContainers.isEmpty()) {
@@ -203,7 +217,15 @@ public class ProjectPersistService {
 
 
                     }
-
+                    KieContainerUpdate kieContainerUpdate = new KieContainerUpdate();
+                    kieContainerUpdate.setMainClass(projectPersist.getMainClass());
+                    kieContainerUpdate.setArtifactID(projectPersist.getArtifactID());
+                    kieContainerUpdate.setGroupID(projectPersist.getGroupID());
+                    kieContainerUpdate.setProjectVersion(projectPersist.getProjectVersion());
+                    kieContainerUpdate.setContainerID(projectPersist.getContainerID());
+                    kieContainerUpdate.setAction(KieContainerUpdate.STATUS.TODEPLOY);
+                    kafkaKieContainerUpdateTemplate.send(serverName,kieContainerUpdate);
+                    workOnGoingView.addRow("Deploy Request="+kieContainerUpdate,ui);
                 }
             }
         };
@@ -230,7 +252,7 @@ public class ProjectPersistService {
                         this.wait(1000);
                     }
                 } catch (InterruptedException e) {
-                    logger.error("executeWrite",e);
+                    logger.error("executeWrite", e);
                     Thread.currentThread().interrupt();
                 }
             }

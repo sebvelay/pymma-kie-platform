@@ -1,6 +1,8 @@
 package org.chtijbug.drools.reverseproxy.service;
 
 import com.github.mkopylec.charon.configuration.MappingProperties;
+import org.chtijbug.drools.ReverseProxyUpdate;
+import org.chtijbug.drools.common.KafkaTopicConstants;
 import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
 import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
 import org.chtijbug.drools.proxy.persistence.repository.ProjectRepository;
@@ -9,6 +11,7 @@ import org.chtijbug.drools.reverseproxy.mappings.CustomMappingsProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -28,9 +31,10 @@ public class UpdateService {
 
     private Boolean toUpdate = true;
 
-    private List<MappingProperties> mappings=new ArrayList<>();
+    private List<MappingProperties> mappings = new ArrayList<>();
 
-    private Map<String,MappingProperties>   mappingPropertiesMap = new HashMap<>();
+    private Map<String, MappingProperties> mappingPropertiesMap = new HashMap<>();
+
     @Autowired
     private CustomMappingsProvider customMappingsProvider;
 
@@ -38,69 +42,46 @@ public class UpdateService {
         return toUpdate;
     }
 
-    public void updateConfig() {
-        /**
-        if (this.toUpdate==false) {
-            this.toUpdate = isToUpdate();
-            if (this.toUpdate==true){
-                generateMappings();
-            }
-        }
-         **/
-        generateMappings();
-    }
 
-    private boolean isToUpdate() {
-        boolean result = false;
-        runtimes.clear();
-        List<RuntimePersist> runtimePersists = runtimeRepository.findAll();
-        Map<String, String> urlMap = new HashMap<>();
-        for (RuntimePersist runtimePersist : runtimePersists) {
-            if (urlMap.containsKey(runtimePersist.getServerName()) == false) {
-                urlMap.put(runtimePersist.getServerName(), runtimePersist.getServerUrl());
-                runtimes.put(runtimePersist.getServerName(), runtimePersist.duplicate());
-            }
-        }
-        List<ProjectPersist> projectPersists = projectRepository.findAll();
-        List<String> projectOk = new ArrayList<>();
-        for (ProjectPersist projectPersist : projectPersists) {
-            if (projectPersist.getServerNames().size() > 0) {
-                projectOk.add(projectPersist.getContainerID());
-                if (projects.containsKey(projectPersist.getContainerID()) == false) {
-                    return true;
+    @KafkaListener(
+            topics = KafkaTopicConstants.REVERSE_PROXY,
+            containerFactory = "mappingKafkaListenerContainerFactory")
+    public void store(ReverseProxyUpdate update) {
+        boolean found = false;
+        for (MappingProperties mappingProperties : mappingPropertiesMap.values()) {
+            if (mappingProperties.getPath().equals(update.getPath())) {
+                found = true;
+                mappingProperties.getDestinations().clear();
+                logger.info("Updating path {}",update.getPath());
+                for (String destination : update.getServerNames()) {
+                    mappingProperties.getDestinations().add(destination);
+                    logger.info("for path {} adding server {} ",update.getPath(),destination);
                 }
 
-                // if a new project is not in the already displayed
-
-                List<String> list1 = projectPersist.getServerNames();
-                int l1 = list1.size();
-                ProjectPersist run2 = projects.get(projectPersist.getContainerID());
-                List<String> list2 = run2.getServerNames();
-                if (list2.size() != list1.size()) {
-                    return true;
-                }
-                list1.retainAll(list2);
-                if (list2.size() != list1.size()) {
-                    return true;
-                }
-
+                break;
             }
         }
-        // An existing project in the reverse is no more to be displayed
-        for (String goodId : projects.keySet()) {
-            if (projectOk.contains(goodId) == false) {
-                return true;
+        if (!found) {
+            MappingProperties newMappingProperties = new MappingProperties();
+            newMappingProperties.setPath(update.getPath());
+            logger.info("Creating path {}",update.getPath());
+            for (String destination : update.getServerNames()) {
+                newMappingProperties.getDestinations().add(destination);
+                logger.info("for path {} adding server {} ",update.getPath(),destination);
             }
+            mappingPropertiesMap.put(update.getPath(), newMappingProperties);
         }
-
-        return result;
+        mappings.clear();
+        mappings.addAll(mappingPropertiesMap.values());
+        this.toUpdate = true;
     }
 
     public List<MappingProperties> retrievePath() {
-        this.toUpdate=false;
+        this.toUpdate = false;
         return mappings;
     }
-    private void generateMappings(){
+
+    private void generateMappings() {
         projects.clear();
         mappingPropertiesMap.clear();
         List<MappingProperties> paths = new ArrayList<>();
@@ -117,16 +98,16 @@ public class UpdateService {
             if (projectPersist.getServerNames().size() > 0) {
                 projects.put(projectPersist.getContainerID(), projectPersist.duplicate());
                 MappingProperties mappingProperties2 = new MappingProperties();
-                String servList=null;
+                String servList = null;
                 for (String serverName : projectPersist.getServerNames()) {
                     RuntimePersist runtimePersist = runtimes.get(serverName);
-                    if (runtimePersist!= null) {
+                    if (runtimePersist != null) {
                         String hostName = runtimePersist.getServerUrl() + "/api/" + projectPersist.getContainerID();
                         mappingProperties2.getDestinations().add(hostName);
-                        if (servList==null){
-                            servList=serverName;
-                        }else{
-                            servList=servList+":"+serverName;
+                        if (servList == null) {
+                            servList = serverName;
+                        } else {
+                            servList = servList + ":" + serverName;
                         }
 
                     }
@@ -136,13 +117,17 @@ public class UpdateService {
                 mappingProperties2.getCustomConfiguration().put("connect", 2000);
                 mappingProperties2.getCustomConfiguration().put("read", 2000);
                 mappingProperties2.setStripPath(true);
-                if ( mappingProperties2.getDestinations().size()>0) {
-                    mappingPropertiesMap.put(mappingProperties2.getPath(),mappingProperties2);
+                if (mappingProperties2.getDestinations().size() > 0) {
+                    mappingPropertiesMap.put(mappingProperties2.getPath(), mappingProperties2);
                     paths.add(mappingProperties2);
-                    logger.info("Project "+projectPersist.getContainerID()+" defined on servers - "+mappingProperties2.getDestinations().toString());
+                    logger.info("Startup creating path {}",mappingProperties2.getPath());
+                    for (String serverName : mappingProperties2.getDestinations()){
+                        logger.info("---------for path {} adding server {} ",mappingProperties2.getPath(),serverName);
+                    }
+                    logger.info("---------Project " + projectPersist.getContainerID() + " defined on servers - " + mappingProperties2.getDestinations().toString());
 
-                }else{
-                    logger.error("Project "+projectPersist.getContainerID()+" defined on non existing server");
+                } else {
+                    logger.error("Project " + projectPersist.getContainerID() + " defined on non existing server");
                 }
 
 

@@ -15,6 +15,7 @@
 
 package org.chtijbug.kieserver.services.drools;
 
+import org.chtijbug.drools.ChtijbugObjectRequest;
 import org.chtijbug.drools.SessionContext;
 import org.chtijbug.drools.kieserver.extension.KieServerAddOnElement;
 import org.chtijbug.drools.kieserver.extension.KieServerGlobalVariableDefinition;

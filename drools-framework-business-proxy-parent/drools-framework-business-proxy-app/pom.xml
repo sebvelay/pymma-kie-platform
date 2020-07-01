@@ -109,62 +109,22 @@
             <artifactId>camel-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-core</artifactId>
-            <version>9.0.13</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kie</groupId>
-            <artifactId>kie-api</artifactId>
-            <version>${jbpm.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.kie</groupId>
-            <artifactId>kie-internal</artifactId>
-            <version>${jbpm.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.drools</groupId>
-            <artifactId>drools-compiler</artifactId>
-            <version>${jbpm.version}</version>
-        </dependency>
 
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+            <version>${kafka.version}</version>
+        </dependency>
         <!-- kie-server -->
-        <dependency>
-            <groupId>org.kie.server</groupId>
-            <artifactId>kie-server-api</artifactId>
-            <version>${jbpm.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.optaplanner</groupId>
-                    <artifactId>optaplanner-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.optaplanner</groupId>
-                    <artifactId>optaplanner-persistence-xstream</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.optaplanner</groupId>
-                    <artifactId>optaplanner-persistence-jaxb</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.kie.server</groupId>
-            <artifactId>kie-server-services-common</artifactId>
-            <version>${jbpm.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>com.pymmasoftware.jbpm</groupId>
             <artifactId>drools-framework-kie-server-services-drools</artifactId>
             <version>${project.version}</version>
             <exclusions>
-                <exclusion>
+                <!--exclusion>
                     <groupId>com.thoughtworks.xstream</groupId>
                     <artifactId>xstream</artifactId>
-                </exclusion>
+                </exclusion-->
                 <exclusion>
                     <groupId>org.apache.activemq</groupId>
                     <artifactId>artemis-jms-client</artifactId>
@@ -212,6 +172,18 @@
                 <exclusion>
                     <groupId>io.netty</groupId>
                     <artifactId>netty-resolver</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.optaplanner</groupId>
+                    <artifactId>optaplanner-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.optaplanner</groupId>
+                    <artifactId>optaplanner-persistence-xstream</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.optaplanner</groupId>
+                    <artifactId>optaplanner-persistence-jaxb</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
