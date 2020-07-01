@@ -1,5 +1,7 @@
 package org.chtijbug.drools.console.view;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -25,6 +27,9 @@ public class ActionLoggingView extends VerticalLayout {
 
     private Button thenFact;
 
+    private Button outputData;
+
+    private ObjectMapper mapper = new ObjectMapper();
     public ActionLoggingView(BusinessTransactionPersistence businessTransactionPersistence, DialogPerso dialogPerso){
 
         dialogPerso.getClose().setVisible(false);
@@ -53,6 +58,13 @@ public class ActionLoggingView extends VerticalLayout {
         thenFact.setEnabled(false);
 
         dialogPerso.getBar().add(thenFact);
+
+        outputData=new Button("View OutputData");
+        outputData.setClassName("menu-button");
+        outputData.setEnabled(false);
+
+
+        dialogPerso.getBar().add(outputData);
 
         title=new Label("TransactionID : "+businessTransactionPersistence.getId());
         title.setClassName("creation-runtime-title");
@@ -88,6 +100,12 @@ public class ActionLoggingView extends VerticalLayout {
                 }else {
                     whenFact.setEnabled(false);
                 }
+                if(b.getOutputData()!=null&&b.getOutputData().getRealFact()!=null){
+                    outputData.setEnabled(true);
+                }else {
+                    outputData.setEnabled(false);
+                }
+
 
             }
 
@@ -109,16 +127,19 @@ public class ActionLoggingView extends VerticalLayout {
                 TextArea textArea=new TextArea(b.getInputData().getFactType().name());
                 textArea.setReadOnly(true);
                 textArea.setClassName("content-log");
-                textArea.setValue(
-                        b.getInputData().getRealFact().toString().replaceAll(",",",\n")
-                                .replaceAll("\\{","\\{\n")
-                                .replaceAll("\\}","\n\\}")
-                                .replaceAll("\\[","\n\\[")
+                try {
+                    String text = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(b.getInputData().getRealFact());
+                    textArea.setValue(text);
+                } catch (JsonProcessingException e) {
+                    textArea.setValue(
+                            b.getInputData().getRealFact().toString().replaceAll(",",",\n")
+                                    .replaceAll("\\{","\\{\n")
+                                    .replaceAll("\\}","\n\\}")
+                                    .replaceAll("\\[","\n\\[")
 
-                );
+                    );
+                }
                 verticalLayout.add(textArea);
-
-
                 dialogPerso1.add(verticalLayout);
             }
 
@@ -141,16 +162,19 @@ public class ActionLoggingView extends VerticalLayout {
                 TextArea textArea=new TextArea(b.getFact().getFactType().name());
                 textArea.setReadOnly(true);
                 textArea.setClassName("content-log");
-                textArea.setValue(
-                        b.getFact().getRealFact().toString().replaceAll(",",",\n")
-                                .replaceAll("\\{","\\{\n")
-                                .replaceAll("\\}","\n\\}")
-                                .replaceAll("\\[","\n\\[")
+                try {
+                    String text = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(b.getFact().getRealFact());
+                    textArea.setValue(text);
+                } catch (JsonProcessingException e) {
+                    textArea.setValue(
+                            b.getFact().getRealFact().toString().replaceAll(",",",\n")
+                                    .replaceAll("\\{","\\{\n")
+                                    .replaceAll("\\}","\n\\}")
+                                    .replaceAll("\\[","\n\\[")
 
-                );
+                    );
+                }
                 verticalLayout.add(textArea);
-
-
                 dialogPerso1.add(verticalLayout);
             }
 
@@ -175,19 +199,23 @@ public class ActionLoggingView extends VerticalLayout {
                         TextArea textArea=new TextArea(fact.getFactType().name());
                         textArea.setReadOnly(true);
                         textArea.setClassName("content-log");
-                        textArea.setValue(
-                                fact.getRealFact().toString().replaceAll(",",",\n")
-                                        .replaceAll("\\{","\\{\n")
-                                        .replaceAll("\\}","\n\\}")
-                                        .replaceAll("\\[","\n\\[")
+                        try {
+                            String text = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(fact.getRealFact());
+                            textArea.setValue(text);
+                        } catch (JsonProcessingException e) {
+                            textArea.setValue(
+                                    fact.getRealFact().toString().replaceAll(",",",\n")
+                                            .replaceAll("\\{","\\{\n")
+                                            .replaceAll("\\}","\n\\}")
+                                            .replaceAll("\\[","\n\\[")
 
-                        );
+                            );
+                        }
                         verticalLayout.add(textArea);
                     }
                 }
                 dialogPerso1.add(verticalLayout);
             }
-
             dialogPerso1.open();
         });
         whenFact.addClickListener(buttonClickEvent -> {
@@ -208,13 +236,18 @@ public class ActionLoggingView extends VerticalLayout {
                         TextArea textArea=new TextArea(fact.getFactType().name());
                         textArea.setReadOnly(true);
                         textArea.setClassName("content-log");
-                        textArea.setValue(
-                                fact.getRealFact().toString().replaceAll(",",",\n")
-                                        .replaceAll("\\{","\\{\n")
-                                        .replaceAll("\\}","\n\\}")
-                                        .replaceAll("\\[","\n\\[")
+                        try {
+                            String text = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(fact.getRealFact());
+                            textArea.setValue(text);
+                        } catch (JsonProcessingException e) {
+                            textArea.setValue(
+                                    fact.getRealFact().toString().replaceAll(",",",\n")
+                                            .replaceAll("\\{","\\{\n")
+                                            .replaceAll("\\}","\n\\}")
+                                            .replaceAll("\\[","\n\\[")
 
-                        );
+                            );
+                        }
                         verticalLayout.add(textArea);
                     }
                 }
@@ -223,7 +256,42 @@ public class ActionLoggingView extends VerticalLayout {
 
             dialogPerso1.open();
         });
+        outputData.addClickListener(buttonClickEvent -> {
+            DialogPerso dialogPerso1=new DialogPerso();
 
+            BusinessTransactionAction b=gridActionLogging.getSelectedItems().stream().findFirst().get();
+
+            if(b!=null&&b.getOutputData()!=null&&b.getOutputData().getRealFact()!=null){
+
+                VerticalLayout verticalLayout=new VerticalLayout();
+                Label label=new Label(b.getEventType().name()+" - "+(b.getRuleExecution()!=null&&b.getRuleExecution().getRuleName()!=null?b.getRuleExecution().getRuleName():""));
+                label.setClassName("creation-runtime-title");
+                verticalLayout.add(label);
+                verticalLayout.setClassName("content-action-logging");
+
+                TextArea textArea=new TextArea(b.getOutputData().getFactType().name());
+                textArea.setReadOnly(true);
+                textArea.setClassName("content-log");
+                try {
+                    String text = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(b.getOutputData().getRealFact());
+                    textArea.setValue(text);
+                } catch (JsonProcessingException e) {
+                    textArea.setValue(
+                            b.getOutputData().getRealFact().toString().replaceAll(",",",\n")
+                                    .replaceAll("\\{","\\{\n")
+                                    .replaceAll("\\}","\n\\}")
+                                    .replaceAll("\\[","\n\\[")
+
+                    );
+                }
+                verticalLayout.add(textArea);
+
+
+                dialogPerso1.add(verticalLayout);
+            }
+
+            dialogPerso1.open();
+        });
     }
 
 }

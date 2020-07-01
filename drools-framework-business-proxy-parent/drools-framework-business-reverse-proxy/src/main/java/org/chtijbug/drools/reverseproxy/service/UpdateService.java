@@ -52,17 +52,22 @@ public class UpdateService {
             if (mappingProperties.getPath().equals(update.getPath())) {
                 found = true;
                 mappingProperties.getDestinations().clear();
+                logger.info("Updating path {}",update.getPath());
                 for (String destination : update.getServerNames()) {
                     mappingProperties.getDestinations().add(destination);
+                    logger.info("for path {} adding server {} ",update.getPath(),destination);
                 }
+
                 break;
             }
         }
         if (!found) {
             MappingProperties newMappingProperties = new MappingProperties();
             newMappingProperties.setPath(update.getPath());
+            logger.info("Creating path {}",update.getPath());
             for (String destination : update.getServerNames()) {
                 newMappingProperties.getDestinations().add(destination);
+                logger.info("for path {} adding server {} ",update.getPath(),destination);
             }
             mappingPropertiesMap.put(update.getPath(), newMappingProperties);
         }
@@ -115,7 +120,11 @@ public class UpdateService {
                 if (mappingProperties2.getDestinations().size() > 0) {
                     mappingPropertiesMap.put(mappingProperties2.getPath(), mappingProperties2);
                     paths.add(mappingProperties2);
-                    logger.info("Project " + projectPersist.getContainerID() + " defined on servers - " + mappingProperties2.getDestinations().toString());
+                    logger.info("Startup creating path {}",mappingProperties2.getPath());
+                    for (String serverName : mappingProperties2.getDestinations()){
+                        logger.info("---------for path {} adding server {} ",mappingProperties2.getPath(),serverName);
+                    }
+                    logger.info("---------Project " + projectPersist.getContainerID() + " defined on servers - " + mappingProperties2.getDestinations().toString());
 
                 } else {
                     logger.error("Project " + projectPersist.getContainerID() + " defined on non existing server");
