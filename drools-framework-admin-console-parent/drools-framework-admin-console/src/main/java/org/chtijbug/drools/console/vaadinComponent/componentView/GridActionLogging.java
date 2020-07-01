@@ -1,8 +1,13 @@
 package org.chtijbug.drools.console.vaadinComponent.componentView;
 
-import com.vaadin.flow.component.checkbox.Checkbox;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.flow.data.provider.ListDataProvider;
@@ -11,6 +16,8 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.SerializablePredicate;
 import org.chtijbug.drools.console.service.IndexerService;
 import org.chtijbug.drools.console.service.util.AppContext;
+import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.DialogPerso;
+import org.chtijbug.drools.logging.Fact;
 import org.chtijbug.drools.proxy.persistence.model.BusinessTransactionAction;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -31,151 +38,344 @@ public class GridActionLogging extends Grid<BusinessTransactionAction> {
     private TextField ruleFlowGroup;
 
 
+    private String strEventType = "EventType";
 
-    private String strEventType ="EventType";
+    private String strPositionExecution = "Position";
 
-    private String strPositionExecution ="Position";
+    private String strRuleName = "RuleName";
 
-    private String strRuleName ="RuleName";
+    private String strPackageName = "Package";
 
-    private String strPackageName ="Package";
-
-    private String strRuleFlowGroup="RuleFlouwGroup";
+    private String strRuleFlowGroup = "RuleFlowGroup";
+    private ObjectMapper mapper = new ObjectMapper();
 
     private ListDataProvider<BusinessTransactionAction> dataProvider;
-    private ConfigurableFilterDataProvider<BusinessTransactionAction,Void,SerializablePredicate<BusinessTransactionAction>> filterDataProvider;
+    private ConfigurableFilterDataProvider<BusinessTransactionAction, Void, SerializablePredicate<BusinessTransactionAction>> filterDataProvider;
 
     private IndexerService indexerService;
 
-    public GridActionLogging(String idRequest){
+    public GridActionLogging(String idRequest) {
 
         indexerService = AppContext.getApplicationContext().getBean(IndexerService.class);
 
         setClassName("action-log-grid-perso");
         setSelectionMode(Grid.SelectionMode.SINGLE);
+        setVerticalScrollingEnabled(true);
 
+       addColumn(new ComponentRenderer<>(runtimePersist -> {
 
-        addColumn(new ComponentRenderer<>(runtimePersist -> {
-
-            SimpleDateFormat simpleDateFormat=new SimpleDateFormat(  "yyyy-MM-dd HH:mm:ss");
-            Label label=new Label();
-            if(runtimePersist.getRuleExecution()!=null) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            Label label = new Label();
+            if (runtimePersist.getRuleExecution() != null) {
                 label.setText(simpleDateFormat.format(runtimePersist.getRuleExecution().getStartDate()));
             }
             return label;
-        })).setHeader("Début");
+        })).setHeader("Début").setResizable(true);
 
         addColumn(new ComponentRenderer<>(runtimePersist -> {
 
-            SimpleDateFormat simpleDateFormat=new SimpleDateFormat(  "yyyy-MM-dd HH:mm:ss");
-            Label label=new Label();
-            if(runtimePersist.getRuleExecution()!=null) {
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            Label label = new Label();
+            if (runtimePersist.getRuleExecution() != null) {
                 label.setText(simpleDateFormat.format(runtimePersist.getRuleExecution().getEndDate()));
             }
             return label;
-        })).setHeader("Fin");
+        })).setHeader("Fin").setResizable(true);
 
 
-        Grid.Column<BusinessTransactionAction> enventTypeC=addColumn(runtimePersist -> runtimePersist.getEventType());
-        this.eventType =new TextField(strEventType);
+        Grid.Column<BusinessTransactionAction> enventTypeC = addColumn(runtimePersist -> runtimePersist.getEventType());
+        this.eventType = new TextField(strEventType);
         this.eventType.setValueChangeMode(ValueChangeMode.EAGER);
         this.eventType.addValueChangeListener(e -> {
             refreshtGrid(this.eventType.getValue(), strEventType);
         });
-        enventTypeC.setHeader(this.eventType);
+        enventTypeC.setHeader(this.eventType).setResizable(true);
 
-        Grid.Column<BusinessTransactionAction> positionC=addColumn(runtimePersist -> runtimePersist.getEventNumber());
+        Grid.Column<BusinessTransactionAction> positionC = addColumn(runtimePersist -> runtimePersist.getEventNumber());
 
-        positionExecution =new TextField(strPositionExecution);
+        positionExecution = new TextField(strPositionExecution);
         positionExecution.setValueChangeMode(ValueChangeMode.EAGER);
         positionExecution.addValueChangeListener(e -> {
             refreshtGrid(positionExecution.getValue(), strPositionExecution);
         });
-        positionC.setHeader(positionExecution);
+        positionC.setHeader(positionExecution).setResizable(true);
         positionC.setWidth("3%");
 
-        Grid.Column<BusinessTransactionAction> ruleNameC=addColumn(runtimePersist -> runtimePersist.getRuleExecution()!=null?runtimePersist.getRuleExecution().getRuleName():"");
-        ruleName =new TextField(strRuleName);
+        Grid.Column<BusinessTransactionAction> ruleNameC = addColumn(runtimePersist -> runtimePersist.getRuleExecution() != null ? runtimePersist.getRuleExecution().getRuleName() : "");
+        ruleName = new TextField(strRuleName);
         ruleName.setValueChangeMode(ValueChangeMode.EAGER);
         ruleName.addValueChangeListener(e -> {
             refreshtGrid(ruleName.getValue(), strRuleName);
         });
-        ruleNameC.setHeader(ruleName);
+        ruleNameC.setHeader(ruleName).setResizable(true);
 
-        Grid.Column<BusinessTransactionAction> versionC=addColumn(runtimePersist -> runtimePersist.getRuleExecution()!=null?runtimePersist.getRuleExecution().getPackageName():"");
-        packageName =new TextField(strPackageName);
+        Grid.Column<BusinessTransactionAction> versionC = addColumn(runtimePersist -> runtimePersist.getRuleExecution() != null ? runtimePersist.getRuleExecution().getPackageName() : "");
+        packageName = new TextField(strPackageName);
         packageName.setValueChangeMode(ValueChangeMode.EAGER);
         packageName.addValueChangeListener(e -> {
             refreshtGrid(packageName.getValue(), strPackageName);
         });
-        versionC.setHeader(packageName);
+        versionC.setHeader(packageName).setResizable(true);
 
-        Grid.Column<BusinessTransactionAction> ruleflowC=addColumn(runtimePersist -> runtimePersist.getRuleflowGroupName()!=null?runtimePersist.getRuleflowGroupName():"");
-        ruleFlowGroup =new TextField(strRuleFlowGroup);
+        Grid.Column<BusinessTransactionAction> ruleflowC = addColumn(runtimePersist -> runtimePersist.getRuleflowGroupName() != null ? runtimePersist.getRuleflowGroupName() : "");
+        ruleFlowGroup = new TextField(strRuleFlowGroup);
         ruleFlowGroup.setValueChangeMode(ValueChangeMode.EAGER);
         ruleFlowGroup.addValueChangeListener(e -> {
             refreshtGrid(ruleFlowGroup.getValue(), strRuleFlowGroup);
         });
-        ruleflowC.setHeader(ruleFlowGroup);
+        ruleflowC.setHeader(ruleFlowGroup).setResizable(true);
 
         addColumn(new ComponentRenderer<>(runtimePersist -> {
+            HorizontalLayout horizontalLayout = new HorizontalLayout();
+            if (runtimePersist.getInputData() != null && runtimePersist.getInputData().getRealFact() != null) {
+                Button inputData = new Button("Input data");
+                inputData.setClassName("menu-button");
+                inputData.setEnabled(true);
+                inputData.addClickListener(buttonClickEvent -> {
+                    DialogPerso dialogPerso1 = new DialogPerso();
 
-            Checkbox label=new Checkbox();
-            label.setEnabled(false);
-            label.setValue(false);
+                    BusinessTransactionAction b = runtimePersist;
 
-            if(runtimePersist.getInputData()!=null&&runtimePersist.getInputData().getRealFact()!=null){
-                label.setValue(true);
-            }
-            if(runtimePersist.getFact()!=null&&runtimePersist.getFact().getRealFact()!=null){
-                label.setValue(true);
-            }
-            if(runtimePersist.getRuleExecution()!=null&&runtimePersist.getRuleExecution().getThenFacts()!=null&&runtimePersist.getRuleExecution().getThenFacts().size()>0){
-                label.setValue(true);
-            }
-            if(runtimePersist.getRuleExecution()!=null&&runtimePersist.getRuleExecution().getWhenFacts()!=null&&runtimePersist.getRuleExecution().getWhenFacts().size()>0){
-                label.setValue(true);
-            }
-            return label;
-        })).setHeader("Data?");
+                    if (b != null && b.getInputData() != null && b.getInputData().getRealFact() != null) {
 
+                        VerticalLayout verticalLayout = new VerticalLayout();
+                        Label label = new Label(b.getEventType().name() );
+                        label.setClassName("creation-runtime-title");
+                        verticalLayout.add(label);
+                        verticalLayout.setClassName("content-action-logging");
+
+                        TextArea textArea = new TextArea(b.getInputData().getFactType().name()+"-"+b.getInputData().getFullClassName());
+                        textArea.setReadOnly(true);
+                        textArea.setClassName("content-log");
+                        try {
+                            String text = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(b.getInputData().getRealFact());
+                            textArea.setValue(text);
+                        } catch (JsonProcessingException e) {
+                            textArea.setValue(
+                                    b.getInputData().getRealFact().toString().replaceAll(",", ",\n")
+                                            .replaceAll("\\{", "\\{\n")
+                                            .replaceAll("\\}", "\n\\}")
+                                            .replaceAll("\\[", "\n\\[")
+
+                            );
+                        }
+                        verticalLayout.add(textArea);
+                        dialogPerso1.add(verticalLayout);
+                    }
+
+                    dialogPerso1.open();
+                });
+                horizontalLayout.add(inputData);
+            }
+            if (runtimePersist.getFact() != null && runtimePersist.getFact().getRealFact() != null) {
+                Button realFact = new Button("Insert Data");
+                realFact.setClassName("menu-button");
+                realFact.setEnabled(true);
+                realFact.addClickListener(buttonClickEvent -> {
+                    DialogPerso dialogPerso1 = new DialogPerso();
+
+                    BusinessTransactionAction b = runtimePersist;
+
+                    if (b != null && b.getFact() != null && b.getFact().getRealFact() != null) {
+
+                        VerticalLayout verticalLayout = new VerticalLayout();
+                        Label label = new Label(b.getEventType().name());
+                        label.setClassName("creation-runtime-title");
+                        verticalLayout.add(label);
+                        verticalLayout.setClassName("content-action-logging");
+
+                        TextArea textArea = new TextArea(b.getFact().getFactType().name()+"-"+b.getFact().getFullClassName());
+                        textArea.setReadOnly(true);
+                        textArea.setClassName("content-log");
+                        try {
+                            String text = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(b.getFact().getRealFact());
+                            textArea.setValue(text);
+                        } catch (JsonProcessingException e) {
+                            textArea.setValue(
+                                    b.getFact().getRealFact().toString().replaceAll(",", ",\n")
+                                            .replaceAll("\\{", "\\{\n")
+                                            .replaceAll("\\}", "\n\\}")
+                                            .replaceAll("\\[", "\n\\[")
+
+                            );
+                        }
+                        verticalLayout.add(textArea);
+                        dialogPerso1.add(verticalLayout);
+                    }
+
+                    dialogPerso1.open();
+                });
+                horizontalLayout.add(realFact);
+            }
+            if (runtimePersist.getRuleExecution() != null && runtimePersist.getRuleExecution().getThenFacts() != null && runtimePersist.getRuleExecution().getThenFacts().size() > 0) {
+                Button whenFact = new Button("When Data");
+                whenFact.setClassName("menu-button");
+                whenFact.setEnabled(true);
+                whenFact.addClickListener(buttonClickEvent -> {
+                    DialogPerso dialogPerso1 = new DialogPerso();
+
+                    BusinessTransactionAction b = runtimePersist;
+
+                    if (b != null && b.getRuleExecution() != null && b.getRuleExecution().getWhenFacts() != null) {
+
+                        VerticalLayout verticalLayout = new VerticalLayout();
+                        Label label = new Label(b.getEventType().name() + " - " + (b.getRuleExecution() != null && b.getRuleExecution().getRuleName() != null ? b.getRuleExecution().getRuleName() : ""));
+                        label.setClassName("creation-runtime-title");
+                        verticalLayout.add(label);
+                        verticalLayout.setClassName("content-action-logging");
+                        for (Fact fact : b.getRuleExecution().getWhenFacts()) {
+                            if (fact != null && fact.getRealFact() != null) {
+
+                                TextArea textArea = new TextArea(fact.getFactType().name()+"-"+fact.getFullClassName());
+                                textArea.setReadOnly(true);
+                                textArea.setClassName("content-log");
+                                try {
+                                    String text = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(fact.getRealFact());
+                                    textArea.setValue(text);
+                                } catch (JsonProcessingException e) {
+                                    textArea.setValue(
+                                            fact.getRealFact().toString().replaceAll(",", ",\n")
+                                                    .replaceAll("\\{", "\\{\n")
+                                                    .replaceAll("\\}", "\n\\}")
+                                                    .replaceAll("\\[", "\n\\[")
+
+                                    );
+                                }
+                                verticalLayout.add(textArea);
+                            }
+                        }
+                        dialogPerso1.add(verticalLayout);
+                    }
+
+                    dialogPerso1.open();
+                });
+                horizontalLayout.add(whenFact);
+            }
+            if (runtimePersist.getRuleExecution() != null && runtimePersist.getRuleExecution().getThenFacts() != null && runtimePersist.getRuleExecution().getThenFacts().size() > 0) {
+
+                Button thenFact = new Button("Then data");
+                thenFact.setClassName("menu-button");
+                thenFact.setEnabled(true);
+                thenFact.addClickListener(buttonClickEvent -> {
+                    DialogPerso dialogPerso1 = new DialogPerso();
+
+                    BusinessTransactionAction b = runtimePersist;
+
+                    if (b != null && b.getRuleExecution() != null && b.getRuleExecution().getThenFacts() != null) {
+
+                        VerticalLayout verticalLayout = new VerticalLayout();
+                        Label label = new Label(b.getEventType().name() + " - " + (b.getRuleExecution() != null && b.getRuleExecution().getRuleName() != null ? b.getRuleExecution().getRuleName() : ""));
+                        label.setClassName("creation-runtime-title");
+                        verticalLayout.add(label);
+                        verticalLayout.setClassName("content-action-logging");
+                        for (Fact fact : b.getRuleExecution().getThenFacts()) {
+                            if (fact != null && fact.getRealFact() != null) {
+
+                                TextArea textArea = new TextArea(fact.getFactType().name()+"-"+fact.getFullClassName());
+                                textArea.setReadOnly(true);
+                                textArea.setClassName("content-log");
+                                try {
+                                    String text = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(fact.getRealFact());
+                                    textArea.setValue(text);
+                                } catch (JsonProcessingException e) {
+                                    textArea.setValue(
+                                            fact.getRealFact().toString().replaceAll(",", ",\n")
+                                                    .replaceAll("\\{", "\\{\n")
+                                                    .replaceAll("\\}", "\n\\}")
+                                                    .replaceAll("\\[", "\n\\[")
+
+                                    );
+                                }
+                                verticalLayout.add(textArea);
+                            }
+                        }
+                        dialogPerso1.add(verticalLayout);
+                    }
+                    dialogPerso1.open();
+                });
+                horizontalLayout.add(thenFact);
+            }
+            if (runtimePersist.getOutputData() != null && runtimePersist.getOutputData().getRealFact() != null) {
+                Button outputData = new Button("Output data");
+                outputData.setClassName("menu-button");
+                outputData.setEnabled(true);
+                outputData.addClickListener(buttonClickEvent -> {
+                    DialogPerso dialogPerso1 = new DialogPerso();
+
+                    BusinessTransactionAction b = runtimePersist;
+
+                    if (b != null && b.getOutputData() != null && b.getOutputData().getRealFact() != null) {
+
+                        VerticalLayout verticalLayout = new VerticalLayout();
+                        Label label = new Label(b.getEventType().name() );
+                        label.setClassName("creation-runtime-title");
+                        verticalLayout.add(label);
+                        verticalLayout.setClassName("content-action-logging");
+
+                        TextArea textArea = new TextArea(b.getOutputData().getFactType().name()+"-"+b.getOutputData().getFullClassName());
+                        textArea.setReadOnly(true);
+                        textArea.setClassName("content-log");
+                        try {
+                            String text = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(b.getOutputData().getRealFact());
+                            textArea.setValue(text);
+                        } catch (JsonProcessingException e) {
+                            textArea.setValue(
+                                    b.getOutputData().getRealFact().toString().replaceAll(",", ",\n")
+                                            .replaceAll("\\{", "\\{\n")
+                                            .replaceAll("\\}", "\n\\}")
+                                            .replaceAll("\\[", "\n\\[")
+
+                            );
+                        }
+                        verticalLayout.add(textArea);
+
+
+                        dialogPerso1.add(verticalLayout);
+                    }
+
+                    dialogPerso1.open();
+                });
+                horizontalLayout.add(outputData);
+            }
+            return horizontalLayout;
+        })).setHeader("Action");
         setDataProvider(idRequest);
     }
-    private void refreshtGrid(String value,String type){
 
-        filterDataProvider.setFilter(filterGrid(value.toUpperCase(),type));
+    private void refreshtGrid(String value, String type) {
+
+        filterDataProvider.setFilter(filterGrid(value.toUpperCase(), type));
         getDataProvider().refreshAll();
     }
-    private SerializablePredicate<BusinessTransactionAction> filterGrid(String value, String type){
+
+    private SerializablePredicate<BusinessTransactionAction> filterGrid(String value, String type) {
         SerializablePredicate<BusinessTransactionAction> columnPredicate = null;
-        if(value.equals(" ")||type.equals(" ")){
+        if (value.equals(" ") || type.equals(" ")) {
             columnPredicate = runtimePersist -> (true);
-        }else {
+        } else {
             if (type.equals(strPositionExecution)) {
                 columnPredicate = runtimePersist -> (String.valueOf(runtimePersist.getEventNumber()).equals(value));
 
             } else if (type.equals(strEventType)) {
-                columnPredicate = runtimePersist -> (runtimePersist.getEventType()!=null&&runtimePersist.getEventType().toString().toUpperCase().contains(value));
+                columnPredicate = runtimePersist -> (runtimePersist.getEventType() != null && runtimePersist.getEventType().toString().toUpperCase().contains(value));
 
             } else if (type.equals(strRuleName)) {
-                columnPredicate = runtimePersist -> (runtimePersist.getRuleExecution()!=null&&runtimePersist.getRuleExecution().getRuleName()!=null&&runtimePersist.getRuleExecution().getRuleName().toUpperCase().contains(value));
-            }
-            else if (type.equals(strPackageName)) {
-                columnPredicate = runtimePersist -> (runtimePersist.getRuleExecution()!=null&&runtimePersist.getRuleExecution().getPackageName()!=null&&runtimePersist.getRuleExecution().getPackageName().toUpperCase().contains(value));
-            }
-            else if (type.equals(strRuleFlowGroup)) {
-                columnPredicate = runtimePersist -> (runtimePersist.getRuleflowGroupName()!=null&&runtimePersist.getRuleflowGroupName().toUpperCase().contains(value));
+                columnPredicate = runtimePersist -> (runtimePersist.getRuleExecution() != null && runtimePersist.getRuleExecution().getRuleName() != null && runtimePersist.getRuleExecution().getRuleName().toUpperCase().contains(value));
+            } else if (type.equals(strPackageName)) {
+                columnPredicate = runtimePersist -> (runtimePersist.getRuleExecution() != null && runtimePersist.getRuleExecution().getPackageName() != null && runtimePersist.getRuleExecution().getPackageName().toUpperCase().contains(value));
+            } else if (type.equals(strRuleFlowGroup)) {
+                columnPredicate = runtimePersist -> (runtimePersist.getRuleflowGroupName() != null && runtimePersist.getRuleflowGroupName().toUpperCase().contains(value));
             }
 
         }
         return columnPredicate;
     }
 
-    public void setDataProvider(String id){
+    public void setDataProvider(String id) {
 
-        List<BusinessTransactionAction> businessTransactionPersistences = indexerService.getBusinessTransactionActionRepository().findAllByBusinessTransactionId(id,Sort.by(new Sort.Order(Sort.Direction.ASC,"eventNumber")),PageRequest.of(0,5000));
+        List<BusinessTransactionAction> businessTransactionPersistences = indexerService.getBusinessTransactionActionRepository().findAllByBusinessTransactionId(id, Sort.by(new Sort.Order(Sort.Direction.ASC, "eventNumber")), PageRequest.of(0, 5000));
 
-        if(businessTransactionPersistences!=null) {
+        if (businessTransactionPersistences != null) {
             dataProvider = new ListDataProvider<>(businessTransactionPersistences);
 
             filterDataProvider = dataProvider.withConfigurableFilter();
@@ -185,7 +385,8 @@ public class GridActionLogging extends Grid<BusinessTransactionAction> {
 
         }
     }
-    public void reinitFilter(){
+
+    public void reinitFilter() {
         positionExecution.setValue("");
         ruleName.setValue("");
         eventType.setValue("");
