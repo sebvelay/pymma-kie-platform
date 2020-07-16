@@ -7,6 +7,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
 import org.kie.server.api.model.*;
 import org.kie.server.controller.api.model.KieServerSetup;
+import org.kie.server.controller.api.model.runtime.ContainerList;
 import org.kie.server.controller.api.model.runtime.ServerInstanceKeyList;
 import org.kie.server.controller.api.model.spec.ContainerSpec;
 import org.kie.server.controller.api.model.spec.ServerTemplateKey;
@@ -150,7 +151,34 @@ public class KieBusinessCentralConnector {
             return null;
         }
     }
+    public ContainerList getListContainers(String username, String password,String serverInstanceId){
+        String completeurl=kiewbUrl+"/controller/runtime/servers/"+kieserverID+"/instances/"+serverInstanceId+"/containers";
 
+        ResponseEntity<ContainerList> response = restTemplateKiewb
+                .execute(completeurl, HttpMethod.GET, requestCallback(null, username, password), clientHttpResponse -> {
+                    ContainerList extractedResponse;
+                    ResponseEntity<ContainerList> extractedValue=null;
+
+                    if (clientHttpResponse.getBody() != null) {
+                        //Scanner s = new Scanner(clientHttpResponse.getBody()).useDelimiter("\\A");
+                        //String result = s.hasNext() ? s.next() : "";
+                        String result = StreamUtils.copyToString(clientHttpResponse.getBody(), Charset.defaultCharset());
+                        if (result==null || result.length()==0){
+
+                        }else {
+                            extractedResponse = mapper.readValue(result, ContainerList.class);
+                            extractedValue = new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
+                        }
+                    }
+
+                    return extractedValue;
+                });
+        if (response!= null) {
+            return response.getBody();
+        }else {
+            return null;
+        }
+    }
     public KieServerSetup connectToBusinessCentral(String username, String password){
         String completeurl=kiewbUrl+"/controller/server/"+kieserverID;
         KieServerInfo kieServerInfo = new KieServerInfo();

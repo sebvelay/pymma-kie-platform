@@ -33,7 +33,7 @@ import static org.kie.server.api.rest.RestURI.CONTAINER_ID;
 
 
 @RestController
-@RequestMapping("/server")
+@RequestMapping("/api/server")
 public class KieServerRestImpl {
 
     @Value(value = "${org.kie.server.id}")

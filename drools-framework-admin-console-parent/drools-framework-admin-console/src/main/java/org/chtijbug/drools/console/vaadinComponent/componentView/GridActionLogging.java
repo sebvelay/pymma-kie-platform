@@ -56,6 +56,7 @@ public class GridActionLogging extends Grid<BusinessTransactionAction> {
 
     public GridActionLogging(String idRequest) {
 
+        mapper.setDateFormat( new SimpleDateFormat("dd-MM-yyyy hh:mm"));
         indexerService = AppContext.getApplicationContext().getBean(IndexerService.class);
 
         setClassName("action-log-grid-perso");
@@ -148,6 +149,7 @@ public class GridActionLogging extends Grid<BusinessTransactionAction> {
                         textArea.setReadOnly(true);
                         textArea.setClassName("content-log");
                         try {
+                            mapper.setDateFormat( new SimpleDateFormat("dd-MM-yyyy hh:mm"));
                             String text = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(b.getInputData().getRealFact());
                             textArea.setValue(text);
                         } catch (JsonProcessingException e) {

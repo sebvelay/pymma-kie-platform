@@ -16,6 +16,9 @@
  */
 package org.chtijbug.drools.proxy;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -83,6 +86,10 @@ public class DroolsBusinessProxyServer {
         configProps.put(
                 ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
                 JsonSerializer.class);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        new DefaultKafkaProducerFactory<>(configProps, new StringSerializer(), new JsonSerializer<ChtijbugObjectRequest>(objectMapper));
         return new DefaultKafkaProducerFactory<>(configProps);
     }
     @Bean

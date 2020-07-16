@@ -22,7 +22,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 @RestController
-@RequestMapping("/server/config")
+@RequestMapping("/api/server/config")
 public class KieServerResource {
 
     public KieServerResource() {
