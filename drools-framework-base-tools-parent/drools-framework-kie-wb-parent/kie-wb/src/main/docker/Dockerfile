@@ -3,7 +3,8 @@
 ###########################################################################
 
 ####### BASE ############
-FROM jboss/keycloak-adapter-wildfly:latest
+FROM jboss/wildfly:19.1.0.Final
+
 
 ####### MAINTAINER ############
 MAINTAINER "Nicolas Héron" "nicolas.heron@pymma-software.com"

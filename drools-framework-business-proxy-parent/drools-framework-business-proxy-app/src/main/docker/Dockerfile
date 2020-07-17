@@ -1,8 +1,9 @@
-FROM openjdk:8-jre-slim
+FROM azul/zulu-openjdk-debian:11
 
 EXPOSE 9080
 EXPOSE 8090
 EXPOSE 4000
+RUN apt-get update && apt-get install -y wget procps
 ADD application.properties /application.properties
 ADD maven/drools-framework-business-proxy-app.jar app.jar
 USER root

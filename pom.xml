@@ -17,7 +17,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <jbpm.version>7.39.0.Final</jbpm.version>
+        <jbpm.version>7.40.0.20200703</jbpm.version>
         <node.version>v10.16.3</node.version>
         <npm.version>6.11.3</npm.version>
         <frontend-maven-plugin.version>1.8.0</frontend-maven-plugin.version>
@@ -32,9 +32,8 @@
         <version.mongodb.driver>3.8.2</version.mongodb.driver>
         <version.number>${git.commit.time}.${git.commit.id.abbrev}</version.number>
         <kafka.version>2.3.7.RELEASE</kafka.version>
-
-
-
+        <javax.activation.version>1.2.0</javax.activation.version>
+        <jaxb.api.version>2.3.0</jaxb.api.version>
     </properties>
     <profiles>
         <profile>

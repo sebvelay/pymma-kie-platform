@@ -1,6 +1,6 @@
-FROM openjdk:8-jre-slim
+FROM azul/zulu-openjdk-debian:11
 
-
+RUN apt-get update && apt-get install -y wget procps
 ADD application.properties /application.properties
 ADD maven/drools-framework-admin-console.jar app.jar
 
