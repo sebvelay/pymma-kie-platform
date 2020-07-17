@@ -75,7 +75,24 @@
                 <docker.Host>http://192.168.1.184:2376</docker.Host>
             </properties>
         </profile>
-
+        <profile>
+            <id>pymma-internal</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <nexus.host>http://192.168.1.122:18081</nexus.host>
+            </properties>
+        </profile>
+        <profile>
+            <id>pymma-web</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <nexus.host>https://nexus.pymma-software.net</nexus.host>
+            </properties>
+        </profile>
 
     </profiles>
 
@@ -189,11 +206,11 @@
     <distributionManagement>
         <snapshotRepository>
             <id>pymma-snapshot</id>
-            <url>https://nexus.pymma-software.com/nexus/content/repositories/pymma-snapshot</url>
+            <url>${nexus.host}/repository/pymma-snapshot/</url>
         </snapshotRepository>
         <repository>
             <id>pymma-release</id>
-            <url>https://nexus.pymma-software.com/nexus/content/repositories/pymma-release</url>
+            <url>${nexus.host}/repository/pymma-release/</url>
         </repository>
     </distributionManagement>
     <developers>
