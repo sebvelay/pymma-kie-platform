@@ -51,7 +51,7 @@ public class DababaseContentInit {
             userGroupsRepository.save(new UserGroups(UUID.randomUUID().toString(),"admingroup"));
             userGroupsRepository.save(new UserGroups(UUID.randomUUID().toString(),"demogroup"));
 
-            adminUser = new User(UUID.randomUUID().toString(),"admin","adminPymma00@");
+            adminUser = new User(UUID.randomUUID().toString(),"admin","adminadmin99#");
             adminUser.getUserGroups().add(userGroupsRepository.findByName("kiemgmt"));
             adminUser.getUserGroups().add(userGroupsRepository.findByName("admingroup"));
             adminUser.getUserRoles().add(userRolesRepository.findByName("admin"));

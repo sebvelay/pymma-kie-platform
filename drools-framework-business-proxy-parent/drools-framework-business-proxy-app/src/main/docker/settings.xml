@@ -5,7 +5,7 @@
         <server>
             <id>guvnor-m2-repo</id>
             <username>admin</username>
-            <password>admin</password>
+            <password>adminadmin99#</password>
                   <configuration>
                 <wagonProvider>httpclient</wagonProvider>
                 <httpConfiguration>
@@ -23,7 +23,7 @@
                 <repository>
                     <id>guvnor-m2-repo</id>
                     <name>Guvnor M2 Repo</name>
-                    <url>${kie-wb.m2repo}</url>
+                    <url>http://kie-wb:8080/kie-wb/maven2/</url>
                     <activation>
                         <activeByDefault>true</activeByDefault>
                     </activation>
@@ -42,7 +42,7 @@
                 <pluginRepository>
                     <id>guvnor-m2-repo</id>
                     <name>Guvnor M2 Repo</name>
-                    <url>${kie-wb.m2repo}</url>
+                    <url>http://kie-wb:8080/kie-wb/maven2/</url>
                     <layout>default</layout>
                     <releases>
                         <enabled>true</enabled>

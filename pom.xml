@@ -32,9 +32,8 @@
         <version.mongodb.driver>3.8.2</version.mongodb.driver>
         <version.number>${git.commit.time}.${git.commit.id.abbrev}</version.number>
         <kafka.version>2.3.7.RELEASE</kafka.version>
-
-
-
+        <javax.activation.version>1.2.0</javax.activation.version>
+        <jaxb.api.version>2.3.0</jaxb.api.version>
     </properties>
     <profiles>
         <profile>

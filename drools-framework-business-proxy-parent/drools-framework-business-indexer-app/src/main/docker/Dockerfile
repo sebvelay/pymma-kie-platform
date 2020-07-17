@@ -1,4 +1,4 @@
-FROM openjdk:8-jre-slim
+FROM azul/zulu-openjdk-debian:11
 
 
 ADD application.properties /application.properties
