@@ -24,6 +24,8 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <detectJavaApiLink>false</detectJavaApiLink>
+                    <detectJavaApiLink>false</detectJavaApiLink>
                 </configuration>
             </plugin>
 
