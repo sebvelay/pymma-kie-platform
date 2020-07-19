@@ -77,7 +77,7 @@ public class KieServiceCommon {
     @Value("${server.port}")
     private int serverPort;
 
-    @Value("${runtime.port=-1}")
+    @Value("${runtime.port:-1}")
     private int runtimePort;
 
     @Value("${runtime.server:none}")
