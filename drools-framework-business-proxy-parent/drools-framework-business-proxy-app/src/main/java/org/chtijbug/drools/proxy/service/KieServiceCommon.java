@@ -73,8 +73,16 @@ public class KieServiceCommon {
     private RuntimeRepository runtimeRepository;
     @Inject
     private ContainerRuntimeRepository containerRuntimeRepository;
+
     @Value("${server.port}")
     private int serverPort;
+
+    @Value("${runtime.port=-1}")
+    private int runtimePort;
+
+    @Value("${runtime.server:none}")
+    private String runtimeServer;
+
     @Autowired
     private ApplicationContext appContext;
     private String hostName = "localhost";
@@ -124,18 +132,32 @@ public class KieServiceCommon {
         } catch (UnknownHostException e) {
             logger.info("initCamelBusinessRoutes.getLocalHost", e);
         }
-        List<RuntimePersist> itIsMes = runtimeRepository.findByServerNameAndHostname(serverName, hostName);
+        List<RuntimePersist> itIsMes;
+        if (runtimePort==-1){
+            itIsMes = runtimeRepository.findByServerNameAndHostname(serverName, hostName);
+        }else{
+            itIsMes = runtimeRepository.findByServerName(serverName);
+        }
+
         ServiceResponse<KieServerInfo> result = server.getInfo();
         String version = result.getResult().getVersion();
-        if (itIsMes.size() == 0) {
+        if (itIsMes.isEmpty()) {
             RuntimePersist runtimePersist = new RuntimePersist(serverName, version, hostName,
                     String.valueOf(serverPort), null,
                     hostName, RuntimePersist.STATUS.UP.toString());
+            if (runtimePort!=-1){
+                runtimePersist.setHostname(runtimeServer);
+                runtimePersist.setServerPort(String.valueOf(runtimePort));
+            }
             String isSwarm = System.getProperty("org.kie.server.swarm");
             if ("1".equals(isSwarm)) {
                 runtimePersist.setServerUrl("http://" + serverName + ":" + serverPort);
             } else {
-                runtimePersist.setServerUrl("http://" + hostName + ":" + serverPort);
+                if (runtimePort==-1) {
+                    runtimePersist.setServerUrl("http://" + hostName + ":" + serverPort);
+                }else{
+                    runtimePersist.setServerUrl("http://" + runtimeServer + ":" + runtimePort);
+                }
             }
             runtimeRepository.save(runtimePersist);
         } else {
@@ -164,6 +186,7 @@ public class KieServiceCommon {
             logger.info("initCamelBusinessRoutes", e);
         }
         Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
             public void run() {
                 String serverName = KieServiceCommon.getKieServerID();
                 List<RuntimePersist> itIsMes = runtimeRepository.findByServerNameAndHostname(serverName, hostName);
@@ -173,7 +196,7 @@ public class KieServiceCommon {
                     runtimeRepository.delete(runtimePersist);
                 }
                 List<ContainerRuntimePojoPersist> ccc = containerRuntimeRepository.findByServerNameAndHostname(serverName, hostName);
-                if (ccc.size() > 0) {
+                if (!ccc.isEmpty()) {
                     containerRuntimeRepository.deleteAll(ccc);
                 }
             }
