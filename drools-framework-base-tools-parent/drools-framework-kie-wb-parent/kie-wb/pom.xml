@@ -268,7 +268,7 @@
                                                 <id>middleware-rest</id>
                                                 <files>
                                                     <file>
-                                                        <source>${project.build.directory}/kie-wb.war</source>
+                                                        <source>${project.build.directory}/c</source>
                                                         <outputDirectory>./</outputDirectory>
                                                         <destName>kie-wb.war</destName>
                                                     </file>
@@ -369,6 +369,21 @@
                                                         <source>${project.build.directory}/pymma-kie-login-module.jar</source>
                                                         <outputDirectory>./</outputDirectory>
                                                         <destName>pymma-kie-login-module.jar</destName>
+                                                    </file>
+                                                    <file>
+                                                        <source>${project.build.directory}/bson.jar</source>
+                                                        <outputDirectory>./</outputDirectory>
+                                                        <destName>bson.jar</destName>
+                                                    </file>
+                                                    <file>
+                                                        <source>${project.build.directory}/mongodb-driver-core.jar</source>
+                                                        <outputDirectory>./</outputDirectory>
+                                                        <destName>mongodb-driver-core.jar</destName>
+                                                    </file>
+                                                    <file>
+                                                        <source>${project.build.directory}/mongodb-driver.jar</source>
+                                                        <outputDirectory>./</outputDirectory>
+                                                        <destName>mongodb-driver.jar</destName>
                                                     </file>
                                                 </files>
                                             </inline>

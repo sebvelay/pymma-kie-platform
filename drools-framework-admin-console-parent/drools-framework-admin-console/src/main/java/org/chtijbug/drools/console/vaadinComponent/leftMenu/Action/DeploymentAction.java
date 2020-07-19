@@ -84,7 +84,9 @@ public class DeploymentAction extends VerticalLayout {
             topics = KafkaTopicConstants.RESPONSE_DEPLOY_TOPIC,groupId = "Console",
             containerFactory = "ruleKafkaListenerKieContainerUpdateFactory")
     public void updateKieServerLogInfo(KieContainerResponse kieContainerResponse){
-        deploymentView.addRow("Deploy Response="+kieContainerResponse.toString(),getUI().get());
+        if (getUI().isPresent()) {
+            deploymentView.addRow("Deploy Response=" + kieContainerResponse.toString(), getUI().get());
+        }
     }
 
     private boolean isActive(Button button){
