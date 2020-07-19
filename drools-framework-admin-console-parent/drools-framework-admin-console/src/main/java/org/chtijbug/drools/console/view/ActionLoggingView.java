@@ -15,6 +15,8 @@ import org.chtijbug.drools.logging.Fact;
 import org.chtijbug.drools.proxy.persistence.model.BusinessTransactionAction;
 import org.chtijbug.drools.proxy.persistence.model.BusinessTransactionPersistence;
 import org.chtijbug.drools.proxy.persistence.model.EventType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
@@ -28,6 +30,8 @@ import java.util.List;
 
 
 public class ActionLoggingView extends VerticalLayout {
+
+    private static Logger logger = LoggerFactory.getLogger(ActionLoggingView.class);
 
     private IndexerService indexerService;
 
@@ -141,7 +145,8 @@ public class ActionLoggingView extends VerticalLayout {
             return IOUtils.toInputStream(stringWriter.toString(), "UTF-8");
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("getInputStream.csvWriter",e);
+
             return null;
         }
 
