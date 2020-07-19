@@ -72,6 +72,8 @@ services:
 
 
 #-Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=4000,suspend=y
+
+
   runtime-proxy-1:
     image: runtime-proxy
     container_name: "runtime-proxy-1"
