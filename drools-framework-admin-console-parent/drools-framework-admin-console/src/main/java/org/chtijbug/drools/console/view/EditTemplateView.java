@@ -126,7 +126,9 @@ public class EditTemplateView extends VerticalLayout {
                                     for (InterpolationVariable interpolationVariable : model.getInterpolationVariablesList()){
 
                                         Object o = line.get(interpolationVariable.getVarName());
-                                        cols[k]=o.toString();
+                                        if (o!= null) {
+                                            cols[k] = o.toString();
+                                        }
                                         k++;
                                     }
                                     model.addRow(cols);
