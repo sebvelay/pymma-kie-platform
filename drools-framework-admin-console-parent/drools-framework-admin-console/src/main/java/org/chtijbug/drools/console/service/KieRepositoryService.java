@@ -128,7 +128,7 @@ public class KieRepositoryService {
         return reponseMoteur;
     }
 
-    public UserConnected login(String url, String username, String password) {
+    public UserConnected login(String url, String username, String password,String workbenchName) {
 
         User user = userRepository.findByLogin(username);
         String completeurl = url + "/chtijbug/login";
@@ -161,7 +161,7 @@ public class KieRepositoryService {
             userConnected.getProjectResponses().addAll(responseBody.getProjects());
             userConnected.getRoles().addAll(responseBody.getRoles());
             userConnected.setUserName(username);
-
+            userConnected.setKieWorkbenchName(workbenchName);
             return userConnected;
         } else {
             return null;

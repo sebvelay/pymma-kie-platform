@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
@@ -30,6 +31,8 @@ public class ProjectPersist  implements Serializable {
     @Indexed
     private String uuid;
 
+    @DBRef
+    private KieWorkbench kieWorkbench;
 
     private KieProject projectName;
 
@@ -162,6 +165,18 @@ public class ProjectPersist  implements Serializable {
 
     public void setBranch(String branch) {
         this.branch = branch;
+    }
+
+    public KieWorkbench getKieWorkbench() {
+        return kieWorkbench;
+    }
+
+    public void setKieWorkbench(KieWorkbench kieWorkbench) {
+        this.kieWorkbench = kieWorkbench;
+    }
+
+    public void setServerNames(List<String> serverNames) {
+        this.serverNames = serverNames;
     }
 
     public ProjectPersist duplicate(){

@@ -51,11 +51,16 @@ public class KieBusinessCentralConnector {
         mapper.registerModule(new JaxbAnnotationModule());
     }
 
-    public String createContainer(String username, String password, ProjectPersist projectPersist){
-        String completeurl=kiewbUrl+"/controller/management/servers/"+kieserverID+"/containers/"+projectPersist.getContainerID();
+    public String createContainer(String username, String password, ProjectPersist projectPersist, String externalUrl){
+        String completeurl;
+        if (externalUrl==null || externalUrl.isEmpty()) {
+            completeurl=kiewbUrl+"/controller/management/servers/"+kieserverID+"/containers/"+projectPersist.getContainerID();
+        }else{
+            completeurl=externalUrl+"/controller/management/servers/"+kieserverID+"/containers/"+projectPersist.getContainerID();
+        }
         ContainerSpec containerSpec = new ContainerSpec();
-        containerSpec.setId(projectPersist.getContainerID());
-        containerSpec.setContainerName(projectPersist.getContainerID());
+        containerSpec.setId(projectPersist.getArtifactID()+"_"+projectPersist.getProjectVersion());
+        containerSpec.setContainerName(projectPersist.getArtifactID()+"_"+projectPersist.getProjectVersion());
         containerSpec.setReleasedId(new ReleaseId());
         containerSpec.setStatus(KieContainerStatus.STARTED);
         containerSpec.getReleasedId().setArtifactId(projectPersist.getArtifactID());
@@ -86,11 +91,16 @@ public class KieBusinessCentralConnector {
         }
     }
 
-    public String updateContainer(String username, String password, ProjectPersist projectPersist, KieContainerResource kieContainerResource){
-        String completeurl=kiewbUrl+"/controller/management/servers/"+kieserverID+"/containers/"+projectPersist.getContainerID();
+    public String updateContainer(String username, String password, ProjectPersist projectPersist, KieContainerResource kieContainerResource, String externalUrl){
+        String completeurl;
+        if (externalUrl==null || externalUrl.isEmpty()) {
+            completeurl=kiewbUrl+"/controller/management/servers/"+kieserverID+"/containers/"+projectPersist.getContainerID();
+        }else{
+            completeurl=externalUrl+"/controller/management/servers/"+kieserverID+"/containers/"+projectPersist.getContainerID();
+        }
         ContainerSpec containerSpec = new ContainerSpec();
-        containerSpec.setId(projectPersist.getContainerID());
-        containerSpec.setContainerName(projectPersist.getContainerID());
+        containerSpec.setId(projectPersist.getArtifactID()+"_"+projectPersist.getProjectVersion());
+        containerSpec.setContainerName(projectPersist.getArtifactID()+"_"+projectPersist.getProjectVersion());
         containerSpec.setReleasedId(new ReleaseId());
         containerSpec.setStatus(KieContainerStatus.STARTED);
         containerSpec.getReleasedId().setArtifactId(projectPersist.getArtifactID());
@@ -179,15 +189,24 @@ public class KieBusinessCentralConnector {
             return null;
         }
     }
-    public KieServerSetup connectToBusinessCentral(String username, String password){
-        String completeurl=kiewbUrl+"/controller/server/"+kieserverID;
+    public KieServerSetup connectToBusinessCentral(String username, String password, String kieServerName, String externalUrl){
+        String completeurl;
+        if (externalUrl==null || externalUrl.isEmpty()) {
+            completeurl = kiewbUrl + "/controller/server/" + kieserverID;
+        }else{
+            completeurl = externalUrl + "/controller/server/" + kieserverID;
+        }
         KieServerInfo kieServerInfo = new KieServerInfo();
         kieServerInfo.setVersion("1.0.0");
         kieServerInfo.setServerId("1");
         kieServerInfo.setName(kieserverID);
         kieServerInfo.setMode(KieServerMode.DEVELOPMENT);
         kieServerInfo.setServerId(kieserverID);
-        kieServerInfo.setLocation(controlerLocation);
+        if (kieServerName==null || kieServerName.isEmpty()){
+            kieServerInfo.setLocation(controlerLocation+"/demo");
+        }else{
+            kieServerInfo.setLocation(controlerLocation+"/"+kieServerName);
+        }
         kieServerInfo.setCapabilities(new ArrayList<>());
         kieServerInfo.getCapabilities().add("BRM");
         ResponseEntity<KieServerSetup> response = restTemplateKiewb

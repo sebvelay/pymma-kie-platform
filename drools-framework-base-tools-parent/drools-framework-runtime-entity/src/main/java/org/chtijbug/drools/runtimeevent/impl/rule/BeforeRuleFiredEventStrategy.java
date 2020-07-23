@@ -16,6 +16,7 @@
 package org.chtijbug.drools.runtimeevent.impl.rule;
 
 
+import com.rits.cloning.Cloner;
 import org.chtijbug.drools.SessionContext;
 import org.chtijbug.drools.entity.DroolsFactObject;
 import org.chtijbug.drools.entity.history.HistoryEvent;
@@ -49,10 +50,11 @@ public class BeforeRuleFiredEventStrategy implements AbstractMemoryEventHandlerS
         ruleExecution.setRuleName(beforeRuleFiredHistoryEvent.getRule().getRuleName());
         ruleExecution.setPackageName(beforeRuleFiredHistoryEvent.getRule().getRulePackageName());
         ruleExecution.setStartEventID(beforeRuleFiredHistoryEvent.getEventID());
+        Cloner cloner = new Cloner();
         for (DroolsFactObject droolsFactObject : beforeRuleFiredHistoryEvent.getWhenObjects()) {
             if (droolsFactObject != null) {
                 Fact fact = new Fact();
-                fact.setRealFact(droolsFactObject.getRealObject());
+                fact.setRealFact(cloner.deepClone(droolsFactObject.getRealObject()));
                 fact.setFactType(FactType.WHEN);
                 fact.setObjectVersion(droolsFactObject.getObjectVersion());
                 fact.setFullClassName(droolsFactObject.getFullClassName());

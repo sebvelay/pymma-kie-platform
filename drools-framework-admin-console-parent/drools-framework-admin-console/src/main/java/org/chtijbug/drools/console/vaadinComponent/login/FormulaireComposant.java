@@ -124,12 +124,13 @@ public class FormulaireComposant extends VerticalLayout {
         UserConnected connected = kieRepositoryService.login(
                 configKie.getKiewbUrl(),
                 userConnectedBinder.getBean().getUserName(),
-                userConnectedBinder.getBean().getUserPassword());
+                userConnectedBinder.getBean().getUserPassword(),
+                configKie.getName());
 
         if(connected!=null) {
             connected.setConnected(true);
             userConnectedService.addUserToSession(connected);
-            projectPersistService.saveIfnotExist(connected.getProjectResponses());
+            projectPersistService.saveIfnotExist(connected.getProjectResponses(),configKie.getName());
 
             return true;
         }else {

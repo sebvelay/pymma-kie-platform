@@ -16,6 +16,7 @@
 package org.chtijbug.drools.runtimeevent.impl.fact;
 
 
+import com.rits.cloning.Cloner;
 import org.chtijbug.drools.SessionContext;
 import org.chtijbug.drools.entity.history.HistoryEvent;
 import org.chtijbug.drools.entity.history.fact.UpdatedFactHistoryEvent;
@@ -32,17 +33,18 @@ public class UpdatedFactEventStrategy implements AbstractMemoryEventHandlerStrat
     @Override
     public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext) {
         UpdatedFactHistoryEvent updatedFactHistoryEvent = (UpdatedFactHistoryEvent) historyEvent;
+        Cloner cloner=new Cloner();
         Fact factOldValue = new Fact();
         factOldValue.setFullClassName(updatedFactHistoryEvent.getObjectOldValue().getFullClassName());
         factOldValue.setObjectVersion(updatedFactHistoryEvent.getObjectOldValue().getObjectVersion());
-        factOldValue.setRealFact(updatedFactHistoryEvent.getObjectOldValue().getRealObject());
+        factOldValue.setRealFact(cloner.deepClone(updatedFactHistoryEvent.getObjectOldValue().getRealObject()));
         factOldValue.setModificationDate(updatedFactHistoryEvent.getDateEvent());
         factOldValue.setFactType(FactType.UPDATED_OLDVALUE);
         factOldValue.setEventid(updatedFactHistoryEvent.getEventID());
         Fact factNewValue = new Fact();
         factNewValue.setFullClassName(updatedFactHistoryEvent.getObjectNewValue().getFullClassName());
         factNewValue.setObjectVersion(updatedFactHistoryEvent.getObjectNewValue().getObjectVersion());
-        factNewValue.setRealFact(updatedFactHistoryEvent.getObjectNewValue().getRealObject());
+        factNewValue.setRealFact(cloner.deepClone(updatedFactHistoryEvent.getObjectNewValue().getRealObject()));
         factNewValue.setModificationDate(updatedFactHistoryEvent.getDateEvent());
         factNewValue.setFactType(FactType.UPDATED_NEWVALUE);
         factNewValue.setEventid(updatedFactHistoryEvent.getEventID());

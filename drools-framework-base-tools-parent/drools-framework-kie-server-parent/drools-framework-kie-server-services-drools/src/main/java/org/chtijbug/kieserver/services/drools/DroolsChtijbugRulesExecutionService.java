@@ -153,7 +153,7 @@ public class DroolsChtijbugRulesExecutionService {
             return chtijbugObjectRequest;
 
         } catch (DroolsChtijbugException e) {
-            e.printStackTrace();
+           logger.error("FireAllRulesAndStartProcess",e);
         }
 
         throw new IllegalStateException("Unable to execute command " + chtijbugObjectRequest.getObjectRequest());
