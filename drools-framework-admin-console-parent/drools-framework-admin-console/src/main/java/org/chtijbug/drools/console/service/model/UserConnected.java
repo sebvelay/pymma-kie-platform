@@ -16,6 +16,8 @@ public class UserConnected {
 
     private boolean connected;
 
+    private String kieWorkbenchName;
+
     public UserConnected() {
     }
 
@@ -40,6 +42,13 @@ public class UserConnected {
         this.userPassword = userPassword;
     }
 
+    public String getKieWorkbenchName() {
+        return kieWorkbenchName;
+    }
+
+    public void setKieWorkbenchName(String kieWorkbenchName) {
+        this.kieWorkbenchName = kieWorkbenchName;
+    }
 
     public List<PlatformProjectResponse> getProjectResponses() {
         return projectResponses;

@@ -8,6 +8,7 @@ public class KieConfigurationData {
 
     private String password;
 
+    private String name;
 
 
     public String getKiewbUrl() {
@@ -34,4 +35,11 @@ public class KieConfigurationData {
         this.password = password;
     }
 
-   }
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}

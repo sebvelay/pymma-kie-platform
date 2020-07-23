@@ -15,6 +15,7 @@
  */
 package org.chtijbug.drools.runtimeevent.impl.fact;
 
+import com.rits.cloning.Cloner;
 import org.chtijbug.drools.SessionContext;
 import org.chtijbug.drools.entity.history.HistoryEvent;
 import org.chtijbug.drools.entity.history.fact.DeletedFactHistoryEvent;
@@ -34,7 +35,8 @@ public class DeleteFactEventStrategy implements AbstractMemoryEventHandlerStrate
         Fact fact = new Fact();
         fact.setFullClassName(deletedFactHistoryEvent.getDeletedObject().getFullClassName());
         fact.setObjectVersion(deletedFactHistoryEvent.getDeletedObject().getObjectVersion());
-        fact.setRealFact(deletedFactHistoryEvent.getDeletedObject().getRealObject());
+        Cloner cloner = new Cloner();
+        fact.setRealFact(cloner.deepClone(deletedFactHistoryEvent.getDeletedObject().getRealObject()));
         fact.setModificationDate(deletedFactHistoryEvent.getDateEvent());
         fact.setFactType(FactType.DELETED);
         RuleExecution existingInSessionRuleExecution = null;

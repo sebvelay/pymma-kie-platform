@@ -16,6 +16,7 @@
 package org.chtijbug.drools.runtimeevent.impl.knowledgeSession;
 
 
+import com.rits.cloning.Cloner;
 import org.chtijbug.drools.SessionContext;
 import org.chtijbug.drools.entity.DroolsFactObject;
 import org.chtijbug.drools.entity.history.HistoryEvent;
@@ -31,6 +32,7 @@ public class KnowledgeSessionFireAllRulesAndStartProcessEventStrategy implements
     public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext) {
         SessionFireAllRulesAndStartProcess sessionFireAllRulesAndStartProcess = (SessionFireAllRulesAndStartProcess) historyEvent;
         SessionExecution existingSessionRutime = sessionContext.getSessionExecution();
+
         if (existingSessionRutime != null) {
             if (sessionFireAllRulesAndStartProcess.getInputObject() != null) {
                 DroolsFactObject inputObject = sessionFireAllRulesAndStartProcess.getInputObject();
@@ -38,7 +40,8 @@ public class KnowledgeSessionFireAllRulesAndStartProcessEventStrategy implements
                 inputFact.setEventid(sessionContext.getSessionExecution().getStartEventID());
                 inputFact.setFactType(FactType.INPUTDATA);
                 inputFact.setFullClassName(inputObject.getFullClassName());
-                inputFact.setRealFact(inputObject.getRealObject());
+                Cloner cloner=new Cloner();
+                inputFact.setRealFact(cloner.deepClone(inputObject.getRealObject()));
                 inputFact.setModificationDate(sessionFireAllRulesAndStartProcess.getDateEvent());
                 inputFact.setObjectVersion(inputObject.getObjectVersion());
                 existingSessionRutime.getFacts().add(inputFact);
@@ -49,7 +52,8 @@ public class KnowledgeSessionFireAllRulesAndStartProcessEventStrategy implements
                 outputFact.setEventid(sessionContext.getSessionExecution().getStopEventID());
                 outputFact.setFactType(FactType.OUTPUTDATA);
                 outputFact.setFullClassName(outputObject.getFullClassName());
-                outputFact.setRealFact(outputObject.getRealObject());
+                Cloner cloner=new Cloner();
+                outputFact.setRealFact(cloner.deepClone(outputObject.getRealObject()));
                 outputFact.setModificationDate(sessionFireAllRulesAndStartProcess.getDateEvent());
                 outputFact.setObjectVersion(outputObject.getObjectVersion());
                 existingSessionRutime.getFacts().add(outputFact);

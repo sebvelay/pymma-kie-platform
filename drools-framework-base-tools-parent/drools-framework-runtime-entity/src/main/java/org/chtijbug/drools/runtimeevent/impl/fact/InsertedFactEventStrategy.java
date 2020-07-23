@@ -15,6 +15,7 @@
  */
 package org.chtijbug.drools.runtimeevent.impl.fact;
 
+import com.rits.cloning.Cloner;
 import org.chtijbug.drools.SessionContext;
 import org.chtijbug.drools.entity.history.HistoryEvent;
 import org.chtijbug.drools.entity.history.fact.InsertedFactHistoryEvent;
@@ -33,7 +34,8 @@ public class InsertedFactEventStrategy implements AbstractMemoryEventHandlerStra
         Fact fact = new Fact();
         fact.setFullClassName(insertedFactHistoryEvent.getInsertedObject().getFullClassName());
         fact.setObjectVersion(insertedFactHistoryEvent.getInsertedObject().getObjectVersion());
-        fact.setRealFact(insertedFactHistoryEvent.getInsertedObject().getRealObject());
+        Cloner cloner = new Cloner();
+        fact.setRealFact(cloner.deepClone(insertedFactHistoryEvent.getInsertedObject().getRealObject()));
         fact.setModificationDate(insertedFactHistoryEvent.getDateEvent());
         fact.setFactType(FactType.INSERTED);
         fact.setEventid(insertedFactHistoryEvent.getEventID());

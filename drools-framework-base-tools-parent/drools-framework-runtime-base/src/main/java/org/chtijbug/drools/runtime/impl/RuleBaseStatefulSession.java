@@ -15,6 +15,7 @@
  */
 package org.chtijbug.drools.runtime.impl;
 
+import com.rits.cloning.Cloner;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 import org.chtijbug.drools.common.reflection.ReflectionUtils;
@@ -380,9 +381,12 @@ public class RuleBaseStatefulSession implements RuleBaseSession {
     public Object fireAllRulesAndStartProcess(Object inputObject, String processName) throws DroolsChtijbugException {
         DroolsFactObject inputDroolsObject = null;
         DroolsFactObject outputDroolsObject = null;
+        Object inputObjectClone;
         if (inputObject != null) {
             this.insertByReflection(inputObject);
-            inputDroolsObject = DroolsFactObjectFactory.createFactObject(inputObject);
+            Cloner cloner = new Cloner();
+            inputObjectClone=cloner.deepClone(inputObject);
+            inputDroolsObject = DroolsFactObjectFactory.createFactObject(inputObjectClone);
         }
         if (processName != null && processName.length() > 0) {
             this.startProcess(processName);
@@ -537,9 +541,12 @@ public class RuleBaseStatefulSession implements RuleBaseSession {
 
         DroolsFactObject inputDroolsObject = null;
         DroolsFactObject outputDroolsObject = null;
+        Object inputObjectClone;
         if (inputObject != null) {
             this.insertByReflection(inputObject);
-            inputDroolsObject = DroolsFactObjectFactory.createFactObject(inputObject);
+            Cloner cloner = new Cloner();
+            inputObjectClone=cloner.deepClone(inputObject);
+            inputDroolsObject = DroolsFactObjectFactory.createFactObject(inputObjectClone);
         }
         Map<String, Object> maps = new HashMap<String, Object>();
         maps.put("inputObject", inputObject);

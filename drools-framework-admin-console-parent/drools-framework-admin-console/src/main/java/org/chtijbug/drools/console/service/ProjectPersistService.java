@@ -11,14 +11,8 @@ import org.chtijbug.drools.console.service.model.kie.JobStatus;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.proxy.persistence.json.KieProject;
-import org.chtijbug.drools.proxy.persistence.model.ContainerPojoPersist;
-import org.chtijbug.drools.proxy.persistence.model.ContainerRuntimePojoPersist;
-import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
-import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
-import org.chtijbug.drools.proxy.persistence.repository.ContainerRepository;
-import org.chtijbug.drools.proxy.persistence.repository.ContainerRuntimeRepository;
-import org.chtijbug.drools.proxy.persistence.repository.ProjectRepository;
-import org.chtijbug.drools.proxy.persistence.repository.RuntimeRepository;
+import org.chtijbug.drools.proxy.persistence.model.*;
+import org.chtijbug.drools.proxy.persistence.repository.*;
 import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +54,10 @@ public class ProjectPersistService {
 
     @Autowired
     private RuntimeRepository runtimeRepository;
+
+    @Autowired
+    private KieWorkbenchRepository workbenchRepository;
+
     @Autowired
     private KafkaTemplate<String, ReverseProxyUpdate> kafkaTemplateProxyUpdate;
 
@@ -72,19 +70,22 @@ public class ProjectPersistService {
     }
 
 
-    public void saveIfnotExist(List<PlatformProjectResponse> platformProjectResponses) {
+    public void saveIfnotExist(List<PlatformProjectResponse> platformProjectResponses,String workbenchName) {
 
+
+        KieWorkbench kieWorkbench = workbenchRepository.findByName(workbenchName);
         for (PlatformProjectResponse platformProjectResponse : platformProjectResponses) {
 
             ProjectPersist projectPersist = projectRepository.findByProjectNameAndBranch(new KieProject(platformProjectResponse.getSpaceName(), platformProjectResponse.getName()), platformProjectResponse.getBranch());
 
             if (projectPersist == null) {
                 projectPersist = platformProjectResponseToProjectPersist(platformProjectResponse);
-
+                projectPersist.setKieWorkbench(kieWorkbench);
                 projectPersist = projectRepository.save(projectPersist);
                 addProjectToSession(projectPersist, true);
 
             } else {
+                projectPersist.setKieWorkbench(kieWorkbench);
                 projectPersist.getClassNameList().clear();
                 for (String className : platformProjectResponse.getJavaClasses()) {
                     projectPersist.getClassNameList().add(className);

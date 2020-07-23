@@ -15,6 +15,7 @@ import org.chtijbug.drools.console.middle.DababaseContentInit;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.ApplicationContextProvider;
 import org.chtijbug.drools.console.service.wbconnector.KieBusinessCentralConnector;
+import org.chtijbug.drools.proxy.persistence.repository.KieWorkbenchRepository;
 import org.chtijbug.drools.proxy.persistence.repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,6 +61,8 @@ public class DroolsSpringBootConsoleApplication extends SpringBootServletInitial
     @Autowired
     private ProjectRepository projectRepository;
 
+    @Autowired
+    private KieWorkbenchRepository kieWorkbenchRepository;
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
@@ -88,6 +91,7 @@ public class DroolsSpringBootConsoleApplication extends SpringBootServletInitial
     public KieConfigurationData createKieConfigurationData(){
         KieConfigurationData kieConfigurationData = new KieConfigurationData();
         kieConfigurationData.setKiewbUrl(kiewbUrl);
+        kieConfigurationData.setName("demo");
         return kieConfigurationData;
     }
     @Override
@@ -174,36 +178,52 @@ public class DroolsSpringBootConsoleApplication extends SpringBootServletInitial
     public void InitPlatform(){
         dababaseContentInit.initDatabaseIfNecessary();
         /**
-        Map<String,KieContainerResource> kies = new HashMap<>();
-        KieServerSetup kieServerSetup = kieBusinessCentralConnector.connectToBusinessCentral("nheron", "adminnheron00@");
-        if (kieServerSetup!= null && kieServerSetup.getContainers()!= null) {
-            for (KieContainerResource kieContainerResource : kieServerSetup.getContainers()) {
-                kies.put(kieContainerResource.getContainerId(), kieContainerResource);
-            }
-        }
-        for (ProjectPersist projectPersist : projectRepository.findAll()){
-            if (projectPersist.getServerNames().size()>0){
-                if (!kies.containsKey(projectPersist.getContainerID())){
-                    kieBusinessCentralConnector.createContainer("nheron", "adminnheron00@",projectPersist);
-                }else{
-                    kieBusinessCentralConnector.updateContainer("nheron", "adminnheron00@",projectPersist,kies.get(projectPersist.getContainerID()));
-                }
-            }
-        }
+       for (KieWorkbench kieWorkbench: kieWorkbenchRepository.findAll()) {
+           Map<String, KieContainerResource> kies = new HashMap<>();
+           KieServerSetup kieServerSetup = kieBusinessCentralConnector.connectToBusinessCentral("nheron", "adminnheron00@", kieWorkbench.getName(),kieWorkbench.getExternalUrl());
+           if (kieServerSetup != null && kieServerSetup.getContainers() != null) {
+               for (KieContainerResource kieContainerResource : kieServerSetup.getContainers()) {
+                   kies.put(kieContainerResource.getContainerId(), kieContainerResource);
+               }
+           }
+           List<ProjectPersist> projectRepositories = projectRepository.findByKieWorkbench(kieWorkbench);
+           if (!projectRepositories.isEmpty()){
+               for (ProjectPersist projectPersist : projectRepository.findAll()) {
+                   if (projectPersist.getServerNames().size() > 0) {
+                       if (!kies.containsKey(projectPersist.getArtifactID()+"_"+projectPersist.getProjectVersion())) {
+                           kieBusinessCentralConnector.createContainer("nheron", "adminnheron00@", projectPersist,kieWorkbench.getExternalUrl());
+                       } else {
+                           kieBusinessCentralConnector.updateContainer("nheron", "adminnheron00@", projectPersist, kies.get(projectPersist.getArtifactID()+"_"+projectPersist.getProjectVersion()),kieWorkbench.getExternalUrl());
+                       }
+                   }
+               }
+           }
+           /**
+               for (ProjectPersist projectPersist : projectRepository.findAll()) {
+                   if (projectPersist.getServerNames().size() > 0) {
+                       if (!kies.containsKey(projectPersist.getContainerID())) {
+                           kieBusinessCentralConnector.createContainer("nheron", "adminnheron00@", projectPersist);
+                       } else {
+                           kieBusinessCentralConnector.updateContainer("nheron", "adminnheron00@", projectPersist, kies.get(projectPersist.getContainerID()));
+                       }
+                   }
+               }
 
-        ServerInstanceKeyList serverInstanceKeyList = kieBusinessCentralConnector.getListInstances("nheron", "adminnheron00@");
-        if (serverInstanceKeyList!=null){
-            for (ServerInstanceKey serverInstanceKey : serverInstanceKeyList.getServerInstanceKeys()){
-                String serverInstanceId = serverInstanceKey.getServerInstanceId();
-                ContainerList containerList = kieBusinessCentralConnector.getListContainers("nheron", "adminnheron00@", serverInstanceId);
-                System.out.println("coucou");
-                for (Container container : containerList.getContainers()){
+               ServerInstanceKeyList serverInstanceKeyList = kieBusinessCentralConnector.getListInstances("nheron", "adminnheron00@");
+               if (serverInstanceKeyList != null) {
+                   for (ServerInstanceKey serverInstanceKey : serverInstanceKeyList.getServerInstanceKeys()) {
+                       String serverInstanceId = serverInstanceKey.getServerInstanceId();
+                       ContainerList containerList = kieBusinessCentralConnector.getListContainers("nheron", "adminnheron00@", serverInstanceId);
+                       System.out.println("coucou");
+                       for (Container container : containerList.getContainers()) {
 
-                }
-            }
-            System.out.println("coucou");
-        }
-        System.out.println("coucou");
+                       }
+                   }
+                   System.out.println("coucou");
+               }
+               System.out.println("coucou");
+
+       }
          **/
     }
 
