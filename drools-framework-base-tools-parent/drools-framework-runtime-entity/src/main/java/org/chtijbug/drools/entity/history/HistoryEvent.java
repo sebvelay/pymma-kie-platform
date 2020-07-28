@@ -36,11 +36,15 @@ public class HistoryEvent implements Serializable {
     private Long sessionId;
     private DroolsChtijbugException droolsChtijbugException;
     private ArrayList<KnowledgeResource> knowledgeResources = new ArrayList<KnowledgeResource>();
-
+    private ClassLoader businessClassLoader;
     /**
      * Mandatory for GWT Serialization
      */
     public HistoryEvent() {
+    }
+
+    public void setBusinessClassLoader(ClassLoader businessClassLoader) {
+        this.businessClassLoader = businessClassLoader;
     }
 
     public HistoryEvent(Long eventID, Date dateEvent, TypeEvent typeEvent) {

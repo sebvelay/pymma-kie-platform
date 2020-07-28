@@ -31,9 +31,8 @@ public class UpdatedFactEventStrategy implements AbstractMemoryEventHandlerStrat
 
 
     @Override
-    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext) {
+    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext,Cloner cloner) {
         UpdatedFactHistoryEvent updatedFactHistoryEvent = (UpdatedFactHistoryEvent) historyEvent;
-        Cloner cloner=new Cloner();
         Fact factOldValue = new Fact();
         factOldValue.setFullClassName(updatedFactHistoryEvent.getObjectOldValue().getFullClassName());
         factOldValue.setObjectVersion(updatedFactHistoryEvent.getObjectOldValue().getObjectVersion());

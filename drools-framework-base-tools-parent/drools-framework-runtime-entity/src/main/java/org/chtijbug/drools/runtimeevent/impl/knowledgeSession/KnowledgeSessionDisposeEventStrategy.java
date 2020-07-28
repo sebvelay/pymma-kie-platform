@@ -16,6 +16,7 @@
 package org.chtijbug.drools.runtimeevent.impl.knowledgeSession;
 
 
+import com.rits.cloning.Cloner;
 import org.chtijbug.drools.SessionContext;
 import org.chtijbug.drools.entity.history.HistoryEvent;
 import org.chtijbug.drools.entity.history.session.SessionDisposedEvent;
@@ -29,7 +30,7 @@ public class KnowledgeSessionDisposeEventStrategy implements AbstractMemoryEvent
 
 
     @Override
-    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext) {
+    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext, Cloner cloner) {
         SessionDisposedEvent sessionDisposedEvent = (SessionDisposedEvent) historyEvent;
         SessionExecution existingSessionRutime = sessionContext.getSessionExecution();
         existingSessionRutime.setEndDate(sessionDisposedEvent.getDateEvent());

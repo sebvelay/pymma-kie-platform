@@ -16,6 +16,7 @@
 package org.chtijbug.drools.runtimeevent.impl.process;
 
 
+import com.rits.cloning.Cloner;
 import org.chtijbug.drools.SessionContext;
 import org.chtijbug.drools.entity.DroolsNodeType;
 import org.chtijbug.drools.entity.history.HistoryEvent;
@@ -28,7 +29,7 @@ import org.chtijbug.drools.runtimeevent.AbstractMemoryEventHandlerStrategy;
 public class AfterNodeInstanceTriggeredEventStrategy implements AbstractMemoryEventHandlerStrategy {
 
     @Override
-    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext) {
+    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext, Cloner cloner) {
         AfterNodeInstanceTriggeredHistoryEvent afterNodeInstanceTriggeredHistoryEvent = (AfterNodeInstanceTriggeredHistoryEvent) historyEvent;
         if (afterNodeInstanceTriggeredHistoryEvent.getNodeInstance().getNode().getNodeType() == DroolsNodeType.RuleNode) {
             String ruleFLowName = afterNodeInstanceTriggeredHistoryEvent.getNodeInstance().getNode().getRuleflowGroupName();

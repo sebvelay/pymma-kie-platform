@@ -29,12 +29,11 @@ import org.chtijbug.drools.runtimeevent.AbstractMemoryEventHandlerStrategy;
 public class InsertedFactEventStrategy implements AbstractMemoryEventHandlerStrategy {
 
     @Override
-    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext) {
+    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext,Cloner cloner) {
         InsertedFactHistoryEvent insertedFactHistoryEvent = (InsertedFactHistoryEvent) historyEvent;
         Fact fact = new Fact();
         fact.setFullClassName(insertedFactHistoryEvent.getInsertedObject().getFullClassName());
         fact.setObjectVersion(insertedFactHistoryEvent.getInsertedObject().getObjectVersion());
-        Cloner cloner = new Cloner();
         fact.setRealFact(cloner.deepClone(insertedFactHistoryEvent.getInsertedObject().getRealObject()));
         fact.setModificationDate(insertedFactHistoryEvent.getDateEvent());
         fact.setFactType(FactType.INSERTED);

@@ -115,7 +115,7 @@ public class DroolsChtijbugRulesExecutionService {
         Object result = null;
 
         try {
-
+            messageHandlerResolver.setClassLoader(chtijbugObjectRequest.getObjectRequest().getClass().getClassLoader());
             RuleBasePackage ruleBasePackage = this.ruleBasePackages.get(kci.getResource().getContainerId());
             if (ruleBasePackage != null) {
                 Date startTime = new Date();

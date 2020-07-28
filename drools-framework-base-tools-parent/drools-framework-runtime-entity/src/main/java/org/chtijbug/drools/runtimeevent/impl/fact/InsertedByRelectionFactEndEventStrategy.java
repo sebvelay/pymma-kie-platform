@@ -16,6 +16,7 @@
 package org.chtijbug.drools.runtimeevent.impl.fact;
 
 
+import com.rits.cloning.Cloner;
 import org.chtijbug.drools.SessionContext;
 import org.chtijbug.drools.entity.history.HistoryEvent;
 import org.chtijbug.drools.entity.history.fact.InsertedByReflectionFactEndHistoryEvent;
@@ -26,7 +27,7 @@ public class InsertedByRelectionFactEndEventStrategy implements AbstractMemoryEv
 
 
     @Override
-    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext) {
+    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext, Cloner cloner) {
 
     }
 

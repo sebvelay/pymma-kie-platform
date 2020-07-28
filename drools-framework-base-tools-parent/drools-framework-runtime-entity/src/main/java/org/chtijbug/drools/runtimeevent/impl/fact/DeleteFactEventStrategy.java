@@ -28,14 +28,12 @@ import org.chtijbug.drools.runtimeevent.AbstractMemoryEventHandlerStrategy;
 
 public class DeleteFactEventStrategy implements AbstractMemoryEventHandlerStrategy {
 
-
     @Override
-    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext) {
+    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext,Cloner cloner) {
         DeletedFactHistoryEvent deletedFactHistoryEvent = (DeletedFactHistoryEvent) historyEvent;
         Fact fact = new Fact();
         fact.setFullClassName(deletedFactHistoryEvent.getDeletedObject().getFullClassName());
         fact.setObjectVersion(deletedFactHistoryEvent.getDeletedObject().getObjectVersion());
-        Cloner cloner = new Cloner();
         fact.setRealFact(cloner.deepClone(deletedFactHistoryEvent.getDeletedObject().getRealObject()));
         fact.setModificationDate(deletedFactHistoryEvent.getDateEvent());
         fact.setFactType(FactType.DELETED);

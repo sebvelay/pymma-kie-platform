@@ -15,6 +15,8 @@
  */
 package org.chtijbug.drools.runtimeevent;
 
+import com.rits.cloning.Cloner;
+import com.rits.cloning.ObjenesisInstantiationStrategy;
 import org.chtijbug.drools.SessionContext;
 import org.chtijbug.drools.entity.history.HistoryEvent;
 import org.chtijbug.drools.runtimeevent.impl.fact.*;
@@ -38,6 +40,8 @@ public class MessageHandlerResolver {
 
     @Resource
     private List<AbstractMemoryEventHandlerStrategy> allMemoryStrategies = new ArrayList<>();
+
+    private ClassLoader classLoader;
 
     public MessageHandlerResolver() {
         allMemoryStrategies.add(new DeleteFactEventStrategy());
@@ -68,16 +72,19 @@ public class MessageHandlerResolver {
         allMemoryStrategies.add(new AfterRuleflowGroupDeactivatedEventStrategy());
         allMemoryStrategies.add(new BeforeRuleFiredEventStrategy());
 
-
     }
 
     public SessionContext getSessionFromHistoryEvent(List<HistoryEvent> historyEvents) {
+        Thread currentThread = Thread.currentThread();
+        ClassLoader old = currentThread.getContextClassLoader();
+        currentThread.setContextClassLoader(classLoader);
         SessionContext sessionContext = new SessionContext();
+        Cloner cloner=new Cloner(new ObjenesisInstantiationStrategy());
         for (HistoryEvent historyEvent : historyEvents) {
             AbstractMemoryEventHandlerStrategy strategy = this.resolveMessageHandlerMemory(historyEvent);
             if (strategy != null) {
                 try {
-                    strategy.handleMessageInternally(historyEvent, sessionContext);
+                    strategy.handleMessageInternally(historyEvent, sessionContext,cloner);
                 }catch (Exception e){
                     logger.error("MessageHandle for class" + historyEvent.getClass().toString(), historyEvent, e);
                 }
@@ -85,6 +92,7 @@ public class MessageHandlerResolver {
         }
 
         sessionContext.getRuleflowGroups().clear();
+        currentThread.setContextClassLoader(old);
         return sessionContext;
     }
 
@@ -94,5 +102,9 @@ public class MessageHandlerResolver {
                 return strategy;
         }
         return null;
+    }
+
+    public void setClassLoader(ClassLoader classLoader) {
+        this.classLoader=classLoader;
     }
 }
