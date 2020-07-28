@@ -27,7 +27,7 @@ import org.chtijbug.drools.runtimeevent.AbstractMemoryEventHandlerStrategy;
 public class BeforeRuleFiredEventStrategy implements AbstractMemoryEventHandlerStrategy {
 
     @Override
-    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext) {
+    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext,Cloner cloner) {
         BeforeRuleFiredHistoryEvent beforeRuleFiredHistoryEvent = (BeforeRuleFiredHistoryEvent) historyEvent;
         RuleExecution ruleExecution = new RuleExecution();
         sessionContext.setRuleExecution(ruleExecution);
@@ -50,7 +50,6 @@ public class BeforeRuleFiredEventStrategy implements AbstractMemoryEventHandlerS
         ruleExecution.setRuleName(beforeRuleFiredHistoryEvent.getRule().getRuleName());
         ruleExecution.setPackageName(beforeRuleFiredHistoryEvent.getRule().getRulePackageName());
         ruleExecution.setStartEventID(beforeRuleFiredHistoryEvent.getEventID());
-        Cloner cloner = new Cloner();
         for (DroolsFactObject droolsFactObject : beforeRuleFiredHistoryEvent.getWhenObjects()) {
             if (droolsFactObject != null) {
                 Fact fact = new Fact();

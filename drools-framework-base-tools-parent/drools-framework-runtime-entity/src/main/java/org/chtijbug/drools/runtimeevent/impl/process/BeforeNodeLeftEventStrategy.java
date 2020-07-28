@@ -16,6 +16,7 @@
 package org.chtijbug.drools.runtimeevent.impl.process;
 
 
+import com.rits.cloning.Cloner;
 import org.chtijbug.drools.SessionContext;
 import org.chtijbug.drools.entity.history.HistoryEvent;
 import org.chtijbug.drools.entity.history.process.BeforeNodeLeftHistoryEvent;
@@ -24,7 +25,7 @@ import org.chtijbug.drools.runtimeevent.AbstractMemoryEventHandlerStrategy;
 public class BeforeNodeLeftEventStrategy implements AbstractMemoryEventHandlerStrategy {
 
     @Override
-    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext) {
+    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext, Cloner cloner) {
 
     }
 

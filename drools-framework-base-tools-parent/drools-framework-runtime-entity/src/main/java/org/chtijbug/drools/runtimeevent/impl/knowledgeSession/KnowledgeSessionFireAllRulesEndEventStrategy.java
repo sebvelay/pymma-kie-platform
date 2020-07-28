@@ -16,6 +16,7 @@
 package org.chtijbug.drools.runtimeevent.impl.knowledgeSession;
 
 
+import com.rits.cloning.Cloner;
 import org.chtijbug.drools.SessionContext;
 import org.chtijbug.drools.entity.history.HistoryEvent;
 import org.chtijbug.drools.entity.history.session.SessionFireAllRulesEndEvent;
@@ -26,7 +27,7 @@ import org.chtijbug.drools.runtimeevent.AbstractMemoryEventHandlerStrategy;
 public class KnowledgeSessionFireAllRulesEndEventStrategy implements AbstractMemoryEventHandlerStrategy {
 
     @Override
-    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext) {
+    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext, Cloner cloner) {
         SessionFireAllRulesEndEvent sessionFireAllRulesEndEvent = (SessionFireAllRulesEndEvent) historyEvent;
         FireAllRulesExecution fireAllRulesExecution = sessionContext.getFireAllRulesExecution();
         fireAllRulesExecution.setStopEventID(sessionFireAllRulesEndEvent.getEventID());

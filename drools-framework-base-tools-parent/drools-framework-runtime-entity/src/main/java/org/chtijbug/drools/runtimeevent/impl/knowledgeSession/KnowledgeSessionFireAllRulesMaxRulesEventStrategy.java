@@ -16,6 +16,7 @@
 package org.chtijbug.drools.runtimeevent.impl.knowledgeSession;
 
 
+import com.rits.cloning.Cloner;
 import org.chtijbug.drools.SessionContext;
 import org.chtijbug.drools.entity.history.HistoryEvent;
 import org.chtijbug.drools.entity.history.session.SessionFireAllRulesMaxNumberReachedEvent;
@@ -25,7 +26,7 @@ import org.chtijbug.drools.runtimeevent.AbstractMemoryEventHandlerStrategy;
 
 public class KnowledgeSessionFireAllRulesMaxRulesEventStrategy implements AbstractMemoryEventHandlerStrategy {
     @Override
-    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext) {
+    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext, Cloner cloner) {
         SessionFireAllRulesMaxNumberReachedEvent sessionFireAllRulesMaxNumberReachedEvent = (SessionFireAllRulesMaxNumberReachedEvent) historyEvent;
         FireAllRulesExecution fireAllRulesExecution = sessionContext.getFireAllRulesExecution();
         fireAllRulesExecution.setMaxRulesEventID(sessionFireAllRulesMaxNumberReachedEvent.getEventID());

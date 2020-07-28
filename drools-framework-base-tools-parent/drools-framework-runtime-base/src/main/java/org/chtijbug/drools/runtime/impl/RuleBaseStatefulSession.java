@@ -16,6 +16,7 @@
 package org.chtijbug.drools.runtime.impl;
 
 import com.rits.cloning.Cloner;
+import com.rits.cloning.ObjenesisInstantiationStrategy;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 import org.chtijbug.drools.common.reflection.ReflectionUtils;
@@ -384,8 +385,13 @@ public class RuleBaseStatefulSession implements RuleBaseSession {
         Object inputObjectClone;
         if (inputObject != null) {
             this.insertByReflection(inputObject);
-            Cloner cloner = new Cloner();
+            inputObject.getClass().getClassLoader();
+            Thread currentThread = Thread.currentThread();
+            ClassLoader old = currentThread.getContextClassLoader();
+            currentThread.setContextClassLoader(inputObject.getClass().getClassLoader());
+            Cloner cloner = new Cloner(new ObjenesisInstantiationStrategy());
             inputObjectClone=cloner.deepClone(inputObject);
+            currentThread.setContextClassLoader(old);
             inputDroolsObject = DroolsFactObjectFactory.createFactObject(inputObjectClone);
         }
         if (processName != null && processName.length() > 0) {

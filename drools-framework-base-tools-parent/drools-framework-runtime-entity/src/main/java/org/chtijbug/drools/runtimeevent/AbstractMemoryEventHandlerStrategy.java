@@ -1,5 +1,6 @@
 package org.chtijbug.drools.runtimeevent;
 
+import com.rits.cloning.Cloner;
 import org.chtijbug.drools.SessionContext;
 import org.chtijbug.drools.entity.history.HistoryEvent;
 
@@ -8,9 +9,10 @@ import org.chtijbug.drools.entity.history.HistoryEvent;
  */
 public interface AbstractMemoryEventHandlerStrategy {
 
-    public abstract void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext);
+    public abstract void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext, Cloner cloner);
 
     public abstract boolean isEventSupported(HistoryEvent historyEvent);
+
 
 
 }

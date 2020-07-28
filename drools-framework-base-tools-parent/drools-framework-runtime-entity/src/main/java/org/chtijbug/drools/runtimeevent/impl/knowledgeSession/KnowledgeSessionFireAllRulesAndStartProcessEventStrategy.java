@@ -29,7 +29,7 @@ import org.chtijbug.drools.runtimeevent.AbstractMemoryEventHandlerStrategy;
 public class KnowledgeSessionFireAllRulesAndStartProcessEventStrategy implements AbstractMemoryEventHandlerStrategy {
 
     @Override
-    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext) {
+    public void handleMessageInternally(HistoryEvent historyEvent, SessionContext sessionContext,Cloner cloner) {
         SessionFireAllRulesAndStartProcess sessionFireAllRulesAndStartProcess = (SessionFireAllRulesAndStartProcess) historyEvent;
         SessionExecution existingSessionRutime = sessionContext.getSessionExecution();
 
@@ -40,7 +40,6 @@ public class KnowledgeSessionFireAllRulesAndStartProcessEventStrategy implements
                 inputFact.setEventid(sessionContext.getSessionExecution().getStartEventID());
                 inputFact.setFactType(FactType.INPUTDATA);
                 inputFact.setFullClassName(inputObject.getFullClassName());
-                Cloner cloner=new Cloner();
                 inputFact.setRealFact(cloner.deepClone(inputObject.getRealObject()));
                 inputFact.setModificationDate(sessionFireAllRulesAndStartProcess.getDateEvent());
                 inputFact.setObjectVersion(inputObject.getObjectVersion());
@@ -52,7 +51,6 @@ public class KnowledgeSessionFireAllRulesAndStartProcessEventStrategy implements
                 outputFact.setEventid(sessionContext.getSessionExecution().getStopEventID());
                 outputFact.setFactType(FactType.OUTPUTDATA);
                 outputFact.setFullClassName(outputObject.getFullClassName());
-                Cloner cloner=new Cloner();
                 outputFact.setRealFact(cloner.deepClone(outputObject.getRealObject()));
                 outputFact.setModificationDate(sessionFireAllRulesAndStartProcess.getDateEvent());
                 outputFact.setObjectVersion(outputObject.getObjectVersion());
