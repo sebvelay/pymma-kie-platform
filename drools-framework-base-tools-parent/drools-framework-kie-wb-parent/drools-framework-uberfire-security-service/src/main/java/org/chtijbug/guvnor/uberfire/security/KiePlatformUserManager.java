@@ -16,6 +16,9 @@
 
 package org.chtijbug.guvnor.uberfire.security;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoDatabase;
+import org.bson.codecs.configuration.CodecRegistry;
 import org.jboss.errai.security.shared.api.identity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +45,9 @@ public class KiePlatformUserManager  implements UserManager, ContextualManager {
     UserSystemManager userSystemManager;
     IdentifierRuntimeSearchEngine<User> usersSearchEngine;
 
-
+    private MongoClient mongoClient;
+    private CodecRegistry pojoCodecRegistry;
+    private MongoDatabase database;
 
     public KiePlatformUserManager() {
         this(new ConfigProperties(System.getProperties()));
@@ -56,7 +61,12 @@ public class KiePlatformUserManager  implements UserManager, ContextualManager {
         //loadConfig(gitPrefs);
     }
 
+    public void setMongo (MongoClient mongoClient,CodecRegistry pojoCodecRegistry,MongoDatabase database){
+        this.mongoClient=mongoClient;
+        this.pojoCodecRegistry = pojoCodecRegistry;
+        this.database=database;
 
+    }
 
     @Override
     public void initialize(final UserSystemManager userSystemManager) throws Exception {

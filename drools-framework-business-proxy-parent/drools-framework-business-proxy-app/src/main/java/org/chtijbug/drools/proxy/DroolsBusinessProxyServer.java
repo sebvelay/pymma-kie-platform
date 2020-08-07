@@ -39,6 +39,7 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.kafka.transaction.KafkaTransactionManager;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -104,13 +105,21 @@ public class DroolsBusinessProxyServer {
         configProps.put(
                 ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
                 JsonSerializer.class);
-        return new DefaultKafkaProducerFactory<>(configProps);
+        DefaultKafkaProducerFactory<String, KieContainerResponse> producer = new DefaultKafkaProducerFactory<>(configProps);
+        producer.transactionCapable();
+        producer.setTransactionIdPrefix("trans");
+        return producer;
+    }
+    @Bean
+    public KafkaTransactionManager transactionManager(ProducerFactory producerFactory) {
+        KafkaTransactionManager manager = new KafkaTransactionManager(producerKieContainerResponseactory());
+        return manager;
     }
     @Bean
     public KafkaTemplate<String, KieContainerResponse> kafkaKieContainerUpdateResponsableTemplate() {
         return new KafkaTemplate<>(producerKieContainerResponseactory());
     }
-    @Bean
+    @Bean(name="deployFinish")
     public NewTopic actionDeployResponseTopic() {
         return new NewTopic(KafkaTopicConstants.RESPONSE_DEPLOY_TOPIC, 1, (short) 1);
     }

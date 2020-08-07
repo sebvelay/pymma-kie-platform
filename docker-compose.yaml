@@ -246,6 +246,25 @@ services:
     command: mongod
     restart: always
 
+  kafka_manager:
+    image: hlebalbau/kafka-manager:stable
+    ports:
+      - "9000:9000"
+    hostname: kafka_manager.pymma
+    networks:
+      drools-network-dev:
+        ipv4_address: 172.27.1.89
+    links:
+      - zoo1:zoo1
+      - zoo2:zoo2
+      - zoo3:zoo3
+    environment:
+      ZK_HOSTS: "zoo1:2181, zoo2:2182, zoo3:2183"
+      KAFKA_MANAGER_AUTH_ENABLED: "true"
+      KAFKA_MANAGER_USERNAME: admin
+      KAFKA_MANAGER_PASSWORD: adminpymma
+    command: -Dpidfile.path=/dev/null
+
   zoo1:
     image: zookeeper:3.4.9
     hostname: zoo1

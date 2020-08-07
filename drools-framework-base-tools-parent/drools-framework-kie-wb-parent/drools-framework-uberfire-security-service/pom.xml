@@ -68,12 +68,11 @@
             <version>1</version>
         </dependency>
 
-        <!--dependency>
+        <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver</artifactId>
             <version>${version.mongodb.driver}</version>
-            <scope>provided</scope>
-        </dependency-->
+        </dependency>
 
     </dependencies>
 

@@ -18,6 +18,7 @@ package org.chtijbug.drools.proxy.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Route;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.chtijbug.drools.KieContainerResponse;
 import org.chtijbug.drools.KieContainerUpdate;
 import org.chtijbug.drools.common.KafkaTopicConstants;
@@ -40,6 +41,7 @@ import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -90,6 +92,10 @@ public class KieServiceCommon {
 
     @Autowired
     KafkaTemplate<String, KieContainerResponse> kafkaKieContainerUpdateResponseTemplate;
+
+    @Qualifier("deployFinish")
+    @Autowired
+    NewTopic responseTopic;
 
     public KieServiceCommon() {
         // for now, if no server impl is passed as parameter, create one
@@ -333,8 +339,8 @@ public class KieServiceCommon {
             }
             KieContainerResponse kieContainerResponse = new KieContainerResponse();
             kieContainerResponse.setStatus(KieContainerResponse.STATUS.SUCCESS);
-
-            kafkaKieContainerUpdateResponseTemplate.send(KafkaTopicConstants.RESPONSE_DEPLOY_TOPIC,kieContainerResponse);
+            kafkaKieContainerUpdateResponseTemplate.executeInTransaction(kt ->
+                    kt.send(KafkaTopicConstants.RESPONSE_DEPLOY_TOPIC,kieContainerResponse));
 
         }catch (Exception e){
             KieContainerResponse kieContainerResponse = new KieContainerResponse();
@@ -344,7 +350,9 @@ public class KieServiceCommon {
             for (StackTraceElement stackTraceElement : e.getStackTrace()){
                 kieContainerResponse.getErrorMessages().add(stackTraceElement.toString());
             }
-            kafkaKieContainerUpdateResponseTemplate.send(KafkaTopicConstants.RESPONSE_DEPLOY_TOPIC,kieContainerResponse);
+            kafkaKieContainerUpdateResponseTemplate.executeInTransaction(kt ->
+                    kt.send(KafkaTopicConstants.RESPONSE_DEPLOY_TOPIC,kieContainerResponse));
+
         }
     }
 

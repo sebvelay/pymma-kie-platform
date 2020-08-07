@@ -16,6 +16,9 @@
 
 package org.chtijbug.guvnor.uberfire.security;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoDatabase;
+import org.bson.codecs.configuration.CodecRegistry;
 import org.jboss.errai.security.shared.api.Group;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +48,11 @@ public class KiePlatformGroupManager  implements GroupManager, ContextualManager
 
     IdentifierRuntimeSearchEngine<Group> groupsSearchEngine;
 
+    private MongoClient mongoClient;
+    private CodecRegistry pojoCodecRegistry;
+    private MongoDatabase database;
+
+
     public KiePlatformGroupManager() {
         this(new ConfigProperties(System.getProperties()));
     }
@@ -58,6 +66,12 @@ public class KiePlatformGroupManager  implements GroupManager, ContextualManager
       //  loadConfig(gitPrefs);
     }
 
+    public void setMongo (MongoClient mongoClient,CodecRegistry pojoCodecRegistry,MongoDatabase database){
+        this.mongoClient=mongoClient;
+        this.pojoCodecRegistry = pojoCodecRegistry;
+        this.database=database;
+
+    }
     @Override
     public void initialize(UserSystemManager userSystemManager) throws Exception {
         groupsSearchEngine = new GroupsIdentifierRuntimeSearchEngine();
