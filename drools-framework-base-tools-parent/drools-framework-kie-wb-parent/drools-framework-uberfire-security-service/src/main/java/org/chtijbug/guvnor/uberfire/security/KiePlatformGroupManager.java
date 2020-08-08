@@ -20,21 +20,19 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.jboss.errai.security.shared.api.Group;
+import org.jboss.errai.security.shared.api.GroupImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.commons.config.ConfigProperties;
 import org.uberfire.ext.security.management.api.*;
 import org.uberfire.ext.security.management.api.exception.SecurityManagementException;
-import org.uberfire.ext.security.management.api.exception.UnsupportedServiceCapabilityException;
 import org.uberfire.ext.security.management.impl.GroupManagerSettingsImpl;
+import org.uberfire.ext.security.management.impl.SearchResponseImpl;
 import org.uberfire.ext.security.management.search.GroupsIdentifierRuntimeSearchEngine;
 import org.uberfire.ext.security.management.search.IdentifierRuntimeSearchEngine;
 import org.uberfire.ext.security.management.util.SecurityManagementUtils;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * <p>Groups manager service provider implementation for Apache tomcat, when using default realm based on properties files.</p>
@@ -84,37 +82,41 @@ public class KiePlatformGroupManager  implements GroupManager, ContextualManager
 
     @Override
     public SearchResponse<Group> search(SearchRequest request) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_SEARCH_GROUPS);
+        SearchResponse<Group> result = new SearchResponseImpl<>();
+        return result;
     }
 
     @Override
     public Group get(String identifier) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_READ_GROUP);
+        Group group = new GroupImpl(identifier);
+        return group;
     }
 
     @Override
     public List<Group> getAll() throws SecurityManagementException {
-        return null;
+        List<Group> groups = new ArrayList<>();
+        groups.add(new GroupImpl("main"));
+        return groups;
     }
 
     @Override
     public Group create(Group entity) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_ADD_GROUP);
+        return entity;
     }
 
     @Override
     public Group update(Group entity) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_UPDATE_GROUP);
+      return entity;
     }
 
     @Override
     public void delete(String... identifiers) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_DELETE_GROUP);
+
     }
 
     @Override
     public GroupManagerSettings getSettings() {
-        final Map<Capability, CapabilityStatus> capabilityStatusMap = new HashMap<Capability, CapabilityStatus>(8);
+         final Map<Capability, CapabilityStatus> capabilityStatusMap = new HashMap<Capability, CapabilityStatus>(8);
         for (final Capability capability : SecurityManagementUtils.GROUPS_CAPABILITIES) {
             capabilityStatusMap.put(capability,
                                     getCapabilityStatus(capability));
@@ -124,7 +126,7 @@ public class KiePlatformGroupManager  implements GroupManager, ContextualManager
     }
 
     protected CapabilityStatus getCapabilityStatus(Capability capability) {
-        /**
+
         if (capability != null) {
             switch (capability) {
                 case CAN_SEARCH_GROUPS:
@@ -135,13 +137,12 @@ public class KiePlatformGroupManager  implements GroupManager, ContextualManager
                     return CapabilityStatus.ENABLED;
             }
         }
-         **/
-        return CapabilityStatus.UNSUPPORTED;
+         return CapabilityStatus.UNSUPPORTED;
     }
 
     @Override
     public void assignUsers(String name,
                             Collection<String> users) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_ASSIGN_GROUPS);
+
     }
 }

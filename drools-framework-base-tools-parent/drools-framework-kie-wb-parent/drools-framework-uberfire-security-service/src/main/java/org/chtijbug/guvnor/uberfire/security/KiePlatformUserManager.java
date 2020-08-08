@@ -20,15 +20,14 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.jboss.errai.security.shared.api.identity.User;
+import org.jboss.errai.security.shared.api.identity.UserImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.uberfire.commons.config.ConfigProperties;
 import org.uberfire.ext.security.management.api.*;
 import org.uberfire.ext.security.management.api.exception.SecurityManagementException;
-import org.uberfire.ext.security.management.api.exception.UnsupportedServiceCapabilityException;
+import org.uberfire.ext.security.management.impl.SearchResponseImpl;
 import org.uberfire.ext.security.management.impl.UserManagerSettingsImpl;
-import org.uberfire.ext.security.management.search.IdentifierRuntimeSearchEngine;
-import org.uberfire.ext.security.management.search.UsersIdentifierRuntimeSearchEngine;
 import org.uberfire.ext.security.management.util.SecurityManagementUtils;
 
 import java.util.*;
@@ -42,8 +41,7 @@ public class KiePlatformUserManager  implements UserManager, ContextualManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(KiePlatformUserManager.class);
 
-    UserSystemManager userSystemManager;
-    IdentifierRuntimeSearchEngine<User> usersSearchEngine;
+
 
     private MongoClient mongoClient;
     private CodecRegistry pojoCodecRegistry;
@@ -70,8 +68,7 @@ public class KiePlatformUserManager  implements UserManager, ContextualManager {
 
     @Override
     public void initialize(final UserSystemManager userSystemManager) throws Exception {
-        this.userSystemManager = userSystemManager;
-        usersSearchEngine = new UsersIdentifierRuntimeSearchEngine();
+
     }
 
     @Override
@@ -81,32 +78,34 @@ public class KiePlatformUserManager  implements UserManager, ContextualManager {
 
     @Override
     public SearchResponse<User> search(SearchRequest request) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_SEARCH_USERS);
+        SearchResponse<User> response = new SearchResponseImpl<>();
+        return response;
     }
 
     @Override
     public User get(String identifier) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_READ_USER);
+       return new UserImpl(identifier);
     }
 
     @Override
     public List<User> getAll() throws SecurityManagementException {
-        return null;
+        List<User> users = new ArrayList<>();
+        return users;
     }
 
     @Override
     public User create(User entity) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_ADD_USER);
+        return entity;
     }
 
     @Override
     public User update(User entity) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_UPDATE_USER);
+       return entity;
     }
 
     @Override
     public void delete(String... identifiers) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_DELETE_USER);
+
 
     }
 
@@ -124,17 +123,14 @@ public class KiePlatformUserManager  implements UserManager, ContextualManager {
     @Override
     public void assignGroups(String username,
                              Collection<String> groups) throws SecurityManagementException {
-        Set<String> userRoles = SecurityManagementUtils.rolesToString(SecurityManagementUtils.getRoles(userSystemManager,
-                                                                                                       username));
-        userRoles.addAll(groups);
-        doAssignGroups(username,
-                       userRoles);
+
     }
 
     @Override
     public void assignRoles(String username,
                             Collection<String> roles) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_ASSIGN_ROLES);
+
+
     }
 
     private void doAssignGroups(String username,
@@ -145,12 +141,12 @@ public class KiePlatformUserManager  implements UserManager, ContextualManager {
     @Override
     public void changePassword(String username,
                                String newPassword) throws SecurityManagementException {
-        throw new UnsupportedServiceCapabilityException(Capability.CAN_CHANGE_PASSWORD);
+
 
     }
 
     protected CapabilityStatus getCapabilityStatus(Capability capability) {
-        /**
+
         if (capability != null) {
             switch (capability) {
                 case CAN_SEARCH_USERS:
@@ -166,7 +162,7 @@ public class KiePlatformUserManager  implements UserManager, ContextualManager {
                     return CapabilityStatus.ENABLED;
             }
         }
-        **/
+
         return CapabilityStatus.UNSUPPORTED;
     }
 }
