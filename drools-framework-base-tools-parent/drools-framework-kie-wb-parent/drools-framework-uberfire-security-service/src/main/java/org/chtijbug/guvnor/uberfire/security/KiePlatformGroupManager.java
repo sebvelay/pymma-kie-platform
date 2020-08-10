@@ -16,8 +16,11 @@
 
 package org.chtijbug.guvnor.uberfire.security;
 
+import com.mongodb.Block;
 import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.jboss.errai.security.shared.api.Group;
 import org.jboss.errai.security.shared.api.GroupImpl;
@@ -95,9 +98,15 @@ public class KiePlatformGroupManager  implements GroupManager, ContextualManager
     @Override
     public List<Group> getAll() throws SecurityManagementException {
         List<Group> groups = new ArrayList<>();
-        groups.add(new GroupImpl("main"));
+        MongoCollection<Document> userGroupsCollection = database.getCollection("userGroups");
+        userGroupsCollection.find().forEach((Block<? super Document>) document -> {
+            String groupName = document.getString("name");
+            Group group = new GroupImpl(groupName);
+            groups.add(group);
+        });
         return groups;
     }
+
 
     @Override
     public Group create(Group entity) throws SecurityManagementException {

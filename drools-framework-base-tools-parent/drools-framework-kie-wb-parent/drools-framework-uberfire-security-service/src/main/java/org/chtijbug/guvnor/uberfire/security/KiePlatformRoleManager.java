@@ -140,11 +140,12 @@ public class KiePlatformRoleManager implements RoleManager, ContextualManager {
         if (capability != null) {
             switch (capability) {
                 case CAN_SEARCH_ROLES:
+                case CAN_READ_ROLE:
+                    return CapabilityStatus.ENABLED;
                 case CAN_ADD_ROLE:
                 case CAN_UPDATE_ROLE:
-                case CAN_READ_ROLE:
                 case CAN_DELETE_ROLE:
-                    return CapabilityStatus.ENABLED;
+                    return CapabilityStatus.UNSUPPORTED;
             }
         }
 

@@ -41,13 +41,13 @@ public class KiePlatformSecurityService implements UserManagementService {
                                       KiePlatformRoleManager roleManager) {
         //-DconnectionString=localhost:28017 -Ddatabase=businessProxyDB
 
-        connectionString = System.getProperty("connectionString");
-        databaseName=System.getProperty("database");
+        this.connectionString = System.getProperty("connectionString");
+        this.databaseName=System.getProperty("database");
         System.out.println("KiePlatformSecurityService initialized with databaseName = " + connectionString );
-        mongoClient = MongoClients.create(connectionString);
-        pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
+        this.mongoClient = MongoClients.create(connectionString);
+        this.pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
                 fromProviders(PojoCodecProvider.builder().automatic(true).build()));
-        database = mongoClient.getDatabase(databaseName).withCodecRegistry(pojoCodecRegistry);
+        this.database = mongoClient.getDatabase(databaseName).withCodecRegistry(pojoCodecRegistry);
         System.out.println("All setup");
         this.userManager = userManager;
         this.groupManager = groupManager;
@@ -61,16 +61,16 @@ public class KiePlatformSecurityService implements UserManagementService {
 
     @Override
     public UserManager users() {
-        return new KiePlatformUserManager();
+        return userManager;
     }
 
     @Override
     public GroupManager groups() {
-        return new KiePlatformGroupManager();
+        return groupManager;
     }
 
     @Override
     public RoleManager roles() {
-        return new KiePlatformRoleManager();
+        return roleManager;
     }
 }
