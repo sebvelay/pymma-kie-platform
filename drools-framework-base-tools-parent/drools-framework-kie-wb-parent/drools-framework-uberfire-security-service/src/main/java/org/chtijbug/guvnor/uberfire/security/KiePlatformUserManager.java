@@ -112,7 +112,18 @@ public class KiePlatformUserManager implements UserManager, ContextualManager {
 
     @Override
     public User get(String identifier) throws SecurityManagementException {
-        return new UserImpl(identifier);
+        MongoCollection<Document> userCollection = database.getCollection("user");
+        List<User> users = new ArrayList<>();
+        userCollection.find(eq("login", identifier)).forEach((Block<? super Document>) document -> {
+            String userName = document.getString("login");
+            User user = fillUser(userName, document);
+            users.add(user);
+        });
+        if (users.size()==1){
+            return users.get(0);
+        }else {
+            throw new SecurityManagementException("Unknown identifier "+identifier);
+        }
     }
 
     @Override
@@ -133,17 +144,15 @@ public class KiePlatformUserManager implements UserManager, ContextualManager {
         AtomicReference<ArrayList<DBRef>> groups = new AtomicReference<ArrayList<DBRef>>(new ArrayList());
         roles.set((ArrayList) document.get("userRoles"));
         groups.set((ArrayList) document.get("userGroups"));
-        MongoCollection<Document> userRolesCollection = database.getCollection("userRoles");
         List<Role> roleList = new ArrayList<>();
         for (DBRef dbRef : roles.get()) {
-            Document roleDocument = userRolesCollection.find(eq("_id", dbRef.getId())).first();
+            Document roleDocument = Utils.getDocumentFromRef(dbRef,database);
             Role role = new RoleImpl(roleDocument.getString("name"));
             roleList.add(role);
         }
-        MongoCollection<Document> userGroupsCollection = database.getCollection("userGroups");
         List<Group> groupList = new ArrayList<>();
         for (DBRef dbRef : groups.get()) {
-            Document groupDocument = userGroupsCollection.find(eq("_id", dbRef.getId())).first();
+            Document groupDocument = Utils.getDocumentFromRef(dbRef,database);
             Group group = new GroupImpl(groupDocument.getString("name"));
             groupList.add(group);
         }
