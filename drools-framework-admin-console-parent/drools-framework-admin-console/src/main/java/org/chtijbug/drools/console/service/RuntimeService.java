@@ -28,28 +28,28 @@ public class RuntimeService {
 
     private RestTemplate restTemplateKiewb = new RestTemplate();
 
-    public ReturnPerso verifyIfKieServerExist(String url) {
+    public ReturnPerso<KieServerInfo> verifyIfKieServerExist(String url) {
         String completeurl = url + "/api/server/details";
-        logger.info("url project content : " + completeurl);
+        logger.info("url pverifyIfKieServerExist :{} " , completeurl);
 
         HttpHeaders httpHeaders=new HttpHeaders();
 
-        HttpEntity httpEntity=new HttpEntity(httpHeaders);
+        HttpEntity<Object> httpEntity=new HttpEntity<>(httpHeaders);
 
         try {
             ResponseEntity<KieServerInfo> response = restTemplateKiewb.exchange(completeurl,
                     HttpMethod.GET,
                     httpEntity,
-                    new ParameterizedTypeReference<KieServerInfo>() {
+                    new ParameterizedTypeReference<>() {
                     });
 
             if (response.getBody() != null ) {
-                return new ReturnPerso(true,"the runtime has been successfully added",response.getBody());
+                return new ReturnPerso<>(true,"the runtime has been successfully added",response.getBody());
             } else {
-                return new ReturnPerso(false,"server error ",null);
+                return new ReturnPerso<>(false,"server error ",null);
             }
         }catch (Exception e){
-            return new ReturnPerso(false,"The hostname is incorrect",null);
+            return new ReturnPerso<>(false,"The hostname is incorrect",null);
         }
     }
 

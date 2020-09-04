@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 @DependsOn("applicationContext")
 public class UserConnectedService {
 
-    public static String USER = "1";
-    public static String ASSET = "2";
-    public static String SPACE = "3";
-    public static String PROJECT = "4";
-    public static String CURRENTPROJECT = "5";
+    public final static String USER = "1";
+    public final static String ASSET = "2";
+    public final static String SPACE = "3";
+    public final static String PROJECT = "4";
+    public final static String CURRENTPROJECT = "5";
 
 
     public UserConnected getUserConnected() {

@@ -12,68 +12,80 @@
     <artifactId>drools-framework-uberfire-security-service</artifactId>
 
 
+
     <dependencies>
         <dependency>
             <groupId>org.uberfire</groupId>
             <artifactId>uberfire-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.uberfire</groupId>
             <artifactId>uberfire-commons</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.kie.soup</groupId>
             <artifactId>kie-soup-commons</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.uberfire</groupId>
             <artifactId>uberfire-security-management-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.uberfire</groupId>
             <artifactId>uberfire-security-management-backend</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.jboss.errai</groupId>
             <artifactId>errai-javax-enterprise</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.jboss.errai</groupId>
             <artifactId>errai-security-server</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.jboss.errai</groupId>
             <artifactId>errai-bus</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
+            <scope>provided</scope>
             <version>1</version>
         </dependency>
 
-        <!--dependency>
+        <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver</artifactId>
-            <version>${version.mongodb.driver}</version>
             <scope>provided</scope>
-        </dependency-->
+            <version>${version.mongodb.driver}</version>
+        </dependency>
 
     </dependencies>
 

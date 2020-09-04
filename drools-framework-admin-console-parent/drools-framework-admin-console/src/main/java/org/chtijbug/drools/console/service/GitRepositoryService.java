@@ -1,6 +1,8 @@
 package org.chtijbug.drools.console.service;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 
@@ -13,16 +15,21 @@ import java.io.InputStreamReader;
 @DependsOn("applicationContext")
 public class GitRepositoryService {
 
+    private static Logger logger = LoggerFactory.getLogger(GitRepositoryService.class);
+
     public static void main(String[] args) {
         GitRepositoryService service = new GitRepositoryService();
         service.executeCommand("cd /Users/nheron/kie-base-jbpm-6/niodir/.niogit/nico1.git && ./hooks/post-commit ");
     }
 
-    public void addHookToRepo(String projectName, String gitBaseUrl) throws IOException {
+    public void addHookToRepo(String projectName, String gitRepoBase,String gitBaseUrl) throws IOException {
         String fileBase = System.getProperty("org.uberfire.nio.git.dir");
         if (fileBase != null) {
-            String gitdirectory = fileBase + "/.niogit/" + projectName + ".git";
-            String gitFileName = fileBase + "/.niogit/" + projectName + ".git/hooks/post-commit";
+            if (gitRepoBase==null || gitBaseUrl.length()==0){
+                gitRepoBase=".niogit";
+            }
+            String gitdirectory = fileBase + "/"+gitRepoBase+"/" + projectName + ".git";
+            String gitFileName = fileBase + "/"+gitRepoBase+"/" + projectName + ".git/hooks/post-commit";
             /**
              * #!/bin/sh
              * REPO=git@gitlab.pymma-software.com:nheron/jbpm-edop-base-example.git
@@ -40,37 +47,40 @@ public class GitRepositoryService {
             stringBuilder.append("cd $currentDir  ").append("\n");
             File file = new File(gitFileName);
             FileUtils.writeStringToFile(file, stringBuilder.toString());
-            file.setExecutable(true, true);
+            boolean executable = file.setExecutable(true, true);
+            logger.info("executable {}",executable);
         }
     }
 
-    public void executeHookPush(String projectName, String gitBaseUrl) {
+    public void executeHookPush(String projectName, String gitRepoBase,String gitBaseUrl) {
         String fileBase = System.getProperty("org.uberfire.nio.git.dir");
         if (fileBase != null) {
-
-            String gitFileName = fileBase + "/.niogit/" + projectName + ".git/hooks/post-commit";
+            if (gitRepoBase==null || gitBaseUrl.length()==0){
+                gitRepoBase=".niogit";
+            }
+            String gitFileName = fileBase + "/"+gitRepoBase+"/" + projectName + ".git/hooks/post-commit";
             this.executeCommand(gitFileName);
         }
     }
 
     private String executeCommand(String command) {
 
-        StringBuffer output = new StringBuffer();
+        StringBuilder output = new StringBuilder();
 
         Process process;
         try {
-            System.out.println(command);
-            System.out.println("============Command start======================");
+            logger.info(command);
+            logger.info("============Command start======================");
             process = Runtime.getRuntime().exec(command);
             process.waitFor();
-            System.out.println("=============Command Stop=====================");
+            logger.info("=============Command Stop=====================");
             new Thread(() -> {
                 try {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
                     String line = "";
                     try {
                         while ((line = reader.readLine()) != null)
-                            System.out.println(line);
+                            logger.info(line);
                     } finally {
                         reader.close();
                     }
@@ -86,7 +96,7 @@ public class GitRepositoryService {
                     String line = "";
                     try {
                         while ((line = reader.readLine()) != null) {
-                            System.out.println(line);
+                            logger.info(line);
                             // Traitement du flux d'erreur de l'application si besoin est
                         }
                     } finally {
