@@ -268,7 +268,7 @@
                                                 <id>middleware-rest</id>
                                                 <files>
                                                     <file>
-                                                        <source>${project.build.directory}/c</source>
+                                                        <source>${project.build.directory}/</source>
                                                         <outputDirectory>./</outputDirectory>
                                                         <destName>kie-wb.war</destName>
                                                     </file>
