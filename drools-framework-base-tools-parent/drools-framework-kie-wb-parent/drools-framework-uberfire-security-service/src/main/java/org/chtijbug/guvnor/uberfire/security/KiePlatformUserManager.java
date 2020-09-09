@@ -25,6 +25,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.types.ObjectId;
 import org.jboss.errai.security.shared.api.Group;
 import org.jboss.errai.security.shared.api.GroupImpl;
 import org.jboss.errai.security.shared.api.Role;
@@ -102,11 +103,11 @@ public class KiePlatformUserManager implements UserManager, ContextualManager {
             User user = fillUser(userName, document);
             users.add(user);
         });
-        boolean hasNextPage=true;
-        if ((request.getPageSize() * (request.getPage())>totalNumber)){
-            hasNextPage=false;
+        boolean hasNextPage = true;
+        if ((request.getPageSize() * (request.getPage()) > totalNumber)) {
+            hasNextPage = false;
         }
-        SearchResponse<User> response = new SearchResponseImpl(users, request.getPage(),request.getPageSize(),Long.valueOf(totalNumber).intValue(),  hasNextPage);
+        SearchResponse<User> response = new SearchResponseImpl(users, request.getPage(), request.getPageSize(), Long.valueOf(totalNumber).intValue(), hasNextPage);
         return response;
     }
 
@@ -119,10 +120,10 @@ public class KiePlatformUserManager implements UserManager, ContextualManager {
             User user = fillUser(userName, document);
             users.add(user);
         });
-        if (users.size()==1){
+        if (users.size() == 1) {
             return users.get(0);
-        }else {
-            throw new SecurityManagementException("Unknown identifier "+identifier);
+        } else {
+            return new UserImpl(identifier);
         }
     }
 
@@ -146,28 +147,81 @@ public class KiePlatformUserManager implements UserManager, ContextualManager {
         groups.set((ArrayList) document.get("userGroups"));
         List<Role> roleList = new ArrayList<>();
         for (DBRef dbRef : roles.get()) {
-            Document roleDocument = Utils.getDocumentFromRef(dbRef,database);
+            Document roleDocument = Utils.getDocumentFromRef(dbRef, database);
             Role role = new RoleImpl(roleDocument.getString("name"));
             roleList.add(role);
         }
         List<Group> groupList = new ArrayList<>();
         for (DBRef dbRef : groups.get()) {
-            Document groupDocument = Utils.getDocumentFromRef(dbRef,database);
+            Document groupDocument = Utils.getDocumentFromRef(dbRef, database);
             Group group = new GroupImpl(groupDocument.getString("name"));
             groupList.add(group);
         }
-        User user = new UserImpl(userName,roleList,groupList);
+        User user = new UserImpl(userName, roleList, groupList);
         return user;
     }
 
     @Override
     public User create(User entity) throws SecurityManagementException {
+        save(entity, true);
         return entity;
     }
 
     @Override
     public User update(User entity) throws SecurityManagementException {
+        save(entity, false);
         return entity;
+    }
+
+    private void save(User entity, boolean isCreated) throws SecurityManagementException {
+        MongoCollection<Document> userCollection = database.getCollection("user");
+        MongoCollection<Document> userGroupsCollection = database.getCollection("userGroups");
+        MongoCollection<Document> userRolesCollection = database.getCollection("userRoles");
+        AtomicReference<ArrayList<DBRef>> roles = new AtomicReference<>(new ArrayList<>());
+        AtomicReference<ArrayList<DBRef>> groups = new AtomicReference<>(new ArrayList<>());
+        List<Document> users = new ArrayList<>();
+        if (isCreated) {
+            userCollection.find(eq("login", entity.getIdentifier())).forEach((Block<? super Document>) document -> {
+                throw new SecurityManagementException("Existing identifier " + entity.getIdentifier());
+            });
+        } else {
+            userCollection.find(eq("login", entity.getIdentifier())).forEach((Block<? super Document>) document -> {
+                users.add(document);
+            });
+            if (users.size() == 0) {
+                throw new SecurityManagementException("unknown identifier " + entity.getIdentifier());
+            }
+            if (users.size() > 1) {
+                throw new SecurityManagementException("existing multiple times with  identifier " + entity.getIdentifier());
+            }
+        }
+
+
+        for (Group group : entity.getGroups()) {
+
+            userGroupsCollection.find(eq("name", group.getName())).forEach((Block<? super Document>) document -> {
+                DBRef dbRef = new DBRef("userGroups", document.get("_id"));
+                groups.get().add(dbRef);
+            });
+        }
+
+        for (Role role : entity.getRoles()) {
+            userRolesCollection.find(eq("name", role.getName())).forEach((Block<? super Document>) document -> {
+                DBRef dbRef = new DBRef("userRoles", document.get("_id"));
+                roles.get().add(dbRef);
+            });
+        }
+        Document userDocument = new Document("_id", new ObjectId());
+        userDocument.append("login", entity.getIdentifier());
+        userDocument.append("password", entity.getIdentifier());
+        userDocument.append("userRoles", roles);
+        userDocument.append("userGroups", groups);
+        if (isCreated) {
+            userCollection.insertOne(userDocument);
+        } else {
+            userCollection.replaceOne(eq("login", entity.getIdentifier()), userDocument);
+        }
+
     }
 
     @Override
@@ -208,6 +262,12 @@ public class KiePlatformUserManager implements UserManager, ContextualManager {
     @Override
     public void changePassword(String username,
                                String newPassword) throws SecurityManagementException {
+        MongoCollection<Document> userCollection = database.getCollection("user");
+
+        userCollection.find(eq("login", username)).forEach((Block<? super Document>) document -> {
+            document.append("password", newPassword);
+            userCollection.replaceOne(eq("login", username), document);
+        });
 
 
     }

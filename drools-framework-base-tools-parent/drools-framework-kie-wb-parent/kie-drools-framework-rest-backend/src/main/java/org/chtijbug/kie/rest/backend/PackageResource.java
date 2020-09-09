@@ -5,21 +5,16 @@ import org.chtijbug.guvnor.server.jaxrs.api.UserLoginInformation;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Package;
 import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
-import org.guvnor.common.services.project.model.Module;
+import org.chtijbug.kie.rest.backend.service.AssetService;
 import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.structure.organizationalunit.OrganizationalUnit;
 import org.guvnor.structure.organizationalunit.OrganizationalUnitService;
 import org.guvnor.structure.repositories.Branch;
-import org.guvnor.structure.repositories.PublicURI;
 import org.guvnor.structure.repositories.Repository;
 import org.guvnor.structure.repositories.RepositoryService;
-import org.kie.workbench.common.screens.datamodeller.model.EditorModelContent;
 import org.kie.workbench.common.screens.datamodeller.service.DataModelerService;
-import org.kie.workbench.common.services.datamodeller.core.DataObject;
-import org.kie.workbench.common.services.datamodeller.core.impl.DataModelImpl;
 import org.slf4j.LoggerFactory;
-import org.uberfire.backend.vfs.PathFactory;
 import org.uberfire.io.IOService;
 import org.uberfire.java.nio.base.options.CommentedOption;
 import org.uberfire.java.nio.file.DirectoryStream;
@@ -29,14 +24,12 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.*;
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.*;
-
 
 @Path("/chtijbug")
 @Named
@@ -54,27 +47,24 @@ public class PackageResource {
     @Inject
     @Named("ioStrategy")
     private IOService ioService;
-
     @Inject
     private OrganizationalUnitService organizationalUnitService;
-
     @Inject
     private RepositoryService repositoryService;
     @Inject
     private WorkspaceProjectService projectService;
-
     private RestTypeDefinition dotFileFilter = new RestTypeDefinition();
     @Inject
     private DataModelerService dataModelerService;
-
     @Inject
     private WorkspaceProjectService workspaceProjectService;
+    @Inject
+    private AssetService assetService;
 
 
     public PackageResource() {
         System.out.println("coucou");
     }
-
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -89,11 +79,10 @@ public class PackageResource {
                 userLoginInformation.getRoles().add(role);
             }
         }
-        userLoginInformation.setProjects(getAllProjects());
+        userLoginInformation.setProjects(assetService.getAllProjects());
         return userLoginInformation;
 
     }
-
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -101,75 +90,7 @@ public class PackageResource {
     // @RolesAllowed({REST_ROLE, REST_PROJECT_ROLE})
     public Collection<PlatformProjectResponse> getProjects() {
         logger.debug("-----getSpaces--- ");
-
-
-        return getAllProjects();
-    }
-
-    private List<PlatformProjectResponse> getAllProjects() {
-        final List<PlatformProjectResponse> spaces = new ArrayList<>();
-        for (OrganizationalUnit ou : organizationalUnitService.getOrganizationalUnits()) {
-            spaces.addAll(getSpace(ou));
-        }
-
-        return spaces;
-    }
-
-    private List<PlatformProjectResponse> getSpace(OrganizationalUnit ou) {
-
-        final List<PlatformProjectResponse> repoNames = new ArrayList<>();
-        for (WorkspaceProject workspaceProject : workspaceProjectService.getAllWorkspaceProjects(ou)) {
-            for (Branch branch : workspaceProject.getRepository().getBranches()){
-                repoNames.add(getProjectResponse(workspaceProject,branch));
-            }
-
-
-        }
-
-        return repoNames;
-    }
-
-    private void toto() {
-
-    }
-
-
-    private PlatformProjectResponse getProjectResponse(WorkspaceProject workspaceProject,Branch branch) {
-        final PlatformProjectResponse projectResponse = new PlatformProjectResponse();
-        projectResponse.setName(workspaceProject.getName());
-        projectResponse.setSpaceName(workspaceProject.getOrganizationalUnit().getName());
-
-        if (workspaceProject.getMainModule() != null) {
-            Module kmodule = workspaceProject.getMainModule();
-            org.uberfire.backend.vfs.Path importVFPath = PathFactory.newPath("project.imports", branch.getPath().toURI()+"project.imports");
-            EditorModelContent econtent = dataModelerService.loadContent(importVFPath);
-            //EditorModelContent econtent = dataModelerService.loadContent(((KieModule) kmodule).getImportsPath());
-            DataModelImpl econtentDataModel = (DataModelImpl) econtent.getDataModel();
-            List<DataObject> dataObjects = econtentDataModel.getExternalClasses();
-            for (DataObject dataObject : dataObjects) {
-                System.out.println(dataObject.toString());
-                String className = "class=" + dataObject.getPackageName() + "." + dataObject.getName();
-                projectResponse.getJavaClasses().add(className);
-
-            }
-            projectResponse.setArtifactId(workspaceProject.getMainModule().getPom().getGav().getArtifactId());
-            projectResponse.setGroupId(workspaceProject.getMainModule().getPom().getGav().getGroupId());
-            projectResponse.setVersion(workspaceProject.getMainModule().getPom().getGav().getVersion());
-            projectResponse.setDescription(workspaceProject.getMainModule().getPom().getDescription());
-            projectResponse.setBranch(branch.getName());
-        }
-
-        final ArrayList<org.guvnor.rest.client.PublicURI> publicURIs = new ArrayList<>();
-
-        for (PublicURI publicURI : workspaceProject.getRepository().getPublicURIs()) {
-            final org.guvnor.rest.client.PublicURI responseURI = new org.guvnor.rest.client.PublicURI();
-            responseURI.setProtocol(publicURI.getProtocol());
-            responseURI.setUri(publicURI.getURI());
-            publicURIs.add(responseURI);
-        }
-
-        projectResponse.setPublicURIs(publicURIs);
-        return projectResponse;
+        return assetService.getAllProjects();
     }
 
     @GET
@@ -206,12 +127,12 @@ public class PackageResource {
             @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName) {
         try {
             List<Asset> contentList = new LinkedList<>();
-            WorkspaceProject project = getProject(organizationalUnitName, projectName);
+            WorkspaceProject project = assetService.getProject(organizationalUnitName, projectName);
             if (project != null) {
                 org.uberfire.backend.vfs.Path rootPath = project.getRootPath();
                 org.uberfire.java.nio.file.Path nioPath = Paths.get(rootPath.toURI());
                 DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream = ioService.newDirectoryStream(nioPath);
-                getContent(directoryStream, contentList);
+                assetService.getContent(directoryStream, contentList);
             }
 
 
@@ -221,118 +142,6 @@ public class PackageResource {
         }
     }
 
-    private WorkspaceProject getProject(String organizationalUnitName, String projectName) {
-        OrganizationalUnit organizationalUnit = organizationalUnitService.getOrganizationalUnit(organizationalUnitName);
-        Collection<WorkspaceProject> workspaceProjects = projectService.getAllWorkspaceProjects(organizationalUnit);
-
-        for (WorkspaceProject project : workspaceProjects) {
-            if (project.getName().equals(projectName)) {
-                return project;
-            }
-        }
-        // }
-        //}
-        return null;
-    }
-
-
-    private void getContentSource(DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream, Asset asset, List<org.uberfire.java.nio.file.Path> pathLinkedList) {
-        for (org.uberfire.java.nio.file.Path elementPath : directoryStream) {
-            if (org.uberfire.java.nio.file.Files.isDirectory(elementPath)) {
-                DirectoryStream<org.uberfire.java.nio.file.Path> adirectoryStream = ioService.newDirectoryStream(elementPath);
-                getContentSource(adirectoryStream, asset, pathLinkedList);
-            } else {
-                if (dotFileFilter.accept(elementPath.getFileName().toString())) {
-                    Map<String, Object> listAttributes = ioService.readAttributes(elementPath);
-                    if (asset.getTitle().equals(elementPath.getFileName().toString())) {
-                        pathLinkedList.add(elementPath);
-                    }
-                }
-            }
-        }
-    }
-
-    private void getContent(DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream, Collection<Asset> contentList) {
-        for (org.uberfire.java.nio.file.Path elementPath : directoryStream) {
-            if (org.uberfire.java.nio.file.Files.isDirectory(elementPath)) {
-                DirectoryStream<org.uberfire.java.nio.file.Path> adirectoryStream = ioService.newDirectoryStream(elementPath);
-                getContent(adirectoryStream, contentList);
-            } else {
-                if (dotFileFilter.accept(elementPath.getFileName().toString())) {
-                    Map<String, Object> listAttributes = ioService.readAttributes(elementPath);
-                    Asset asset = new Asset();
-                    asset.setTitle(elementPath.getFileName().toString());
-                    asset.setDirectory(elementPath.getParent().toString());
-                    asset.setRefLink(elementPath.getFileName().toUri());
-                    contentList.add(asset);
-                }
-            }
-        }
-    }
-
-    private String getContentSource(DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream, String assetName) {
-        for (org.uberfire.java.nio.file.Path elementPath : directoryStream) {
-            if (org.uberfire.java.nio.file.Files.isDirectory(elementPath)) {
-                DirectoryStream<org.uberfire.java.nio.file.Path> adirectoryStream = ioService.newDirectoryStream(elementPath);
-                String result = getContentSource(adirectoryStream, assetName);
-                if (result != null && result.length() > 0) {
-                    return result;
-                }
-            } else {
-
-                if (elementPath.getFileName().toString().startsWith(".") == false) {
-                    if (elementPath.getFileName().toString().equals(assetName)) {
-                        return ioService.readAllString(elementPath);
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    private org.uberfire.java.nio.file.Path getFileElementPath(DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream, String assetName) {
-        for (org.uberfire.java.nio.file.Path elementPath : directoryStream) {
-            if (org.uberfire.java.nio.file.Files.isDirectory(elementPath)) {
-                DirectoryStream<org.uberfire.java.nio.file.Path> adirectoryStream = ioService.newDirectoryStream(elementPath);
-                org.uberfire.java.nio.file.Path foundElementPath = getFileElementPath(adirectoryStream, assetName);
-                if (foundElementPath != null) {
-                    return foundElementPath;
-                }
-            } else {
-                if (dotFileFilter.accept(elementPath.getFileName().toString())
-                        && elementPath.getFileName().toString().contains(assetName)) {
-                    return elementPath;
-                }
-            }
-        }
-        return null;
-    }
-
-    private org.uberfire.java.nio.file.Path getDirectoryElementPath(DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream, String assetName) {
-        for (org.uberfire.java.nio.file.Path elementPath : directoryStream) {
-            if (org.uberfire.java.nio.file.Files.isDirectory(elementPath)) {
-                DirectoryStream<org.uberfire.java.nio.file.Path> adirectoryStream=null;
-                try {
-                    adirectoryStream = ioService.newDirectoryStream(elementPath);
-                    if (elementPath.getFileName().toString().equals(assetName)) {
-                        return elementPath;
-                    }
-                    org.uberfire.java.nio.file.Path foundElementPath = getDirectoryElementPath(adirectoryStream, assetName);
-                    if (foundElementPath != null) {
-                        return foundElementPath;
-                    }
-                }catch (Exception e){
-
-                }finally {
-                    if (adirectoryStream!= null){
-                        adirectoryStream.close();
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     @GET
     @Path("{organizationalUnitName}/{projectName}/assets/{assetName}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -340,13 +149,13 @@ public class PackageResource {
             @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName, @PathParam("assetName") String assetName) {
         List<Asset> resultList = new LinkedList<>();
         try {
-            WorkspaceProject project = getProject(organizationalUnitName, projectName);
+            WorkspaceProject project = assetService.getProject(organizationalUnitName, projectName);
             if (project != null) {
                 List<Asset> contentList = new LinkedList<>();
                 org.uberfire.backend.vfs.Path rootPath = project.getRootPath();
                 org.uberfire.java.nio.file.Path nioPath = Paths.get(rootPath.toURI());
                 DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream = ioService.newDirectoryStream(nioPath);
-                getContent(directoryStream, contentList);
+                assetService.getContent(directoryStream, contentList);
                 for (Asset asset : contentList) {
                     if (asset.getTitle().equals(assetName)) {
                         resultList.add(asset);
@@ -368,12 +177,12 @@ public class PackageResource {
         List<Asset> resultList = new LinkedList<>();
         String result = "";
         try {
-            WorkspaceProject project = getProject(organizationalUnitName, projectName);
+            WorkspaceProject project = assetService.getProject(organizationalUnitName, projectName);
             if (project != null) {
                 org.uberfire.backend.vfs.Path rootPath = project.getRootPath();
                 org.uberfire.java.nio.file.Path nioPath = Paths.get(rootPath.toURI());
                 DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream = ioService.newDirectoryStream(nioPath);
-                result = getContentSource(directoryStream, assetName);
+                result = assetService.getContentSource(directoryStream, assetName);
             }
             return result;
         } catch (RuntimeException e) {
@@ -385,10 +194,10 @@ public class PackageResource {
     @PUT
     @Path("{organizationalUnitName}/{projectName}/asset/{assetName}")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public void updateAssetFromJAXB(
-            @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName,
-            @PathParam("assetName") String assetName, String asset) {
-        updateAssetContent(organizationalUnitName, projectName, assetName, asset);
+    public Response updateAssetFromJAXB(@Context HttpHeaders headers,
+                                        @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName,
+                                        @PathParam("assetName") String assetName, String asset) {
+        return updateAssetContent(headers, organizationalUnitName, projectName, assetName, asset, true);
     }
 
     @POST
@@ -398,15 +207,15 @@ public class PackageResource {
     public Asset createAssetFromSourceAndJAXB(
             @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName, Asset asset) {
         try {
-            WorkspaceProject project = getProject(organizationalUnitName, projectName);
-            if (project!= null) {
+            WorkspaceProject project = assetService.getProject(organizationalUnitName, projectName);
+            if (project != null) {
                 org.uberfire.backend.vfs.Path rootPath = project.getRootPath();
                 org.uberfire.java.nio.file.Path nioPathDirectory = Paths.get(rootPath.toURI());
-                DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream=null;
+                DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream = null;
                 try {
-                     directoryStream = ioService.newDirectoryStream(nioPathDirectory);
-                    org.uberfire.java.nio.file.Path directoryWhereCreateAsset = getDirectoryElementPath(directoryStream, asset.getTitle());
-                    if (directoryWhereCreateAsset!= null) {
+                    directoryStream = ioService.newDirectoryStream(nioPathDirectory);
+                    org.uberfire.java.nio.file.Path directoryWhereCreateAsset = assetService.getDirectoryElementPath(directoryStream, asset.getTitle());
+                    if (directoryWhereCreateAsset != null) {
                         final org.uberfire.java.nio.file.Path nioPath = Paths.get(directoryWhereCreateAsset.toUri());
                         if (ioService.exists(nioPath)) {
                             throw new FileAlreadyExistsException(nioPath.toString());
@@ -414,10 +223,10 @@ public class PackageResource {
                         CommentedOption commentedOption = new CommentedOption(asset.getComment());
                         ioService.write(nioPath, asset.getContent().getBytes(), commentedOption);
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
 
-                }finally {
-                    if (directoryStream!= null){
+                } finally {
+                    if (directoryStream != null) {
                         directoryStream.close();
                     }
                 }
@@ -433,14 +242,64 @@ public class PackageResource {
     @POST
     @Path("{organizationalUnitName}/{projectName}/asset/{assetName}/source")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
-    public void updateAssetSource(
-            @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName, @PathParam("assetName") String assetName, String content) {
-        updateAssetContent(organizationalUnitName, projectName, assetName, content);
+    public Response createAssetSource(@Context HttpHeaders headers,
+                                      @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName, @PathParam("assetName") String assetName, String content) {
+
+        return updateAssetContent(headers, organizationalUnitName, projectName, assetName, content, true);
     }
 
-    private void updateAssetContent(String organizationalUnitName, String projectName, String assetName, String content) {
+    @PUT
+    @Path("{organizationalUnitName}/{projectName}/asset/{assetName}/source")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
+    public Response updateAssetSource(@Context HttpHeaders headers,
+                                      @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName, @PathParam("assetName") String assetName, String content) {
+
+        return updateAssetContent(headers, organizationalUnitName, projectName, assetName, content, false);
+    }
+
+    @DELETE
+    @Path("{organizationalUnitName}/{projectName}/asset/{assetName}/source")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
+    public Response deleteAssetSource(@Context HttpHeaders headers,
+                                      @PathParam("organizationalUnitName") String organizationalUnitName, @PathParam("projectName") String projectName, @PathParam("assetName") String assetName, String content) {
+
+        WorkspaceProject project = assetService.getProject(organizationalUnitName, projectName);
+
+        if (project != null) {
+            // Optional<Branch> rr = project.getRepository().getBranch("ee");
+            // org.uberfire.backend.vfs.Path tata = rr.get().getPath();
+            org.uberfire.backend.vfs.Path rootPath = project.getRootPath();
+            org.uberfire.java.nio.file.Path nioPath = Paths.get(rootPath.toURI());
+
+            DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream = ioService.newDirectoryStream(nioPath);
+            org.uberfire.java.nio.file.Path elementToDelete = assetService.getFileElementPath(directoryStream, assetName);
+            if (elementToDelete == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            } else {
+
+                File fileToUpdate = elementToDelete.toFile();
+                if (fileToUpdate.isFile()) {
+                    content = content.replace("\"", "");
+                    ioService.delete(elementToDelete);
+                    logger.debug("Returning OK response with content '{}'", content);
+                    return Response.status(Response.Status.NO_CONTENT).build();
+                } else {
+                    return Response.status(Response.Status.NOT_MODIFIED).entity("Asset is not a file").build();
+                }
+
+            }
+        } else {
+            logger.info("Project {} or Organization {} not found ", projectName, organizationalUnitName);
+            return Response.status(Response.Status.NOT_FOUND).entity("Project  or Organization  not found").build();
+        }
+    }
+
+
+    private Response updateAssetContent(HttpHeaders headers, String organizationalUnitName, String projectName, String assetName, String content, boolean isCreate) {
+
         try {
-            WorkspaceProject project = getProject(organizationalUnitName, projectName);
+
+            WorkspaceProject project = assetService.getProject(organizationalUnitName, projectName);
 
             if (project != null) {
                 // Optional<Branch> rr = project.getRepository().getBranch("ee");
@@ -449,23 +308,43 @@ public class PackageResource {
                 org.uberfire.java.nio.file.Path nioPath = Paths.get(rootPath.toURI());
 
                 DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream = ioService.newDirectoryStream(nioPath);
-                org.uberfire.java.nio.file.Path elementToUpdate = getFileElementPath(directoryStream, assetName);
-                if (elementToUpdate != null) {
+                org.uberfire.java.nio.file.Path elementToUpdate = assetService.getFileElementPath(directoryStream, assetName);
+                if (elementToUpdate != null && isCreate) {
+                    return Response.status(Response.Status.CONFLICT).build();
+                } else if (elementToUpdate != null && !isCreate) {
                     File fileToUpdate = elementToUpdate.toFile();
                     if (fileToUpdate.isFile()) {
                         content = content.replace("\"", "");
                         ioService.write(elementToUpdate, content);
-                        //   FileOutputStream fileOutputStream = new FileOutputStream(fileToUpdate);
-                        //   fileOutputStream.write(content.getBytes());
-                        //   fileOutputStream.close();
+                        logger.debug("Returning OK response with content '{}'", content);
+                        return Response.status(Response.Status.ACCEPTED).build();
+                    } else {
+                        return Response.status(Response.Status.NOT_MODIFIED).entity("Asset is not a file").build();
                     }
+                } else {//
+                    if (isCreate) {
+                        org.uberfire.java.nio.file.Path directoryWhereCreateAsset = assetService.getRuleDirectory(directoryStream, assetName);
 
+                        if (directoryWhereCreateAsset != null) {
+                            URI parentURI = directoryWhereCreateAsset.getParent().toUri();
+                            URI uri = new URI(parentURI.getScheme(), parentURI.getUserInfo(), parentURI.getHost(), parentURI.getPort(), parentURI.getPath() + "/" + assetName, parentURI.getQuery(), parentURI.getFragment());
+                            final org.uberfire.java.nio.file.Path nioPathWhere = Paths.get(uri);
+                            CommentedOption commentedOption = new CommentedOption("Created from rest");
+                            ioService.write(nioPathWhere, content.getBytes(), commentedOption);
+                            return Response.status(Response.Status.CREATED).build();
+                        } else {
+                            return Response.status(Response.Status.NOT_FOUND).entity("no Rule package").build();
+                        }
+                    } else {
+                        return Response.status(Response.Status.NOT_FOUND).entity("Asset not found").build();
+                    }
                 }
-            }else{
-                throw new WebApplicationException("Asset not found " + assetName);
+            } else {
+                logger.info("Project {} or Organization {} not found ", projectName, organizationalUnitName);
+                return Response.status(Response.Status.NOT_FOUND).entity("Project  or Organization  not found").build();
             }
-        } catch (RuntimeException e) {
-            throw new WebApplicationException(e);
+        } catch (RuntimeException | URISyntaxException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
         }
     }
 

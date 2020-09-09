@@ -36,7 +36,14 @@ public class DababaseContentInit {
 
         User adminUser = userRepository.findByLogin("admin");
         if (adminUser==null){
-
+/**
+ *   admin       The administrator
+ *   analyst     The analyst
+ *   developer   The developer
+ *   manager     The manager
+ *   user        The end user
+ *   kiemgmt     KIE management user
+ */
             userRolesRepository.save( new UserRoles(UUID.randomUUID().toString(),"process-admin"));
             userRolesRepository.save( new UserRoles(UUID.randomUUID().toString(),"manager"));
             userRolesRepository.save( new UserRoles(UUID.randomUUID().toString(),"admin"));
