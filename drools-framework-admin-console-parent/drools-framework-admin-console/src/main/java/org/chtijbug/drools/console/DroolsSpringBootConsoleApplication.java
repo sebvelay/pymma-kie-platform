@@ -1,6 +1,7 @@
 package org.chtijbug.drools.console;
 
 
+import com.vaadin.flow.spring.SpringServlet;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -23,7 +24,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -166,6 +169,11 @@ public class DroolsSpringBootConsoleApplication extends SpringBootServletInitial
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(greetingConsumerFactory());
         return factory;
+    }
+
+    @Bean
+    public ServletRegistrationBean<SpringServlet> springServlet(ApplicationContext context) {
+        return new ServletRegistrationBean<>(new SpringServlet(context), "/admin/*", "/frontend/*");
     }
 
 
