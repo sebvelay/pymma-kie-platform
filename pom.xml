@@ -206,14 +206,20 @@
             <url>https://maven.pkg.github.com/pymma/pymma-kie-platform</url>
         </repository>
     </distributionManagement-->
+    <repositories>
+        <repository>
+            <id>Pymma-opensource</id>
+            <url>${nexus.host}/repository/opensource-maven</url>
+        </repository>
+    </repositories>
     <distributionManagement>
         <snapshotRepository>
             <id>pymma-snapshot</id>
-            <url>${nexus.host}/repository/pymma-snapshot/</url>
+            <url>${nexus.host}/repository/opensource-maven</url>
         </snapshotRepository>
         <repository>
             <id>pymma-release</id>
-            <url>${nexus.host}/repository/pymma-release/</url>
+            <url>${nexus.host}/repository/opensource-maven</url>
         </repository>
     </distributionManagement>
     <developers>
