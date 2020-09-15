@@ -207,13 +207,14 @@ public class RuleBaseSingleton implements RuleBasePackage {
                 //_____ Wrapping the knowledge Session
                 newRuleBaseSession = new RuleBaseStatefulSession(this.ruleBaseID, sessionId, newDroolsSession, maxNumberRulesToExecute, sessionHistoryListener);
                 //_____ Release semaphore
-                lockKbase.release();
             } else {
                 throw new DroolsChtijbugException(DroolsChtijbugException.KbaseNotInitialised, "", null);
             }
             //____ return the wrapped KnowledgeSession
             return newRuleBaseSession;
         } finally {
+
+            lockKbase.release();
             logger.debug("<<createRuleBaseSession", newRuleBaseSession);
         }
     }
