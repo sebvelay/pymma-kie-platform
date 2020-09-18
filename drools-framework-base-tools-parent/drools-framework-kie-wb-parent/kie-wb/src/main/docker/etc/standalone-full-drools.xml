@@ -452,8 +452,8 @@
                 <security-domain name="other" cache-type="default">
                     <authentication>
                         <login-module code="org.chtijbug.wildfly.loginmodule.KiePlatformLoginModule" flag="required" module="com.pymmasoftware.pymma-kie-loginmodule">
-                            <module-option name="connectionString" value="mongodb://mongodb:27017"/>
-                            <module-option name="name" value="businessProxyDB"/>
+                            <module-option name="connectionString" value="${connectionString}"/>
+                            <module-option name="name" value="${name}"/>
                         </login-module>
                     </authentication>
                 </security-domain>

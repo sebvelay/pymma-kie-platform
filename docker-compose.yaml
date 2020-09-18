@@ -17,6 +17,8 @@ services:
       - gitdata:/home/niodir
       - lucenedata:/home/lucene
     hostname: kie-wb.pymma
+    environment:
+      PYMMA_OPTS: "  -DconnectionString=mongodb://mongodb:27017 -Dname=businessProxyDB "
     links:
       - businessProxyDB:mongodb
     depends_on:
