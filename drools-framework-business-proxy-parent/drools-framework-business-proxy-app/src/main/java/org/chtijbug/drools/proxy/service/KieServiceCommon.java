@@ -157,7 +157,13 @@ public class KieServiceCommon {
             }
             String isSwarm = System.getProperty("org.kie.server.swarm");
             if ("1".equals(isSwarm)) {
-                runtimePersist.setServerUrl("http://" + serverName + ":" + serverPort);
+                if (System.getProperty("org.kie.server.swarm.port")!= null &&
+                         System.getProperty("org.kie.server.swarm.port").length()>0){
+                    runtimePersist.setServerUrl("http://" + serverName + ":" + System.getProperty("org.kie.server.swarm.port"));
+                }else{
+                    runtimePersist.setServerUrl("http://" + serverName + ":" + serverPort);
+                }
+
             } else {
                 if (runtimePort==-1) {
                     runtimePersist.setServerUrl("http://" + hostName + ":" + serverPort);
