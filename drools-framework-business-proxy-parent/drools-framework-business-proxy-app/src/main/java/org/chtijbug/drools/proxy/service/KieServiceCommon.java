@@ -15,13 +15,10 @@
 
 package org.chtijbug.drools.proxy.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoDatabase;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Route;
-import org.apache.kafka.clients.admin.NewTopic;
-import org.chtijbug.drools.KieContainerResponse;
-import org.chtijbug.drools.KieContainerUpdate;
-import org.chtijbug.drools.common.KafkaTopicConstants;
 import org.chtijbug.drools.proxy.PlatfomKieServerStateRepository;
 import org.chtijbug.drools.proxy.camel.DroolsRouter;
 import org.chtijbug.drools.proxy.persistence.model.ContainerPojoPersist;
@@ -29,6 +26,7 @@ import org.chtijbug.drools.proxy.persistence.model.ContainerRuntimePojoPersist;
 import org.chtijbug.drools.proxy.persistence.model.RuntimePersist;
 import org.chtijbug.drools.proxy.persistence.repository.ContainerRepository;
 import org.chtijbug.drools.proxy.persistence.repository.ContainerRuntimeRepository;
+import org.chtijbug.drools.proxy.persistence.repository.ReactiveContainerRuntimeRepository;
 import org.chtijbug.drools.proxy.persistence.repository.RuntimeRepository;
 import org.chtijbug.kieserver.services.drools.DroolsChtijbugKieServerExtension;
 import org.chtijbug.kieserver.services.drools.DroolsChtijbugRulesExecutionService;
@@ -37,16 +35,14 @@ import org.kie.server.services.api.KieServerExtension;
 import org.kie.server.services.api.KieServerRegistry;
 import org.kie.server.services.impl.KieContainerInstanceImpl;
 import org.kie.server.services.impl.KieServerImpl;
-import org.kie.server.services.impl.marshal.MarshallerHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -63,10 +59,14 @@ public class KieServiceCommon {
     private static final Logger logger = LoggerFactory.getLogger(KieServiceCommon.class);
     @Autowired
     CamelContext camelContext;
+
+    Disposable subscription;
+
+
     private KieServerImpl server;
-    private MarshallerHelper marshallerHelper;
+
     private KieServerRegistry registry;
-    private ObjectMapper mapper = new ObjectMapper();
+
     private DroolsChtijbugRulesExecutionService droolsChtijbugRulesExecutionService = null;
     private DroolsChtijbugKieServerExtension droolsChtijbugKieServerExtension;
     @Inject
@@ -75,31 +75,28 @@ public class KieServiceCommon {
     private RuntimeRepository runtimeRepository;
     @Inject
     private ContainerRuntimeRepository containerRuntimeRepository;
-
+    @Inject
+    private ReactiveContainerRuntimeRepository reactiveContainerRuntimeRepository;
     @Value("${server.port}")
     private int serverPort;
-
     @Value("${runtime.port:-1}")
     private int runtimePort;
-
     @Value("${runtime.server:none}")
     private String runtimeServer;
-
     @Autowired
     private ApplicationContext appContext;
+    
     private String hostName = "localhost";
     private Map<String, DroolsRouter> routes = new HashMap<>();
 
-    @Autowired
-    KafkaTemplate<String, KieContainerResponse> kafkaKieContainerUpdateResponseTemplate;
-
-    @Qualifier("deployFinish")
-    @Autowired
-    NewTopic responseTopic;
+    @Value("${spring.data.mongodb.database}")
+    private String databaseName;
+    
+    @Inject
+    private MongoClient mongoClient;
 
     public KieServiceCommon() {
-        // for now, if no server impl is passed as parameter, create one
-        // this.server = KieServerLocator.getInstance();
+
     }
 
     public static String getKieServerID() {
@@ -127,10 +124,7 @@ public class KieServiceCommon {
             }
         }
 
-        this.marshallerHelper = new MarshallerHelper(this.server.getServerRegistry());
-
         String serverName = KieServiceCommon.getKieServerID();
-
 
         try {
             InetAddress inetAddress = InetAddress.getLocalHost();
@@ -139,44 +133,46 @@ public class KieServiceCommon {
             logger.info("initCamelBusinessRoutes.getLocalHost", e);
         }
         List<RuntimePersist> itIsMes;
-        if (runtimePort==-1){
+        if (runtimePort == -1) {
             itIsMes = runtimeRepository.findByServerNameAndHostname(serverName, hostName);
-        }else{
+        } else {
             itIsMes = runtimeRepository.findByServerName(serverName);
         }
-
+        RuntimePersist runtimePersist;
         ServiceResponse<KieServerInfo> result = server.getInfo();
         String version = result.getResult().getVersion();
         if (itIsMes.isEmpty()) {
-            RuntimePersist runtimePersist = new RuntimePersist(serverName, version, hostName,
+            runtimePersist = new RuntimePersist(serverName, version, hostName,
                     String.valueOf(serverPort), null,
                     hostName, RuntimePersist.STATUS.UP.toString());
-            if (runtimePort!=-1){
+            if (runtimePort != -1) {
                 runtimePersist.setHostname(runtimeServer);
                 runtimePersist.setServerPort(String.valueOf(runtimePort));
             }
             String isSwarm = System.getProperty("org.kie.server.swarm");
+            String swarmPort=System.getProperty("org.kie.server.swarm.port");
             if ("1".equals(isSwarm)) {
-                if (System.getProperty("org.kie.server.swarm.port")!= null &&
-                         System.getProperty("org.kie.server.swarm.port").length()>0){
-                    runtimePersist.setServerUrl("http://" + serverName + ":" + System.getProperty("org.kie.server.swarm.port"));
-                }else{
+                if (swarmPort != null &&
+                        swarmPort.length() > 0) {
+                    runtimePersist.setServerUrl("http://" + serverName + ":" + swarmPort);
+                } else {
                     runtimePersist.setServerUrl("http://" + serverName + ":" + serverPort);
                 }
 
             } else {
-                if (runtimePort==-1) {
+                if (runtimePort == -1) {
                     runtimePersist.setServerUrl("http://" + hostName + ":" + serverPort);
-                }else{
+                } else {
                     runtimePersist.setServerUrl("http://" + runtimeServer + ":" + runtimePort);
                 }
             }
             runtimeRepository.save(runtimePersist);
         } else {
-            RuntimePersist runtimePersist = itIsMes.get(0);
+            runtimePersist = itIsMes.get(0);
             runtimePersist.setStatus(RuntimePersist.STATUS.UP.toString());
             runtimeRepository.save(runtimePersist);
         }
+
         try {
             for (KieContainerResource kieContainerResource : this.server.getServerState().getResult().getContainers()) {
                 this.createContainer(kieContainerResource.getContainerId(), kieContainerResource);
@@ -189,8 +185,23 @@ public class KieServiceCommon {
                         containerRuntimePojoPersist.setServerName(serverName);
                         containerRuntimePojoPersist.setHostname(hostName);
                         containerRuntimePojoPersist.setStatus(ContainerRuntimePojoPersist.STATUS.UP.name());
-                        containerRuntimeRepository.save(containerRuntimePojoPersist);
+                        containerRuntimePojoPersist = containerRuntimeRepository.save(containerRuntimePojoPersist);
                     }
+                    Flux<ContainerRuntimePojoPersist> streamToDeploy = reactiveContainerRuntimeRepository.findByServerNameAndHostname(containerRuntimePojoPersist.getServerName(),containerRuntimePojoPersist.getHostname());
+                    MongoDatabase db = mongoClient.getDatabase(databaseName);
+                  //  db.runCommand("{ convertToCapped: 'ContainerRuntimePojoPersist', size: 9128 }");
+
+
+                    this.subscription = streamToDeploy.subscribe(elementToDeploy -> {
+                                try {
+                                    if (ContainerRuntimePojoPersist.STATUS.TODEPLOY.name().equals(elementToDeploy.getStatus())) {
+                                        this.updateConfigToDeploy(container, elementToDeploy);
+                                    }
+                                } catch (Exception e) {
+                                    logger.error("updateConfigToDeploy",e);
+                                }
+                            }
+                    );
                     this.initCamelBusinessRoute(container);
                 }
             }
@@ -254,7 +265,7 @@ public class KieServiceCommon {
             try {
                 Set<Class<?>> classes = kieContainerInstance.getExtraClasses();
                 String className = container.getClassName();
-                Class foundClass = this.getClassFromName(classes, className);
+                Class<Object> foundClass = this.getClassFromName(classes, className);
                 if (foundClass != null) {
                     ClassLoader classLoader = foundClass.getClassLoader();
                     Class<?> theClass = classLoader.loadClass(className);
@@ -309,58 +320,22 @@ public class KieServiceCommon {
         return result.getResult();
     }
 
+    public void updateConfigToDeploy(ContainerPojoPersist container, ContainerRuntimePojoPersist containerRuntimePojoPersist) throws Exception {
+        this.disposeContainer(container.getContainerId());
+        KieContainerResource newContainer = new KieContainerResource();
+        newContainer.setContainerId(container.getContainerId());
+        newContainer.setReleaseId(new ReleaseId());
+        newContainer.getReleaseId().setArtifactId(container.getArtifactId());
+        newContainer.getReleaseId().setGroupId(container.getGroupId());
+        newContainer.getReleaseId().setVersion(container.getVersion());
+        this.createContainer(container.getContainerId(), newContainer);
+        this.initCamelBusinessRoute(container);
+        containerRuntimePojoPersist.setStatus(ContainerRuntimePojoPersist.STATUS.UP.toString());
+        containerRuntimeRepository.save(containerRuntimePojoPersist);
 
-    @KafkaListener(
-            topics = "${org.kie.server.id}", groupId = "${org.kie.server.id}",
-            containerFactory = "ruleKafkaListenerKieContainerUpdateFactory")
-    public void updateConfig(KieContainerUpdate update)  {
-        try {
-            String serverName = KieServiceCommon.getKieServerID();
-            if (update.getAction().equals(KieContainerUpdate.STATUS.TODEPLOY)) {
-                this.disposeContainer(update.getContainerID());
-                KieContainerResource newContainer = new KieContainerResource();
-                newContainer.setContainerId(update.getContainerID());
-                newContainer.setReleaseId(new ReleaseId());
-                newContainer.getReleaseId().setArtifactId(update.getArtifactID());
-                newContainer.getReleaseId().setGroupId(update.getGroupID());
-                newContainer.getReleaseId().setVersion(update.getProjectVersion());
-                this.createContainer(update.getContainerID(), newContainer);
-                ContainerPojoPersist containerIds = containerRepository.findByServerNameAndContainerId(serverName, update.getContainerID());
-                this.initCamelBusinessRoute(containerIds);
-                List<ContainerRuntimePojoPersist> containers = containerRuntimeRepository.findByServerNameAndContainerId(serverName, update.getContainerID());
-                for (ContainerRuntimePojoPersist element : containers) {
-                    element.setStatus(ContainerRuntimePojoPersist.STATUS.UP.toString());
-                    containerRuntimeRepository.save(element);
-                }
-            } else {
-                this.disposeContainer(update.getContainerID());
-                this.deleteCamelBusinessRoute(update.getContainerID());
-                ContainerPojoPersist containerIds = containerRepository.findByServerNameAndContainerId(serverName, update.getContainerID());
-                List<ContainerRuntimePojoPersist> containers = containerRuntimeRepository.findByServerNameAndContainerId(serverName, update.getContainerID());
-                for (ContainerRuntimePojoPersist element : containers) {
-                    element.setStatus(ContainerRuntimePojoPersist.STATUS.UP.toString());
-                    containerRuntimeRepository.save(element);
-                }
-                containerRepository.delete(containerIds);
-            }
-            KieContainerResponse kieContainerResponse = new KieContainerResponse();
-            kieContainerResponse.setStatus(KieContainerResponse.STATUS.SUCCESS);
-            kafkaKieContainerUpdateResponseTemplate.executeInTransaction(kt ->
-                    kt.send(KafkaTopicConstants.RESPONSE_DEPLOY_TOPIC,kieContainerResponse));
-
-        }catch (Exception e){
-            KieContainerResponse kieContainerResponse = new KieContainerResponse();
-            kieContainerResponse.setStatus(KieContainerResponse.STATUS.ERROR);
-            kieContainerResponse.setKieContainerUpdate(update);
-            kieContainerResponse.setMessageError(e.getMessage());
-            for (StackTraceElement stackTraceElement : e.getStackTrace()){
-                kieContainerResponse.getErrorMessages().add(stackTraceElement.toString());
-            }
-            kafkaKieContainerUpdateResponseTemplate.executeInTransaction(kt ->
-                    kt.send(KafkaTopicConstants.RESPONSE_DEPLOY_TOPIC,kieContainerResponse));
-
-        }
     }
+
+
 
 
     public KieContainerResource createContainerWithRestBusinessService(String id, KieContainerResource container, String className, String processID) {
@@ -401,8 +376,6 @@ public class KieServiceCommon {
                 this.initCamelBusinessRoute(containerPojoPersist);
                 containerRepository.save(containerPojoPersist);
 
-            } catch (ClassNotFoundException e) {
-                logger.error("createContainerWithRestBusinessService", e);
             } catch (Exception e) {
                 logger.error("createContainerWithRestBusinessService", e);
             } finally {
@@ -437,20 +410,16 @@ public class KieServiceCommon {
 
 
     public ServiceResponse<KieContainerResource> activateContainer(String id) {
-        ServiceResponse<KieContainerResource> response = server.activateContainer(id);
-
-        return response;
+         return server.activateContainer(id);
     }
 
 
     public ServiceResponse<KieContainerResource> deactivateContainer(String id) {
-        ServiceResponse<KieContainerResource> response = server.deactivateContainer(id);
-        return response;
+         return server.deactivateContainer(id);
     }
 
     public ServiceResponse<KieContainerResource> getContainerInfo(String id) {
-        ServiceResponse<KieContainerResource> result = server.getContainerInfo(id);
-        return result;
+        return server.getContainerInfo(id);
     }
 
     public ServiceResponse<Void> disposeContainer(String id) {
@@ -464,26 +433,21 @@ public class KieServiceCommon {
     }
 
 
-    public ServiceResponse<KieServerStateInfo> getServerState(@Context HttpHeaders headers) {
-        ServiceResponse<KieServerStateInfo> result = server.getServerState();
-        return result;
+    public ServiceResponse<KieServerStateInfo> getServerState(@Context HttpHeaders headers) { ;
+        return server.getServerState();
     }
 
     public boolean readycheck() {
-        boolean result = server.isKieServerReady();
-        return result;
+        return server.isKieServerReady();
     }
 
 
     public List<Message> healthcheck(boolean report) {
-        List<Message> healthMessages = server.healthCheck(report);
-
-
-        return healthMessages;
+       return server.healthCheck(report);
     }
 
-    private Class getClassFromName(Set<Class<?>> classes, String name) {
-        Class result = null;
+    private Class<Object> getClassFromName(Set<Class<?>> classes, String name) {
+        Class<Object> result = null;
         for (Class c : classes) {
             if (c.getCanonicalName() != null
                     && c.getCanonicalName().equals(name)) {
@@ -492,5 +456,9 @@ public class KieServiceCommon {
             }
         }
         return result;
+    }
+
+    public void close() {
+        this.subscription.dispose();
     }
 }

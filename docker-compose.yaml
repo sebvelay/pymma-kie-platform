@@ -248,6 +248,23 @@ services:
     command: mongod
     restart: always
 
+
+  businessProxyDBtest:
+    image: mongo
+    container_name: "businessProxyDBtest"
+    volumes:
+      - mongodb2:/data/db
+      - mongodb_config2:/data/configdb
+    hostname: mongo2.pymma
+    networks:
+      drools-network-dev:
+        ipv4_address: 172.27.1.33
+    ports:
+      - 27017:27017
+    command: mongod
+    restart: always
+
+
   kafka_manager:
     image: hlebalbau/kafka-manager:stable
     ports:
@@ -385,6 +402,8 @@ services:
 volumes:
   mongodb:
   mongodb_config:
+  mongodb2:
+  mongodb_config2:
   gitdata:
   lucenedata:
   kieserverdir:

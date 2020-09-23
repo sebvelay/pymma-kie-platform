@@ -2,7 +2,6 @@ package org.chtijbug.drools.console.service;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinSession;
-import org.chtijbug.drools.KieContainerUpdate;
 import org.chtijbug.drools.ReverseProxyUpdate;
 import org.chtijbug.drools.common.KafkaTopicConstants;
 import org.chtijbug.drools.console.AddLog;
@@ -61,8 +60,7 @@ public class ProjectPersistService {
     @Autowired
     private KafkaTemplate<String, ReverseProxyUpdate> kafkaTemplateProxyUpdate;
 
-    @Autowired
-    private KafkaTemplate<String, KieContainerUpdate> kafkaKieContainerUpdateTemplate;
+
 
     public ProjectPersistService() {
         this.config = AppContext.getApplicationContext().getBean(KieConfigurationData.class);
@@ -218,15 +216,6 @@ public class ProjectPersistService {
 
 
                     }
-                    KieContainerUpdate kieContainerUpdate = new KieContainerUpdate();
-                    kieContainerUpdate.setMainClass(projectPersist.getMainClass());
-                    kieContainerUpdate.setArtifactID(projectPersist.getArtifactID());
-                    kieContainerUpdate.setGroupID(projectPersist.getGroupID());
-                    kieContainerUpdate.setProjectVersion(projectPersist.getProjectVersion());
-                    kieContainerUpdate.setContainerID(projectPersist.getContainerID());
-                    kieContainerUpdate.setAction(KieContainerUpdate.STATUS.TODEPLOY);
-                    kafkaKieContainerUpdateTemplate.send(serverName,kieContainerUpdate);
-                    workOnGoingView.addRow("Deploy Request="+kieContainerUpdate,ui);
                 }
             }
         };

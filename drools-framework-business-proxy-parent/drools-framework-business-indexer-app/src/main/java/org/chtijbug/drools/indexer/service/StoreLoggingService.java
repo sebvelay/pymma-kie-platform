@@ -9,6 +9,8 @@ import org.chtijbug.drools.proxy.persistence.model.BusinessTransactionPersistenc
 import org.chtijbug.drools.proxy.persistence.model.EventType;
 import org.chtijbug.drools.proxy.persistence.repository.BusinessTransactionActionRepository;
 import org.chtijbug.drools.proxy.persistence.repository.BusinessTransactionPersistenceRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,8 @@ import java.util.*;
 
 @Service("storeService")
 public class StoreLoggingService {
+
+    private static final Logger logger = LoggerFactory.getLogger(StoreLoggingService.class);
 
     @Autowired
     private BusinessTransactionPersistenceRepository transactionRepository;
@@ -150,22 +154,15 @@ public class StoreLoggingService {
                 businessTransactionoutput.setEventNumber(ii++);
                 actions.put(businessTransactionoutput.getEventNumber(), businessTransactionoutput);
             }
-            List<Long> keys = new ArrayList<Long>(actions.keySet());
+            List<Long> keys = new ArrayList<>(actions.keySet());
             Collections.sort(keys);
             List<BusinessTransactionAction> sortedList = new LinkedList<>();
             for (Long i : keys) {
                 sortedList.add(actions.get(i));
             }
             transactionRepository.save(item);
-            Iterable<BusinessTransactionAction> toto = actionRepository.saveAll(sortedList);
-            System.out.println("");
-
-
-            //item.setContent(fileContent);
-
-            //    repository.save(item);
-        }
-
-        System.out.println("coucou");
+            actionRepository.saveAll(sortedList);
+            logger.info("Logging transaction {}",result.getTransactionID());
+      }
     }
 }

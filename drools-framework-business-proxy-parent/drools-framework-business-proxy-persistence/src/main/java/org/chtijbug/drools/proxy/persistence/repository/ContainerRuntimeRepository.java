@@ -12,9 +12,9 @@ public interface ContainerRuntimeRepository extends MongoRepository<ContainerRun
 
     List<ContainerRuntimePojoPersist> findByServerNameAndContainerId(String serverName, String containerId);
     List<ContainerRuntimePojoPersist> findByServerNameAndStatus(String serverName, String status);
-    List<ContainerRuntimePojoPersist> findByServerNameAndStatusAndHostname(String serverName, String status,String hostname);
     List<ContainerRuntimePojoPersist> findByServerNameAndHostname(String serverName, String hostname);
     ContainerRuntimePojoPersist findByServerNameAndContainerIdAndHostname(String serverName, String containerId,String hostname);
+
 
 
 

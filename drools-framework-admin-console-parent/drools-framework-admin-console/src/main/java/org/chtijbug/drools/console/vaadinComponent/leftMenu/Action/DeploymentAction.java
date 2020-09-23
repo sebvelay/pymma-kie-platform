@@ -3,8 +3,6 @@ package org.chtijbug.drools.console.vaadinComponent.leftMenu.Action;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import org.chtijbug.drools.KieContainerResponse;
-import org.chtijbug.drools.common.KafkaTopicConstants;
 import org.chtijbug.drools.console.service.ProjectPersistService;
 import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.DialogPerso;
@@ -13,7 +11,6 @@ import org.chtijbug.drools.console.vaadinComponent.componentView.AssociateProjec
 import org.chtijbug.drools.console.vaadinComponent.componentView.DefineProject;
 import org.chtijbug.drools.console.view.DeploymentView;
 import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
-import org.springframework.kafka.annotation.KafkaListener;
 
 public class DeploymentAction extends VerticalLayout {
 
@@ -80,14 +77,6 @@ public class DeploymentAction extends VerticalLayout {
 
     }
 
-    @KafkaListener(
-            topics = KafkaTopicConstants.RESPONSE_DEPLOY_TOPIC,groupId = "Console",
-            containerFactory = "ruleKafkaListenerKieContainerUpdateFactory")
-    public void updateKieServerLogInfo(KieContainerResponse kieContainerResponse){
-        if (getUI().isPresent()) {
-            deploymentView.addRow("Deploy Response=" + kieContainerResponse.toString(), getUI().get());
-        }
-    }
 
     private boolean isActive(Button button){
         return button.getClassNames().contains("active");

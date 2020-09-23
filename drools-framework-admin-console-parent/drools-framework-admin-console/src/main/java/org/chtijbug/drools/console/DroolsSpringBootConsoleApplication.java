@@ -3,7 +3,6 @@ package org.chtijbug.drools.console;
 
 import com.vaadin.flow.spring.SpringServlet;
 import org.apache.kafka.clients.admin.AdminClientConfig;
-import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -11,7 +10,6 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.chtijbug.drools.KieContainerResponse;
 import org.chtijbug.drools.KieContainerUpdate;
 import org.chtijbug.drools.ReverseProxyUpdate;
-import org.chtijbug.drools.common.KafkaTopicConstants;
 import org.chtijbug.drools.console.middle.DababaseContentInit;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.ApplicationContextProvider;
@@ -110,10 +108,7 @@ public class DroolsSpringBootConsoleApplication extends SpringBootServletInitial
         return new KafkaAdmin(configs);
     }
 
-    @Bean
-    public NewTopic loggingTopic() {
-        return new NewTopic(KafkaTopicConstants.REVERSE_PROXY, 1, (short) 1);
-    }
+
 
     @Bean
     public ProducerFactory<String, ReverseProxyUpdate> producerFactory() {
@@ -149,10 +144,7 @@ public class DroolsSpringBootConsoleApplication extends SpringBootServletInitial
         return new KafkaTemplate<>(producerFactory());
     }
 
-    @Bean
-    public KafkaTemplate<String, KieContainerUpdate> kafkaKieContainerUpdateTemplate() {
-        return new KafkaTemplate<>(producerKieContainerUpdateFactory());
-    }
+
 
 
     public ConsumerFactory<String, KieContainerResponse> greetingConsumerFactory() {

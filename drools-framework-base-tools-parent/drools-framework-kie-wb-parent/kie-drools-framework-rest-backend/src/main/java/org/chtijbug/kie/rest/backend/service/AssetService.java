@@ -74,10 +74,14 @@ public class AssetService {
     private List<PlatformProjectResponse> getSpace(OrganizationalUnit ou) {
 
         final List<PlatformProjectResponse> repoNames = new ArrayList<>();
-        for (WorkspaceProject workspaceProject : workspaceProjectService.getAllWorkspaceProjects(ou)) {
-            for (Branch branch : workspaceProject.getRepository().getBranches()) {
-                repoNames.add(getProjectResponse(workspaceProject, branch));
+        try {
+            for (WorkspaceProject workspaceProject : workspaceProjectService.getAllWorkspaceProjects(ou)) {
+                for (Branch branch : workspaceProject.getRepository().getBranches()) {
+                    repoNames.add(getProjectResponse(workspaceProject, branch));
+                }
             }
+        }catch (Exception e){
+            logger.info("getSpace error "+ou.getName(),e);
         }
         return repoNames;
     }
