@@ -21,13 +21,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.chtijbug.drools.ChtijbugObjectRequest;
 import org.chtijbug.drools.KieContainerResponse;
-import org.chtijbug.drools.KieContainerUpdate;
 import org.chtijbug.drools.common.KafkaTopicConstants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
@@ -35,11 +32,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
-import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-import org.springframework.kafka.core.*;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaAdmin;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import org.springframework.kafka.transaction.KafkaTransactionManager;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -50,6 +48,7 @@ import java.util.Map;
 @SpringBootApplication
 @Configuration
 @EnableKafka
+@EnableScheduling
 public class DroolsBusinessProxyServer {
 
     @Value(value = "${org.kie.server.id}")
@@ -70,10 +69,7 @@ public class DroolsBusinessProxyServer {
         return new NewTopic(KafkaTopicConstants.LOGING_TOPIC, 1, (short) 1);
     }
 
-    @Bean
-    public NewTopic actionResponseTopic() {
-        return new NewTopic(KafkaTopicConstants.RESPONSE_TOPIC, 1, (short) 1);
-    }
+
 
     @Bean
     public ProducerFactory<String, ChtijbugObjectRequest> producerFactory() {
@@ -90,7 +86,7 @@ public class DroolsBusinessProxyServer {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        new DefaultKafkaProducerFactory<>(configProps, new StringSerializer(), new JsonSerializer<ChtijbugObjectRequest>(objectMapper));
+        new DefaultKafkaProducerFactory<>(configProps, new StringSerializer(), new JsonSerializer<>(objectMapper));
         return new DefaultKafkaProducerFactory<>(configProps);
     }
     @Bean
@@ -110,45 +106,18 @@ public class DroolsBusinessProxyServer {
         producer.setTransactionIdPrefix("trans");
         return producer;
     }
-    @Bean
-    public KafkaTransactionManager transactionManager(ProducerFactory producerFactory) {
-        KafkaTransactionManager manager = new KafkaTransactionManager(producerKieContainerResponseactory());
-        return manager;
-    }
-    @Bean
-    public KafkaTemplate<String, KieContainerResponse> kafkaKieContainerUpdateResponsableTemplate() {
-        return new KafkaTemplate<>(producerKieContainerResponseactory());
-    }
+
     @Bean(name="deployFinish")
     public NewTopic actionDeployResponseTopic() {
         return new NewTopic(KafkaTopicConstants.RESPONSE_DEPLOY_TOPIC, 1, (short) 1);
     }
 
 
-    public ConsumerFactory<String, KieContainerUpdate> greetingConsumerFactory() {
-        Map<String, Object> props = new HashMap<>();
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupID);
-        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(KieContainerUpdate.class));
-    }
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, KieContainerUpdate>
-    ruleKafkaListenerKieContainerUpdateFactory() {
-
-        ConcurrentKafkaListenerContainerFactory<String, KieContainerUpdate> factory =
-                new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(greetingConsumerFactory());
-        return factory;
-    }
 
     @Bean
     public KafkaTemplate<String, ChtijbugObjectRequest> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
-
-
-
-
 
     /**
      * Main method to start the application.

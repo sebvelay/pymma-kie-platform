@@ -8,7 +8,7 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.shared.communication.PushMode;
-import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
+import org.chtijbug.drools.console.vaadincomponent.Squelette.SqueletteComposant;
 
 import java.util.Optional;
 

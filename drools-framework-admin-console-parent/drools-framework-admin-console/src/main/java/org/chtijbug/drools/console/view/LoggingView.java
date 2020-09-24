@@ -3,8 +3,8 @@ package org.chtijbug.drools.console.view;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import org.chtijbug.drools.console.vaadinComponent.componentView.GridLogging;
-import org.chtijbug.drools.console.vaadinComponent.leftMenu.Action.ActionLogging;
+import org.chtijbug.drools.console.vaadincomponent.componentview.GridLogging;
+import org.chtijbug.drools.console.vaadincomponent.leftMenu.Action.ActionLogging;
 
 @StyleSheet("css/accueil.css")
 public class LoggingView extends VerticalLayout {

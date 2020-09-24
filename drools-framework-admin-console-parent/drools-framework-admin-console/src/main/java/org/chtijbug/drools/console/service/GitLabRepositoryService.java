@@ -33,7 +33,7 @@ public class GitLabRepositoryService {
     public List<GroupElementResponse> getListGitRepostitories(String url, String token, String groupName) {
 
         String completeurl = url + "/groups/" + groupName + "/projects";
-        logger.info("url gitlab : " + completeurl);
+        logger.info("url gitlab : {}" , completeurl);
         ResponseEntity<List<GroupElementResponse>> response = restTemplateKiewb
                 .execute(completeurl, HttpMethod.GET, requestCallback(null, token), clientHttpResponse -> {
                     List<GroupElementResponse> extractedResponse = null;
@@ -43,8 +43,7 @@ public class GitLabRepositoryService {
                         GroupElementResponse[] values = mapper.readValue(result, GroupElementResponse[].class);
                         extractedResponse = Arrays.asList(values);
                     }
-                    ResponseEntity<List<GroupElementResponse>> extractedValue = new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
-                    return extractedValue;
+                    return new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
                 });
         List<GroupElementResponse> reponseMoteur;
 
@@ -55,7 +54,7 @@ public class GitLabRepositoryService {
     public GroupElementResponse createProjectForUser(String url, String token, String projectName) {
 
         String completeurl = url + "/projects?name=" + projectName;
-        logger.info("url moteur reco : " + completeurl);
+        logger.info("url moteur reco : {}", completeurl);
         ResponseEntity<GroupElementResponse> response = restTemplateKiewb
                 .execute(completeurl, HttpMethod.POST, requestCallback(null, token), clientHttpResponse -> {
                     GroupElementResponse extractedResponse = null;
@@ -64,8 +63,7 @@ public class GitLabRepositoryService {
                         String result = s.hasNext() ? s.next() : "";
                         extractedResponse = mapper.readValue(result, GroupElementResponse.class);
                     }
-                    ResponseEntity<GroupElementResponse> extractedValue = new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
-                    return extractedValue;
+                    return new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
                 });
         GroupElementResponse reponseMoteur;
 
@@ -76,7 +74,7 @@ public class GitLabRepositoryService {
     public ProjectMoveResponse moveProjectTpGroup(String url, String token, String projectid, String groupName) {
 
         String completeurl = url + "/groups/" + groupName + "/projects/" + projectid;
-        logger.info("url moteur reco : " + completeurl);
+        logger.info("url moteur reco : {}" , completeurl);
         ResponseEntity<ProjectMoveResponse> response = restTemplateKiewb
                 .execute(completeurl, HttpMethod.POST, requestCallback(null, token), clientHttpResponse -> {
                     ProjectMoveResponse extractedResponse = null;
@@ -85,8 +83,7 @@ public class GitLabRepositoryService {
                         String result = s.hasNext() ? s.next() : "";
                         extractedResponse = mapper.readValue(result, ProjectMoveResponse.class);
                     }
-                    ResponseEntity<ProjectMoveResponse> extractedValue = new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
-                    return extractedValue;
+                    return new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
                 });
         ProjectMoveResponse reponseMoteur;
 
@@ -105,7 +102,7 @@ public class GitLabRepositoryService {
             clientHttpRequest.getHeaders().add(
                     HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
 
-            String authHeader = new String(token);
+            String authHeader = token;
             clientHttpRequest.getHeaders().add(
                     "Private-Token", authHeader);
         };

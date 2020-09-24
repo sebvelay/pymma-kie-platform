@@ -17,8 +17,8 @@ import com.vaadin.flow.shared.communication.PushMode;
 import org.chtijbug.drools.console.AddLog;
 import org.chtijbug.drools.console.service.ProjectPersistService;
 import org.chtijbug.drools.console.service.util.AppContext;
-import org.chtijbug.drools.console.vaadinComponent.Squelette.SqueletteComposant;
-import org.chtijbug.drools.console.vaadinComponent.leftMenu.Action.DeploymentAction;
+import org.chtijbug.drools.console.vaadincomponent.Squelette.SqueletteComposant;
+import org.chtijbug.drools.console.vaadincomponent.leftMenu.Action.DeploymentAction;
 import org.chtijbug.drools.proxy.persistence.model.ProjectPersist;
 
 import java.util.ArrayList;
