@@ -4,11 +4,13 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
-import org.chtijbug.drools.console.vaadinComponent.componentView.service.dtmodel.ColumnDefinition;
-import org.chtijbug.drools.console.vaadinComponent.componentView.service.dtmodel.DecisionTable;
-import org.chtijbug.drools.console.vaadinComponent.componentView.service.dtmodel.GuidedException;
+import org.chtijbug.drools.console.vaadincomponent.componentview.service.dtmodel.ColumnDefinition;
+import org.chtijbug.drools.console.vaadincomponent.componentview.service.dtmodel.DecisionTable;
+import org.chtijbug.drools.console.vaadincomponent.componentview.service.dtmodel.GuidedException;
 import org.drools.workbench.models.guided.dtable.backend.GuidedDTXMLPersistence;
 import org.drools.workbench.models.guided.dtable.shared.model.GuidedDecisionTable52;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ import java.util.List;
 @Service
 @DependsOn("applicationContext")
 public class DecisionTableExcelService {
+
+    private static Logger logger = LoggerFactory.getLogger(DecisionTableExcelService.class);
 
     @Value("${adminConsole.tmpdir}")
     public String tmpDir;
@@ -75,6 +79,7 @@ public class DecisionTableExcelService {
                 }
             }
         } catch (IOException e) {
+            logger.error("IOException","ImportExcell",e);
             throw e;
         } finally {
             if (workbook != null) {
@@ -84,7 +89,7 @@ public class DecisionTableExcelService {
         return result;
     }
 
-    public ByteArrayInputStream exportExcel(String nameTemplate)  {
+    public ByteArrayInputStream exportExcel(String nameTemplate) {
 
         //Récupération des objets JAVA
 
@@ -99,7 +104,7 @@ public class DecisionTableExcelService {
         try {
             workbook = new XSSFWorkbook();
             DecisionTable decisionTable = new DecisionTable(model);
-            CreationHelper createHelper = workbook.getCreationHelper();
+            workbook.getCreationHelper();
             Sheet sheet = workbook.createSheet(nameTemplate);
 
             Font headerFont = workbook.createFont();
@@ -111,27 +116,26 @@ public class DecisionTableExcelService {
 
             Row headerRow = sheet.createRow(0);
 
-            if (decisionTable.getRows() != null && decisionTable.getRows().size() != 0) {
-                int columnIndex = 0;
+            if (decisionTable.getRows() != null && !decisionTable.getRows().isEmpty()) {
+
                 int j = 0;
                 for (ColumnDefinition columnDefinition : decisionTable.getColumnDefinitionList()) {
-                    if (columnDefinition.isHideColumn() == false) {
+                    if (!columnDefinition.isHideColumn()) {
                         Cell cell = headerRow.createCell(j);
                         cell.setCellValue(columnDefinition.getHeader());
                         cell.setCellStyle(headerCellStyle);
                         j++;
                     }
-                    columnIndex++;
                 }
                 int rowIndex = 1;
 
                 for (int i = 0; i < decisionTable.getRows().size(); i++) {
-                    org.chtijbug.drools.console.vaadinComponent.componentView.service.dtmodel.Row row = decisionTable.getRows().get(i);
+                    org.chtijbug.drools.console.vaadincomponent.componentview.service.dtmodel.Row row = decisionTable.getRows().get(i);
                     int k = 0;
                     int jj = 0;
                     Row r = sheet.createRow(rowIndex);
                     for (ColumnDefinition columnDefinition : decisionTable.getColumnDefinitionList()) {
-                        if (columnDefinition.isHideColumn() == false) {
+                        if (!columnDefinition.isHideColumn()) {
                             Cell cell = r.createCell(k);
                             cell.setCellValue(row.getRowElements().get(jj).getValue());
                             cell.setCellStyle(headerCellStyle);
@@ -144,32 +148,16 @@ public class DecisionTableExcelService {
 
             }
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            try {
-                FileOutputStream fileOutputStream = new FileOutputStream(tmpDir + "/" + nameTemplate + ".xlsx");
-                workbook.write(fileOutputStream);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                workbook.write(bos);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            ByteArrayInputStream is = null;
+            FileOutputStream fileOutputStream = new FileOutputStream(tmpDir + "/" + nameTemplate + ".xlsx");
+            workbook.write(fileOutputStream);
+            workbook.write(bos);
             byte[] barray = bos.toByteArray();
-            ByteArrayInputStream is = new ByteArrayInputStream(barray);
-
-            try {
-                workbook.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
+            is = new ByteArrayInputStream(barray);
+            workbook.close();
             return is;
-
-        } catch (GuidedException e) {
-            e.printStackTrace();
+        } catch (GuidedException | IOException e) {
+            logger.error("new FileOutputStream", e);
         } finally {
             if (workbook != null) {
                 try {

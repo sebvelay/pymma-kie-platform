@@ -14,8 +14,8 @@ import org.chtijbug.drools.console.service.UserConnectedService;
 import org.chtijbug.drools.console.service.model.UserConnected;
 import org.chtijbug.drools.console.service.model.kie.KieConfigurationData;
 import org.chtijbug.drools.console.service.util.AppContext;
-import org.chtijbug.drools.console.vaadinComponent.ComponentPerso.DialogPerso;
-import org.chtijbug.drools.console.vaadinComponent.leftMenu.Action.TemplatesAction;
+import org.chtijbug.drools.console.vaadincomponent.componentperso.DialogPerso;
+import org.chtijbug.drools.console.vaadincomponent.leftMenu.Action.TemplatesAction;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
 import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
 

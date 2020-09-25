@@ -1,6 +1,5 @@
 package org.chtijbug.drools.console.view;
 
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Image;
@@ -9,8 +8,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.InputStreamFactory;
 import com.vaadin.flow.server.StreamResource;
-import org.chtijbug.drools.console.vaadinComponent.login.LoginComponent;
-import org.chtijbug.drools.console.vaadinComponent.login.TextInfoComponent;
+import org.chtijbug.drools.console.vaadincomponent.login.LoginComponent;
+import org.chtijbug.drools.console.vaadincomponent.login.TextInfoComponent;
 
 import java.io.InputStream;
 
