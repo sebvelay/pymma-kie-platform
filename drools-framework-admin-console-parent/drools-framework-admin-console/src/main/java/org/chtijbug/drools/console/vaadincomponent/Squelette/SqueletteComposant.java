@@ -98,7 +98,7 @@ public class SqueletteComposant extends VerticalLayout {
         infoPage.removeAll();
         infoPage.add(verticalLayout);
 
-        if(pageName.equals(DeploymentView.pageName)){
+        if(pageName.equals(DeploymentView.PAGE_NAME)){
             consoleDeploy.setVisible(true);
         }
     }

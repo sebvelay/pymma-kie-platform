@@ -5,16 +5,31 @@ import org.guvnor.rest.client.ProjectResponse;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PlatformProjectResponse extends ProjectResponse {
+public class PlatformProjectData extends ProjectResponse {
 
     private String artifactId;
+
+    private String wbName;
 
     private String branch;
 
     private List<String> javaClasses = new ArrayList<>();
 
-    public PlatformProjectResponse() {
+    private List<DependencyData> dependencies = new ArrayList<>();
+
+    private KModuleData kModule;
+
+
+    public PlatformProjectData() {
         super();
+    }
+
+    public String getWbName() {
+        return wbName;
+    }
+
+    public void setWbName(String wbName) {
+        this.wbName = wbName;
     }
 
     public List<String> getJavaClasses() {
@@ -39,5 +54,21 @@ public class PlatformProjectResponse extends ProjectResponse {
 
     public void setBranch(String branch) {
         this.branch = branch;
+    }
+
+    public List<DependencyData> getDependencies() {
+        return dependencies;
+    }
+
+    public void setDependencies(List<DependencyData> dependencies) {
+        this.dependencies = dependencies;
+    }
+
+    public KModuleData getkModule() {
+        return kModule;
+    }
+
+    public void setkModule(KModuleData kModule) {
+        this.kModule = kModule;
     }
 }

@@ -10,7 +10,7 @@ import org.chtijbug.drools.proxy.persistence.model.User;
 import org.chtijbug.drools.proxy.persistence.repository.UserRepository;
 import org.chtijbug.guvnor.server.jaxrs.api.UserLoginInformation;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
-import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
+import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,21 +80,21 @@ public class KieRepositoryService {
         return reponseMoteur;
     }
 
-    public List<PlatformProjectResponse> getListSpaces2(String url, String username, String password) {
+    public List<PlatformProjectData> getListSpaces2(String url, String username, String password) {
         String completeurl = url + chtijbugprefix+"detailedSpaces";
         logger.info("url getListSpaces2 :{} ", completeurl);
-        ResponseEntity<List<PlatformProjectResponse>> response = restTemplateKiewb
+        ResponseEntity<List<PlatformProjectData>> response = restTemplateKiewb
                 .execute(completeurl, HttpMethod.GET, requestCallback(null, username, password), clientHttpResponse -> {
-                    List<PlatformProjectResponse> extractedResponse = null;
+                    List<PlatformProjectData> extractedResponse = null;
                     if (clientHttpResponse.getBody() != null) {
                         Scanner s = new Scanner(clientHttpResponse.getBody()).useDelimiter("\\A");
                         String result = s.hasNext() ? s.next() : "";
-                        PlatformProjectResponse[] values = mapper.readValue(result, PlatformProjectResponse[].class);
+                        PlatformProjectData[] values = mapper.readValue(result, PlatformProjectData[].class);
                         extractedResponse = Arrays.asList(values);
                     }
                      return new ResponseEntity<>(extractedResponse, clientHttpResponse.getHeaders(), clientHttpResponse.getStatusCode());
                 });
-        List<PlatformProjectResponse> reponseMoteur;
+        List<PlatformProjectData> reponseMoteur;
 
         reponseMoteur = response.getBody();
         return reponseMoteur;

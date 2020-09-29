@@ -12,7 +12,7 @@ import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.proxy.persistence.json.KieProject;
 import org.chtijbug.drools.proxy.persistence.model.*;
 import org.chtijbug.drools.proxy.persistence.repository.*;
-import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
+import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +44,8 @@ public class ProjectPersistService {
     @Autowired
     private UserConnectedService userConnectedService;
 
+    @Autowired
+    private JobService jobService;
 
     @Autowired
     private ContainerRepository containerRepository;
@@ -68,11 +70,11 @@ public class ProjectPersistService {
     }
 
 
-    public void saveIfnotExist(List<PlatformProjectResponse> platformProjectResponses,String workbenchName) {
+    public void saveIfnotExist(List<PlatformProjectData> platformProjectResponses, String workbenchName) {
 
 
         KieWorkbench kieWorkbench = workbenchRepository.findByName(workbenchName);
-        for (PlatformProjectResponse platformProjectResponse : platformProjectResponses) {
+        for (PlatformProjectData platformProjectResponse : platformProjectResponses) {
 
             ProjectPersist projectPersist = projectRepository.findByProjectNameAndBranch(new KieProject(platformProjectResponse.getSpaceName(), platformProjectResponse.getName()), platformProjectResponse.getBranch());
 
@@ -160,7 +162,7 @@ public class ProjectPersistService {
         return false;
     }
 
-    public ProjectPersist platformProjectResponseToProjectPersist(PlatformProjectResponse platformProjectResponse) {
+    public ProjectPersist platformProjectResponseToProjectPersist(PlatformProjectData platformProjectResponse) {
         ProjectPersist projectPersist = new ProjectPersist();
         projectPersist.setArtifactID(platformProjectResponse.getArtifactId());
         projectPersist.setGroupID(platformProjectResponse.getGroupId());
@@ -185,12 +187,12 @@ public class ProjectPersistService {
                 JobStatus result = kieRepositoryService.buildProject(config.getKiewbUrl(), userConnected.getUserName(),
                         userConnected.getUserPassword(), projectPersist.getProjectName().getSpaceName(), projectPersist.getProjectName().getName(), projectPersist.getBranch(), "compile", workOnGoingView, ui);
 
-                executeWrite(url, username, password, workOnGoingView, result.getJobId(), ui);
+                jobService.executeWrite(url, username, password, workOnGoingView, result.getJobId(), ui);
 
                 result = kieRepositoryService.buildProject(config.getKiewbUrl(), userConnected.getUserName(),
                         userConnected.getUserPassword(), projectPersist.getProjectName().getSpaceName(), projectPersist.getProjectName().getName(), projectPersist.getBranch(), "install", workOnGoingView, ui);
 
-                executeWrite(url, username, password, workOnGoingView, result.getJobId(), ui);
+                jobService.executeWrite(url, username, password, workOnGoingView, result.getJobId(), ui);
 
 
 
@@ -221,31 +223,7 @@ public class ProjectPersistService {
 
     }
 
-    private void executeWrite(String url, String username, String password, AddLog workOnGoingView, String jobID, UI ui) {
 
-        String isJobDone = "NO";
-        while ("NO".equals(isJobDone)) {
-            JobStatus jobStatus = kieRepositoryService.getStatusJobID(url,
-                    username,
-                    password, jobID);
-            if ("DUPLICATE_RESOURCE".equals(jobStatus.getStatus())
-                    || "SUCCESS".equals(jobStatus.getStatus())) {
-                isJobDone = "YES";
-                workOnGoingView.addRow("JobID=" + jobID + " finished", ui);
-            } else if ("ACCEPTED".equals(jobStatus.getStatus())
-                    || ("APPROVED".equals(jobStatus.getStatus()))) {
-                try {
-                    synchronized (this) {
-                        workOnGoingView.addRow("JobID=" + jobID + " not yet finished", ui);
-                        this.wait(1000);
-                    }
-                } catch (InterruptedException e) {
-                    logger.error("executeWrite", e);
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }
-    }
 
     public ProjectRepository getProjectRepository() {
         return projectRepository;

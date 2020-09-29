@@ -23,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,7 +34,7 @@ public class ActionLoggingView extends VerticalLayout {
 
     private static Logger logger = LoggerFactory.getLogger(ActionLoggingView.class);
 
-    private IndexerService indexerService;
+    private transient IndexerService indexerService;
 
     private Label title;
 
@@ -47,8 +48,6 @@ public class ActionLoggingView extends VerticalLayout {
     public ActionLoggingView(BusinessTransactionPersistence businessTransactionPersistence, DialogPerso dialogPerso) {
         indexerService = AppContext.getApplicationContext().getBean(IndexerService.class);
         dialogPerso.getClose().setVisible(false);
-        //Text text = new Text("Sessino Context ");
-        //dialogPerso.getBar().add(text);
         this.uniqueID = businessTransactionPersistence.getTransactionId();
         this.dbID = businessTransactionPersistence.getId();
 
@@ -82,12 +81,10 @@ public class ActionLoggingView extends VerticalLayout {
                 String inputData = "";
                 String outputData = "";
                 if (c.getInputData() != null) {
-                    //inputData = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(c.getInputData().getRealFact());
-                    inputData = mapper.writeValueAsString(c.getInputData().getRealFact());
+                     inputData = mapper.writeValueAsString(c.getInputData().getRealFact());
                 }
                 if (c.getOutputData() != null) {
-                    //outputData = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(c.getOutputData().getRealFact());
-                    outputData = mapper.writeValueAsString(c.getOutputData().getRealFact());
+                     outputData = mapper.writeValueAsString(c.getOutputData().getRealFact());
                 }
                 if (c.getRuleExecution() != null) {
                     ruleName = c.getRuleExecution().getRuleName();
@@ -95,8 +92,6 @@ public class ActionLoggingView extends VerticalLayout {
                     beginDate = simpleDateFormat.format(c.getRuleExecution().getStartDate());
                     endDate = simpleDateFormat.format(c.getRuleExecution().getEndDate());
                 }
-                //TODO Encode in string the json content
-
                 if (c.getEventType().equals(EventType.INPUT)) {
                     csvWriter.writeNext("", "", c.getEventType().name(), String.valueOf(c.getEventNumber()), "", "", "", "", "", "", "",c.getInputData().getFullClassName(),inputData);
                 } else if (c.getEventType().equals(EventType.OUPUT)) {
@@ -132,8 +127,7 @@ public class ActionLoggingView extends VerticalLayout {
                         datas.add(f.getFullClassName());
                         datas.add(mapper.writeValueAsString(f.getRealFact()));
                     }
-                    //csvWriter.writeAll("", "", c.getEventType().name(), String.valueOf(c.getEventNumber()), "", "", "", c.getProcessID(), "", "", "",datas);
-                    csvWriter.writeAll(Collections.singletonList(datas));
+                     csvWriter.writeAll(Collections.singletonList(datas));
                 } else {
                     csvWriter.writeNext(beginDate, endDate, c.getEventType().name(), String.valueOf(c.getEventNumber()),
                             ruleName, packageName, c.getRuleflowGroupName(), c.getProcessID()
@@ -142,7 +136,7 @@ public class ActionLoggingView extends VerticalLayout {
             }
 
 
-            return IOUtils.toInputStream(stringWriter.toString(), "UTF-8");
+            return IOUtils.toInputStream(stringWriter.toString(), StandardCharsets.UTF_8.name());
 
         } catch (IOException e) {
             logger.error("getInputStream.csvWriter",e);

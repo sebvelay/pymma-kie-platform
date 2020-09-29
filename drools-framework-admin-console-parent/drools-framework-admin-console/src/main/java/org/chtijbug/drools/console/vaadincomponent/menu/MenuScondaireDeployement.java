@@ -30,7 +30,7 @@ public class MenuScondaireDeployement extends HorizontalLayout {
 
             DeploymentAction deploymentAction=new DeploymentAction(squeletteComposant,deploymentView);
             deploymentView.setDeploymentAction(deploymentAction);
-            squeletteComposant.navigate(deploymentView,DeploymentView.pageName,deploymentAction);
+            squeletteComposant.navigate(deploymentView,DeploymentView.PAGE_NAME,deploymentAction);
         });
     }
 

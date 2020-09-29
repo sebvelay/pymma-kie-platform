@@ -38,7 +38,11 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +52,12 @@ import java.util.Map;
 @EnableMongoRepositories("org.chtijbug.drools.proxy.persistence.repository")
 @EnableKafka
 @PropertySource("classpath:application.properties")
+@EnableSwagger2
 public class DroolsSpringBootConsoleApplication extends SpringBootServletInitializer {
+
+
+
+
 
     @Value("${kie-wb.baseurl}")
     private String kiewbUrl;
@@ -68,10 +77,9 @@ public class DroolsSpringBootConsoleApplication extends SpringBootServletInitial
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurerAdapter() {
+        return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                super.addCorsMappings(registry);
                 registry.addMapping("/**")
                         .allowedOrigins("*")
                         .allowedMethods("GET", "POST", "OPTIONS", "DELETE", "PUT")
@@ -85,8 +93,7 @@ public class DroolsSpringBootConsoleApplication extends SpringBootServletInitial
 
     @Bean(name = "applicationContext")
     public ApplicationContextProvider getAppplicationContext() {
-        ApplicationContextProvider applicationContextProvider = new ApplicationContextProvider();
-        return applicationContextProvider;
+        return new ApplicationContextProvider();
     }
 
     @Bean
@@ -166,7 +173,7 @@ public class DroolsSpringBootConsoleApplication extends SpringBootServletInitial
 
 
    @EventListener(ApplicationReadyEvent.class)
-    public void InitPlatform(){
+    public void initPlatform(){
         dababaseContentInit.initDatabaseIfNecessary();
         /**
        for (KieWorkbench kieWorkbench: kieWorkbenchRepository.findAll()) {
@@ -217,6 +224,18 @@ public class DroolsSpringBootConsoleApplication extends SpringBootServletInitial
        }
          **/
     }
+
+    @Bean
+    public Docket api() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("org.chtijbug.drools.console.restExpose"))
+                //.paths(PathSelectors.regex("/api/wb./wb.*"))
+                .paths(PathSelectors.regex("/api/wb.*"))
+                .build()
+                .pathMapping("/swagger");
+    }
+
 
 
 }

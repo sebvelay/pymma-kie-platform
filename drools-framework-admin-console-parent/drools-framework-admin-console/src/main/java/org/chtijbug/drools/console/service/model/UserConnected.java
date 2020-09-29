@@ -1,6 +1,6 @@
 package org.chtijbug.drools.console.service.model;
 
-import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
+import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ public class UserConnected {
 
     private String userPassword;
 
-    private List<PlatformProjectResponse> projectResponses = new ArrayList<>();
+    private List<PlatformProjectData> projectResponses = new ArrayList<>();
 
     private List<String> roles = new ArrayList<>();
 
@@ -50,11 +50,11 @@ public class UserConnected {
         this.kieWorkbenchName = kieWorkbenchName;
     }
 
-    public List<PlatformProjectResponse> getProjectResponses() {
+    public List<PlatformProjectData> getProjectResponses() {
         return projectResponses;
     }
 
-    public void setProjectResponses(List<PlatformProjectResponse> projectResponses) {
+    public void setProjectResponses(List<PlatformProjectData> projectResponses) {
         this.projectResponses = projectResponses;
     }
 

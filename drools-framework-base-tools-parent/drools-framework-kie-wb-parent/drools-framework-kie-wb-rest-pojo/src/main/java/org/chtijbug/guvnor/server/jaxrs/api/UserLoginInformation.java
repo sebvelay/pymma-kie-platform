@@ -17,7 +17,7 @@
 package org.chtijbug.guvnor.server.jaxrs.api;
 
 
-import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
+import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectData;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -30,17 +30,17 @@ import java.util.List;
 public class UserLoginInformation {
 
 
-    private List<PlatformProjectResponse> projects = new ArrayList<>();
+    private List<PlatformProjectData> projects = new ArrayList<>();
 
     private String username;
 
     private List<String> roles = new ArrayList<>();
 
-    public List<PlatformProjectResponse> getProjects() {
+    public List<PlatformProjectData> getProjects() {
         return projects;
     }
 
-    public void setProjects(List<PlatformProjectResponse> projects) {
+    public void setProjects(List<PlatformProjectData> projects) {
         this.projects = projects;
     }
 

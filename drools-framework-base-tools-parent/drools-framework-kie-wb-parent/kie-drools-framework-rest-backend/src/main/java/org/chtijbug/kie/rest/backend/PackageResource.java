@@ -4,8 +4,11 @@ package org.chtijbug.kie.rest.backend;
 import org.chtijbug.guvnor.server.jaxrs.api.UserLoginInformation;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Package;
-import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
+import org.chtijbug.guvnor.server.jaxrs.model.DependencyData;
+import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectData;
 import org.chtijbug.kie.rest.backend.service.AssetService;
+import org.guvnor.common.services.project.model.GAV;
+import org.guvnor.common.services.project.model.POM;
 import org.guvnor.common.services.project.model.WorkspaceProject;
 import org.guvnor.common.services.project.service.WorkspaceProjectService;
 import org.guvnor.structure.organizationalunit.OrganizationalUnit;
@@ -88,7 +91,7 @@ public class PackageResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/detailedSpaces")
     // @RolesAllowed({REST_ROLE, REST_PROJECT_ROLE})
-    public Collection<PlatformProjectResponse> getProjects() {
+    public Collection<PlatformProjectData> getProjects() {
         logger.debug("-----getSpaces--- ");
         return assetService.getAllProjects();
     }
@@ -348,4 +351,88 @@ public class PackageResource {
         }
     }
 
+    @PUT
+    @Path("{organizationalUnitName}/{projectName}/dependency")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_PLAIN})
+    public Response updateProjectDependencies(@Context HttpHeaders headers,
+                                              @PathParam("organizationalUnitName") String organizationalUnitName,
+                                              @PathParam("projectName") String projectName, PlatformProjectData request) {
+
+        try {
+
+            WorkspaceProject project = assetService.getProject(organizationalUnitName, projectName);
+            List<DependencyData> toAdd = new ArrayList<>();
+            if (project != null) {
+                POM pom = project.getMainModule().getPom();
+                for (DependencyData dependencyData : request.getDependencies()) {
+                    for (GAV element : pom.getDependencies().getGavs()) {
+                        if (element.getGroupId().equals(dependencyData.getGroupId())
+                                && element.getArtifactId().equals(dependencyData.getArtifactId())
+                                && element.getVersion().equals(dependencyData.getVersion())) {
+                            toAdd.add(dependencyData);
+                            break;
+                        }
+                    }
+                }
+                StringBuilder stringBuilder = new StringBuilder();
+
+                stringBuilder.append("\n");
+                for (DependencyData dependencyData : toAdd) {
+
+                    stringBuilder.append("<dependency>").append("\n");
+                    stringBuilder.append("\t").append("<groupId>").append(dependencyData.getGroupId()).append("</groupId>").append("\n");
+                    stringBuilder.append("\t").append("<artifactId>").append(dependencyData.getArtifactId()).append("</artifactId>").append("\n");
+                    stringBuilder.append("\t").append("<version>").append(dependencyData.getVersion()).append("</version>").append("\n");
+                    stringBuilder.append("</dependency>").append("\n").append("\n");
+                }
+                stringBuilder.append("\n");
+                org.uberfire.backend.vfs.Path pomPath = project.getMainModule().getPomXMLPath();
+                org.uberfire.java.nio.file.Path nioPath = Paths.get(pomPath.toURI());
+                String pomContent = ioService.readAllString(nioPath);
+                int dependInt = pomContent.indexOf("/dependencies");
+                String newPomContent = pomContent.substring(0, dependInt - 1) + stringBuilder.toString() + pomContent.substring(dependInt-1, pomContent.length());
+                CommentedOption commentedOption = new CommentedOption("Added from rest");
+                ioService.write(nioPath, newPomContent.getBytes(), commentedOption);
+                if (request.getkModule()!= null ) {
+                    String kbase="kbase";
+                    if (request.getkModule().getKbase()!=null
+                        && !request.getkModule().getKbase().isEmpty()){
+                        kbase=request.getkModule().getKbase();
+                    }
+                    String basePackage = pom.getGav().getGroupId() + "."+projectName.replace("-", "_");
+
+                    org.uberfire.backend.vfs.Path rootPath = project.getRootPath();
+                    org.uberfire.java.nio.file.Path nioRootPath = Paths.get(rootPath.toURI());
+                    DirectoryStream<org.uberfire.java.nio.file.Path> directoryRootStream = ioService.newDirectoryStream(nioRootPath);
+                    org.uberfire.java.nio.file.Path kmodulePath = assetService.findFileByName(directoryRootStream, "kmodule.xml");
+                    String kmoduleContent = ioService.readAllString(kmodulePath);
+                    /**
+                     * <?xml version="1.0" encoding="UTF-8"?>
+                     * <kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule">
+                     *     <kbase name="kbase-extension"  packages="com.adeo.lys.rules" includes="kbase-base">
+                     *          <ksession name="session-extension" type="stateful" default="false" clockType="realtime"/>
+                     *     </kbase>
+                     * </kmodule>
+                     */
+                    StringBuilder kModuleBuilder = new StringBuilder();
+                    kModuleBuilder.append("<kmodule xmlns=\"http://jboss.org/kie/6.0.0/kmodule\">").append("\n");
+                    kModuleBuilder.append("\t").append("<kbase name=\"").append(kbase).append("\"   default=\"true\" eventProcessingMode=\"stream\" equalsBehavior=\"identity\" packages=\"").append(basePackage).append("\" includes=\"").append(request.getkModule().getKbaseToInclude()).append("\">").append("\n");
+                    kModuleBuilder.append("\t").append("\t").append("  <ksession name=\"session-extension\" type=\"stateful\" default=\"false\" clockType=\"realtime\"/>").append("\n");
+                    kModuleBuilder.append("\t").append("</kbase>").append("\n");
+                    kModuleBuilder.append("</kmodule>").append("\n");
+                    kmoduleContent=kModuleBuilder.toString();
+                    CommentedOption commentedOption2= new CommentedOption("Added from rest");
+                    ioService.write(kmodulePath, kmoduleContent.getBytes(), commentedOption2);
+                    logger.info("Kmodule updated");
+                }
+                return Response.status(Response.Status.CREATED).entity(request).build();
+            } else {
+                logger.info("Project {} or Organization {} not found ", projectName, organizationalUnitName);
+                return Response.status(Response.Status.NOT_FOUND).entity(request).build();
+            }
+        } catch (RuntimeException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
+        }
+
+    }
 }

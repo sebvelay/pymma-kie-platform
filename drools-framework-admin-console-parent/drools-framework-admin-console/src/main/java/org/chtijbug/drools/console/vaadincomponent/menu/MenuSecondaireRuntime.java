@@ -29,7 +29,7 @@ public class MenuSecondaireRuntime extends HorizontalLayout {
             }
             RuntimesView deploymentView=new RuntimesView();
             RuntimesAction deploymentAction=new RuntimesAction(squeletteComposant);
-            squeletteComposant.navigate(deploymentView,DeploymentView.pageName,deploymentAction);
+            squeletteComposant.navigate(deploymentView,DeploymentView.PAGE_NAME,deploymentAction);
         });
     }
 

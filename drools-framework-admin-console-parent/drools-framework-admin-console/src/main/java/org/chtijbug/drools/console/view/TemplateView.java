@@ -17,7 +17,7 @@ import org.chtijbug.drools.console.service.util.AppContext;
 import org.chtijbug.drools.console.vaadincomponent.componentperso.DialogPerso;
 import org.chtijbug.drools.console.vaadincomponent.leftMenu.Action.TemplatesAction;
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
-import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
+import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,8 +81,8 @@ public class TemplateView extends VerticalLayout {
         });
     }
 
-    public void setDataProvider(ComboBox<PlatformProjectResponse> spaceSelection){
-        PlatformProjectResponse response = spaceSelection.getValue();
+    public void setDataProvider(ComboBox<PlatformProjectData> spaceSelection){
+        PlatformProjectData response = spaceSelection.getValue();
         List<Asset> tmp = kieRepositoryService.getListAssets(config.getKiewbUrl(), userConnected.getUserName(), userConnected.getUserPassword(), response.getSpaceName(), response.getName());
         List<Asset> result = new ArrayList<>();
         for (Asset asset : tmp) {
@@ -97,17 +97,17 @@ public class TemplateView extends VerticalLayout {
         reinitFilter();
     }
 
-    public void refreshList(ComboBox<PlatformProjectResponse> spaceSelection) {
+    public void refreshList(ComboBox<PlatformProjectData> spaceSelection) {
         spaceSelection.setItems(userConnected.getProjectResponses());
     }
-    public void edit(ComboBox<PlatformProjectResponse> spaceSelection){
+    public void edit(ComboBox<PlatformProjectData> spaceSelection){
         Set<Asset> selectedElements = assetListGrid.getSelectedItems();
         if (selectedElements.toArray().length > 0) {
             Optional<Asset> assetOptional = selectedElements.stream().findFirst();
             if (assetOptional.isPresent()) {
                 String assetName = assetOptional.get().getTitle();
                 if (assetName != null) {
-                    PlatformProjectResponse response = spaceSelection.getValue();
+                    PlatformProjectData response = spaceSelection.getValue();
                     userConnectedService.addAssetToSession(assetName);
                     userConnectedService.addProjectToSession(response.getName());
                     userConnectedService.addSpaceToSession(response.getSpaceName());

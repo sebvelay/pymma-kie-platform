@@ -5,7 +5,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import org.chtijbug.drools.console.vaadincomponent.componentperso.ComboBoxPerso;
 import org.chtijbug.drools.console.view.TemplateView;
-import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
+import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectData;
 
 public class TemplatesAction extends VerticalLayout {
 
@@ -15,7 +15,7 @@ public class TemplatesAction extends VerticalLayout {
 
     private Button edit;
 
-    private ComboBoxPerso<PlatformProjectResponse> spaceSelection;
+    private ComboBoxPerso<PlatformProjectData> spaceSelection;
 
     public TemplatesAction(TemplateView templateView){
 
@@ -24,7 +24,7 @@ public class TemplatesAction extends VerticalLayout {
 
         spaceSelection = new ComboBoxPerso<>("Project",VaadinIcon.SEARCH.create());
         spaceSelection.getComboBox().setItems(templateView.getUserConnectedService().getUserConnected().getProjectResponses());
-        spaceSelection.getComboBox().setItemLabelGenerator(PlatformProjectResponse::getName);
+        spaceSelection.getComboBox().setItemLabelGenerator(PlatformProjectData::getName);
         spaceSelection.getComboBox().addValueChangeListener(valueChangeEvent -> {
             templateView.setDataProvider(spaceSelection.getComboBox());
         });
