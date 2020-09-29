@@ -1,4 +1,4 @@
-package org.chtijbug.drools.console.restExpose;
+package org.chtijbug.drools.console.restexpose;
 
 import org.chtijbug.drools.console.service.IndexerService;
 import org.chtijbug.drools.proxy.persistence.model.BusinessTransactionAction;
@@ -6,10 +6,7 @@ import org.chtijbug.drools.proxy.persistence.model.BusinessTransactionPersistenc
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,7 +19,7 @@ public class ElasticSearchExpose {
     @Autowired
     private IndexerService indexerService;
 
-    @RequestMapping(value = "/findLastByTransactionId", method = RequestMethod.GET)
+    @GetMapping(value = "/findLastByTransactionId")
     public BusinessTransactionPersistence findTransactionById(@RequestParam String transactionId, HttpServletRequest request, HttpServletResponse response) {
 
         BusinessTransactionPersistence tmp=null;
@@ -43,12 +40,9 @@ public class ElasticSearchExpose {
         }
         return tmp;
     }
-    @RequestMapping(value = "/findActionByBusinessId", method = RequestMethod.GET)
+    @GetMapping(value = "/findActionByBusinessId")
     public List<BusinessTransactionAction> findActionById(@RequestParam String businessId, HttpServletRequest request, HttpServletResponse response) {
-
-        List<BusinessTransactionAction> businessTransactionPersistences = indexerService.getBusinessTransactionActionRepository().findAllByBusinessTransactionId(businessId,Sort.by(new Sort.Order(Sort.Direction.ASC,"eventNumber")),PageRequest.of(0,5000));
-
-        return businessTransactionPersistences;
+        return indexerService.getBusinessTransactionActionRepository().findAllByBusinessTransactionId(businessId,Sort.by(new Sort.Order(Sort.Direction.ASC,"eventNumber")),PageRequest.of(0,5000));
     }
 
 }

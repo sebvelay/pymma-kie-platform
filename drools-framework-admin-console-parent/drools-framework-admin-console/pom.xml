@@ -70,6 +70,10 @@
             <artifactId>spring-kafka</artifactId>
             <version>${kafka.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
         <dependency>
             <groupId>org.apache.poi</groupId>
@@ -80,6 +84,10 @@
             <groupId>org.kie.server</groupId>
             <artifactId>kie-server-api</artifactId>
             <version>${jbpm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.uberfire</groupId>
+            <artifactId>uberfire-rest-client</artifactId>
         </dependency>
         <dependency>
             <groupId>com.pymmasoftware.jbpm</groupId>
@@ -231,7 +239,11 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
-
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>3.0.0</version>
+        </dependency>
 
     </dependencies>
 

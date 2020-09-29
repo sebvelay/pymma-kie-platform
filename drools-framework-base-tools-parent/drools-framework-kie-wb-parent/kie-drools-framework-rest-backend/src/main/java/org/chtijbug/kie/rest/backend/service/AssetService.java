@@ -1,7 +1,7 @@
 package org.chtijbug.kie.rest.backend.service;
 
 import org.chtijbug.guvnor.server.jaxrs.jaxb.Asset;
-import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectResponse;
+import org.chtijbug.guvnor.server.jaxrs.model.PlatformProjectData;
 import org.chtijbug.kie.rest.backend.RestTypeDefinition;
 import org.guvnor.common.services.project.model.Module;
 import org.guvnor.common.services.project.model.WorkspaceProject;
@@ -62,8 +62,8 @@ public class AssetService {
     @Inject
     private WorkspaceProjectService workspaceProjectService;
 
-    public List<PlatformProjectResponse> getAllProjects() {
-        final List<PlatformProjectResponse> spaces = new ArrayList<>();
+    public List<PlatformProjectData> getAllProjects() {
+        final List<PlatformProjectData> spaces = new ArrayList<>();
         for (OrganizationalUnit ou : organizationalUnitService.getOrganizationalUnits()) {
             spaces.addAll(getSpace(ou));
         }
@@ -71,9 +71,9 @@ public class AssetService {
         return spaces;
     }
 
-    private List<PlatformProjectResponse> getSpace(OrganizationalUnit ou) {
+    private List<PlatformProjectData> getSpace(OrganizationalUnit ou) {
 
-        final List<PlatformProjectResponse> repoNames = new ArrayList<>();
+        final List<PlatformProjectData> repoNames = new ArrayList<>();
         try {
             for (WorkspaceProject workspaceProject : workspaceProjectService.getAllWorkspaceProjects(ou)) {
                 for (Branch branch : workspaceProject.getRepository().getBranches()) {
@@ -89,11 +89,14 @@ public class AssetService {
 
 
 
-    private PlatformProjectResponse getProjectResponse(WorkspaceProject workspaceProject, Branch branch) {
-        final PlatformProjectResponse projectResponse = new PlatformProjectResponse();
+    private PlatformProjectData getProjectResponse(WorkspaceProject workspaceProject, Branch branch) {
+        final PlatformProjectData projectResponse = new PlatformProjectData();
         projectResponse.setName(workspaceProject.getName());
         projectResponse.setSpaceName(workspaceProject.getOrganizationalUnit().getName());
-
+        String wbName=System.getProperty("org.chtijbug.wbname");
+        if (wbName==null || wbName.length()==0)
+            wbName="demo";
+        projectResponse.setWbName(wbName);
         if (workspaceProject.getMainModule() != null) {
             Module kmodule = workspaceProject.getMainModule();
             org.uberfire.backend.vfs.Path importVFPath = PathFactory.newPath("project.imports", branch.getPath().toURI() + "project.imports");
@@ -214,6 +217,22 @@ public class AssetService {
             } else {
                 if (dotFileFilter.accept(elementPath.getFileName().toString())
                         && elementPath.getFileName().toString().contains(assetName)) {
+                    return elementPath;
+                }
+            }
+        }
+        return null;
+    }
+    public org.uberfire.java.nio.file.Path findFileByName(DirectoryStream<org.uberfire.java.nio.file.Path> directoryStream, String assetName) {
+        for (org.uberfire.java.nio.file.Path elementPath : directoryStream) {
+            if (org.uberfire.java.nio.file.Files.isDirectory(elementPath)) {
+                DirectoryStream<org.uberfire.java.nio.file.Path> adirectoryStream = ioService.newDirectoryStream(elementPath);
+                org.uberfire.java.nio.file.Path foundElementPath = findFileByName(adirectoryStream, assetName);
+                if (foundElementPath != null) {
+                    return foundElementPath;
+                }
+            } else {
+                if (elementPath.getFileName().toString().contains(assetName)) {
                     return elementPath;
                 }
             }
