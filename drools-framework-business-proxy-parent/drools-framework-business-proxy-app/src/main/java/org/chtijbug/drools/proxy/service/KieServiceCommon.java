@@ -430,15 +430,17 @@ public class KieServiceCommon {
     }
     @Scheduled(fixedDelay = 5000)
     public void updateConfig(){
-
+        logger.info("updateConfig - check for new version to deploy");
 
         try {
 
             String serverName = KieServiceCommon.getKieServerID();
             List<ContainerRuntimePojoPersist> containerRuntimePojoPersists = containerRuntimeRepository.findByServerNameAndHostname(serverName, hostName);
             for (ContainerRuntimePojoPersist element : containerRuntimePojoPersists) {
+                logger.info("runtime {} has status {}",element.getContainerId(),element.getStatus());
                 ContainerPojoPersist containerPojoPersist = containerRepository.findByServerNameAndContainerId(serverName, element.getContainerId());
                 if (element.getStatus().equals(ContainerRuntimePojoPersist.STATUS.TODEPLOY.name())) {
+                    logger.info("start deploy new container");
                     this.disposeContainer(element.getContainerId());
                     KieContainerResource newContainer = new KieContainerResource();
                     newContainer.setContainerId(element.getContainerId());
@@ -447,7 +449,9 @@ public class KieServiceCommon {
                     newContainer.getReleaseId().setGroupId(containerPojoPersist.getGroupId());
                     newContainer.getReleaseId().setVersion(containerPojoPersist.getVersion());
                     this.createContainer(element.getContainerId(), newContainer);
+                    logger.info("container created {}",element.getContainerId());
                     this.initCamelBusinessRoute(containerPojoPersist);
+                    logger.info("route created");
                     element.setStatus(ContainerRuntimePojoPersist.STATUS.UP.toString());
                     containerRuntimeRepository.save(element);
 
